@@ -24,11 +24,9 @@ import language.dictionary.Japanese;
 
 import java.util.ArrayList;
 
-/**
- * Created by wareya on 2017/03/23.
- */
 public class WordScannerNew extends WordScanner implements SubScanner
 {
+    protected static ArrayList<ValidWord> matches;
     public void subinit()
     {
         if(ruleList != null)return;
@@ -263,10 +261,19 @@ public class WordScannerNew extends WordScanner implements SubScanner
         //ruleList.add(new StdRule("", "ある", "(mizenkei)", DefTag.v5r_i, DefTag.stem_mizenkei)); // not used
         ruleList.add(new StdRule("あれ", "ある", "(izenkei)", DefTag.v5r_i, DefTag.stem_e));
         // ruleList.add(new StdRule("あれ", "ある", "imperative", DefTag.v5r_i, DefTag.uninflectable)); // rare and conflicts with あれ "that"
+
+        /*
+        definitionValidityTest = (def, needed) -> {
+            if(needed.toString().equals("")) return false;
+            if(!def.getTags().contains(needed)) return false;
+            return true;
+        };
+        */
     }
     // nasty subroutine: make functional? how much overhead does passing data structures have in java?
     public void ScanWord(String word)
     {
+        matches = new ArrayList<>();
         matches.add(new ValidWord(word, ""));//add initial unmodified word
         // convert to kana and add that too if it's not already in hiragana
         String hiragana = Japanese.toHiragana(word, false);
@@ -301,5 +308,36 @@ public class WordScannerNew extends WordScanner implements SubScanner
             else
                 break;
         }
+    }
+
+    protected int test_rules(int start)
+    {
+        int new_matches = 0;
+
+        //attempt all deconjugation rules in order
+        int size = matches.size();//don't scan matches added during iteration
+        if(start == size) return 0;
+
+        // Iterating on rules outside of iterating on matches allows each match to be deconjugated more than once per iteration in some cases
+        // which makes WordScanner require fewer iterations before exhausting all possible deconjugations
+        for(DeconRule rule:ruleList)
+        {
+            for(int i = start; i < size; i++)
+            {
+                //check if any of our possible matches can be deconjugated by this rule
+                ValidWord gotten = (ValidWord)rule.process(matches.get(i));
+                if(gotten != null)
+                {
+                    matches.add(gotten);
+                    new_matches++;
+                }
+            }
+        }
+        return new_matches;
+    }
+
+    public ArrayList<? extends AbstractWord> getInnerMatches()
+    {
+        return matches;
     }
 }

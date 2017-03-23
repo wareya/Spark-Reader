@@ -22,56 +22,37 @@ import language.dictionary.Definition;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 /**
  * Holds a possible valid conjugation if a word exists with the valid tags
  * @author Laurens Weyn
  */
-public class ValidWord
+public class ValidWord extends AbstractWord
 {
-    private String word, originalWord;
-    private Set<DefTag> neededTags;
-    private HashSet<String> seenForms;
-    private ArrayList<DefTag> conjugationTags;
-    private String process;
-    private Integer conjugations;
+    protected HashSet<String> seenForms;
+    protected ArrayList<DefTag> conjugationTags;
+    protected Integer conjugations;
 
     public ValidWord(Integer conjugations, String originalWord, String word, HashSet<String> seenForms, Set<DefTag> neededTags, ArrayList<DefTag> conjugationTags, String process)
     {
+        super(originalWord, word, neededTags, process);
         this.conjugations = conjugations;
-        this.originalWord = originalWord;
         this.seenForms = seenForms;
         this.conjugationTags = conjugationTags;
-        this.word = word;
-        this.neededTags = neededTags;
-        this.process = process.trim();
     }
     public ValidWord(String word, String process)
     {
+        super(word, process);
         this.conjugations = 0;
-        this.originalWord = word;
-        this.word = word;
         this.neededTags = new HashSet<>();
         this.seenForms = new HashSet<>();
         this.conjugationTags = new ArrayList<>();
-        this.process = process;
     }
     public Integer getNumConjugations()
     {
         return conjugations;
-    }
-    public String getOriginalWord()
-    {
-        return originalWord;
-    }
-    public String getWord()
-    {
-        return word;
-    }
-
-    public Set<DefTag> getNeededTags()
-    {
-        return neededTags;
     }
     public HashSet<String> getSeenForms()
     {
@@ -81,7 +62,6 @@ public class ValidWord
     {
         return conjugationTags;
     }
-
     boolean hasSeenForm(String test)
     {
         return seenForms.contains(test);
@@ -95,16 +75,15 @@ public class ValidWord
     public boolean defMatches(Definition def)
     {
 
-        if(def.getTags() == null && getNeededTags().isEmpty())return true;//still accept if no tags needed
-        else if (def.getTags() == null)return false;//does not have needed tags
+        if(def.getTags() == null && getNeededTags().isEmpty()) return true;//still accept if no tags needed
+        else if (def.getTags() == null) return false;//does not have needed tags
 
         for(DefTag needed:getNeededTags())
         {
-            if(needed.toString().equals("")) return false;
-            if(!def.getTags().contains(needed))
-            {
+            if(needed.toString().equals(""))
                 return false;
-            }
+            if(!def.getTags().contains(needed))
+                return false;
         }
         return true;
     }

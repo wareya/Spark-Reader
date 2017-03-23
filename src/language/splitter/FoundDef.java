@@ -16,6 +16,7 @@
  */
 package language.splitter;
 
+import language.deconjugator.AbstractWord;
 import language.deconjugator.ValidWord;
 import language.dictionary.*;
 import main.Main;
@@ -32,7 +33,7 @@ import static main.Main.options;
  */
 public class FoundDef implements Comparable<FoundDef>
 {
-    private final ValidWord foundForm;
+    private final AbstractWord foundForm;
     private final Definition foundDef;
     
 
@@ -40,7 +41,7 @@ public class FoundDef implements Comparable<FoundDef>
 
     TextBlockRenderer defText;
 
-    public FoundDef(ValidWord foundForm, Definition foundDef)
+    public FoundDef(AbstractWord foundForm, Definition foundDef)
     {
         this.foundForm = foundForm;
         this.foundDef = foundDef;
@@ -192,7 +193,7 @@ public class FoundDef implements Comparable<FoundDef>
     }
 
 
-    public ValidWord getFoundForm()
+    public AbstractWord getFoundForm()
     {
         return foundForm;
     }

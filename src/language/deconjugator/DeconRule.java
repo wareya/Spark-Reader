@@ -31,5 +31,5 @@ public interface DeconRule
      * @param word the word to attempt to deconjugate
      * @return the deconjugated word, or null if it doesn't apply
      */
-    public abstract ValidWord process(ValidWord word);
+    public abstract AbstractWord process(AbstractWord word);
 }

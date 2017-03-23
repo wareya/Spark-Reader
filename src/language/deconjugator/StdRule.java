@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.ArrayList;
 
 /**
- * Original (legacy) deconjugation rule.
+ * Standard (new) deconjugation rule.
  * Created by Laurens on 2/18/2017.
  */
 public class StdRule implements DeconRule
@@ -41,8 +41,10 @@ public class StdRule implements DeconRule
 
     @Override
     // Verifies and adds this rule as an inner-more conjugation in a deconjugated word
-    public ValidWord process(ValidWord word)
+    public AbstractWord process(AbstractWord abstractword)
     {
+        ValidWord word = (ValidWord)abstractword;
+
         if(word.getWord().equals("")) return null; // can't deconjugate emptiness
         if(!word.getWord().endsWith(ending)) return null; // can't possibly be valid
 

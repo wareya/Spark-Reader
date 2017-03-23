@@ -16,9 +16,6 @@
  */
 package language.deconjugator;
 
-import language.dictionary.DefTag;
-import language.dictionary.Japanese;
-
 import java.util.ArrayList;
 import java.util.TreeSet;
 
@@ -34,12 +31,11 @@ interface SubScanner
 {
     void subinit();
     void ScanWord(String word);
+    ArrayList<? extends AbstractWord> getInnerMatches();
 }
-
 
 public class WordScanner
 {
-    protected static ArrayList<ValidWord> matches;
     protected String word;
 
     protected static ArrayList<DeconRule> ruleList;
@@ -91,42 +87,14 @@ public class WordScanner
     public WordScanner(String word)
     {
         init();
-
-        matches = new ArrayList<>();
         this.word = word;
 
         subscanner.ScanWord(word);
     }
-    
-    protected int test_rules(int start)
+
+    public ArrayList<? extends AbstractWord> getMatches()
     {
-        int new_matches = 0;
-
-        //attempt all deconjugation rules in order
-        int size = matches.size();//don't scan matches added during iteration
-        if(start == size) return 0;
-
-        // Iterating on rules outside of iterating on matches allows each match to be deconjugated more than once per iteration in some cases
-        // which makes WordScanner require fewer iterations before exhausting all possible deconjugations
-        for(DeconRule rule:ruleList)
-        {
-            for(int i = start; i < size; i++)
-            {
-                //check if any of our possible matches can be deconjugated by this rule
-                ValidWord gotten = rule.process(matches.get(i));
-                if(gotten != null)
-                {
-                    matches.add(gotten);
-                    new_matches++;
-                }
-            }
-        }
-        return new_matches;
-    }
-
-    public ArrayList<ValidWord> getMatches()
-    {
-        return matches;
+        return subscanner.getInnerMatches();
     }
 
     public String getWord()
@@ -137,7 +105,7 @@ public class WordScanner
     public static void main(String[] args)
     {
         System.out.println();
-        for(ValidWord vw: new WordScanner("分からない").getMatches())
+        for(AbstractWord vw: new WordScanner("分からない").getMatches())
         {
             System.out.println(vw.toString() + " " + vw.getNeededTags());
         }

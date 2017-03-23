@@ -18,8 +18,10 @@ public class ContextRule extends StdRule
     }
 
     // Verifies and adds this rule as an inner-more conjugation in a deconjugated word
-    public ValidWord process(ValidWord word)
+    public AbstractWord process(AbstractWord abstractword)
     {
+        ValidWord word = (ValidWord)abstractword;
+
         if(!checker.l(this, word)) return null;
 
         return super.process(word);

@@ -16,6 +16,7 @@
  */
 package language.splitter;
 
+import language.deconjugator.AbstractWord;
 import language.deconjugator.ValidWord;
 import language.deconjugator.WordScanner;
 import language.dictionary.*;
@@ -135,7 +136,7 @@ public class WordSplitter
 
     private void attachDefinitions(FoundWord word, WordScanner conjugations)
     {
-        for(ValidWord match:conjugations.getMatches())//for each possible conjugation...
+        for(AbstractWord match:conjugations.getMatches())//for each possible conjugation...
         {
             List<Definition> defs = dict.find(match.getWord());
             if(defs != null)for(Definition def:defs)//for each possible definition...
