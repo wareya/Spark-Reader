@@ -14,6 +14,15 @@ abstract public class Segmenter
         }
         return r;
     }
+    static public ArrayList<String> subList(ArrayList<String> array, Integer start, Integer end)
+    {
+        ArrayList<String> r = new ArrayList<>();
+        for(; start < end; start++)
+        {
+            r.add(array.get(start));
+        }
+        return r;
+    }
 
     abstract public ArrayList<String> Segment(String input);
 }

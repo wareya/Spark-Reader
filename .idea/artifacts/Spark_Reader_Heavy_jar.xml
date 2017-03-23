@@ -1,11 +1,11 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="Spark Reader Basic:jar">
+  <artifact type="jar" build-on-make="true" name="Spark Reader Heavy:jar">
     <output-path>$PROJECT_DIR$/</output-path>
-    <root id="archive" name="Spark Reader Basic.jar">
-      <element id="module-output" name="Spark Reader Basic" />
+    <root id="archive" name="Spark Reader Heavy.jar">
+      <element id="module-output" name="Spark Reader Heavy" />
       <element id="module-output" name="Spark Reader Core" />
-      <element id="extracted-dir" path="$USER_HOME$/java libs/JNA/jna-4.2.2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$USER_HOME$/java libs/JNA/jna-platform-4.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kuromoji-ipadic-0.9.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kuromoji-core-0.9.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/java libs/eb4j-1.0.5/lib/log4j-1.2.14.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/java libs/eb4j-1.0.5/lib/xml2eb-1.0.5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/java libs/eb4j-1.0.5/lib/commons-io-1.4.jar" path-in-jar="/" />
@@ -18,6 +18,8 @@
       <element id="extracted-dir" path="$USER_HOME$/java libs/eb4j-1.0.5/lib/conv-zipcode-1.0.5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/java libs/eb4j-1.0.5/lib/slf4j-log4j12-1.5.10.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/java libs/eb4j-1.0.5/lib/commons-collections-3.2.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/java libs/JNA/jna-4.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/java libs/JNA/jna-platform-4.2.2.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

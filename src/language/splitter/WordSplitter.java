@@ -23,6 +23,7 @@ import language.dictionary.*;
 import language.dictionary.Dictionary;
 import java.util.*;
 
+import static language.Segmenter.instance;
 import static main.Main.options;
 
 /**
@@ -48,7 +49,7 @@ public class WordSplitter
     }
     private List<FoundWord> splitSection(String text, boolean firstSection)
     {
-        ArrayList<String> segments = Segmenter.instance.Segment(text);
+        ArrayList<String> segments = instance.Segment(text);
         ArrayList<FoundWord> words = new ArrayList<>();
         int start = 0;
         //until we've covered all words
@@ -57,6 +58,8 @@ public class WordSplitter
             // select the initial "overly long and certainly bogus" segment for deconjugation
 
             int pos = segments.size();
+
+            System.out.println("before segment optimization: start: " + start + " pos: " + pos);
 
             if(!options.getOption("automaticallyParse").equals("none")) // (unless parsing is disabled)
             {
@@ -67,7 +70,6 @@ public class WordSplitter
                     if(dict.find(string_at) == null && !dict.hasEpwingDef(string_at))
                     {
                         // not in dictionary, see if adding possible deconjugation match endings to it gives us a dictionary entry (fixes 振り返ります etc)
-                        //string_at = string_at.substring(0, string_at.length()-1);
                         boolean good_match = false;
                         for(String ending:WordScanner.possibleEndings())
                         {
@@ -83,6 +85,7 @@ public class WordSplitter
                     }
                     break;
                 }
+                if(pos == start) pos = start+1;
                 // extend it until it's about to pick up characters that aren't acceptable in conjugations
                 while(pos < segments.size())
                 {
@@ -102,11 +105,16 @@ public class WordSplitter
                         break;
                 }
             }
+
+            System.out.println("after segment optimization: start: " + start + " pos: " + pos);
+
             FoundWord matchedWord = null;
             //until we've tried all lengths and failed
             while(pos > start)
             {
-                WordScanner word = new WordScanner(Segmenter.Unsegment(segments, start, pos));//deconjugate
+                String str = Segmenter.Unsegment(segments, start, pos);
+                System.out.println("start: " + start + " pos: " + pos + " str: " + str);
+                WordScanner word = new WordScanner(str);//deconjugate
                 matchedWord = new FoundWord(word.getWord());//prototype definition
                 attachDefinitions(matchedWord, word);//add cached definitions
                 //override: match more words than usual
@@ -160,7 +168,6 @@ public class WordSplitter
         word.sortDefs();//sort these new definitions
     }
 
-
     public List<FoundWord> split(String text, Set<Integer> breaks)
     {
         ArrayList<FoundWord> words = new ArrayList<>();
@@ -168,7 +175,7 @@ public class WordSplitter
         int pos = 0;
         int start = 0;
         breaks.add(0);
-        
+
         // todo: make segmenting on writing system changes optional? (when normal segmentation disabled only; dropdown menu?)
         // fixme: not segmenting non-japanese text into single characters makes the renderer's assumtions on segment width break, horribly.
         boolean was_japanese;
@@ -182,7 +189,7 @@ public class WordSplitter
                 // cause was_japanese to be equal to is_japanese on the next iteration
                 if(breaks.contains(pos) && pos+1 < text.length())
                     is_japanese = Japanese.isJapaneseWriting(text.charAt(pos+1));
-                
+
                 String section = text.substring(start, pos);
                 words.addAll(splitSection(section, breaks.contains(start)));
                 start = pos;

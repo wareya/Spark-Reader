@@ -3,6 +3,7 @@ package main;
 import hooker.ClipboardHook;
 import hooker.Hook;
 import hooker.Log;
+import language.Segmenter;
 import language.dictionary.Dictionary;
 import language.dictionary.EPWINGDefinition;
 import language.splitter.WordSplitter;
@@ -55,6 +56,11 @@ public class Main
 
     public static void main(String[] args)throws Exception
     {
+        if(Segmenter.instance == null)
+        {
+            System.out.println("Segmenter was not initialized. Rebuild Spark Reader with a segmenter as the artefact.");
+            return;
+        }
         System.out.println(VERSION);
         initLoadingScreen();
         try
