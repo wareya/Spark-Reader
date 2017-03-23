@@ -16,15 +16,14 @@
  */
 package language.splitter;
 
+import language.Segmenter;
 import language.deconjugator.ValidWord;
 import language.deconjugator.WordScanner;
 import language.dictionary.*;
 import language.dictionary.Dictionary;
 import java.util.*;
 
-import static language.dictionary.Japanese.isKana;
 import static main.Main.options;
-
 
 /**
  * Takes in text and splits it into individual words
@@ -49,25 +48,26 @@ public class WordSplitter
     }
     private List<FoundWord> splitSection(String text, boolean firstSection)
     {
+        ArrayList<String> segments = Segmenter.instance.Segment(text);
         ArrayList<FoundWord> words = new ArrayList<>();
         int start = 0;
         //until we've covered all words
-        while(start < text.length())
+        while(start < segments.size())
         {
-            int pos = text.length();
-
             // select the initial "overly long and certainly bogus" segment for deconjugation
+
+            int pos = segments.size();
 
             if(!options.getOption("automaticallyParse").equals("none")) // (unless parsing is disabled)
             {
                 // look for the longest segment covered as-is in the dictionary
                 while(pos > start)
                 {
-                    String string_at = text.substring(start, pos);
+                    String string_at = Segmenter.Unsegment(segments, start, pos);
                     if(dict.find(string_at) == null && !dict.hasEpwingDef(string_at))
                     {
                         // not in dictionary, see if adding possible deconjugation match endings to it gives us a dictionary entry (fixes 振り返ります etc)
-                        string_at = string_at.substring(0, string_at.length()-1);
+                        //string_at = string_at.substring(0, string_at.length()-1);
                         boolean good_match = false;
                         for(String ending:WordScanner.possibleEndings())
                         {
@@ -84,9 +84,19 @@ public class WordSplitter
                     break;
                 }
                 // extend it until it's about to pick up characters that aren't acceptable in conjugations
-                while(pos < text.length())
+                while(pos < segments.size())
                 {
-                    if(WordScanner.isAcceptableCharacter(text.charAt(pos))) // character past the end of substr start...pos
+                    String nextSegment = segments.get(pos);
+                    boolean good_segment = true;
+                    for(char c : nextSegment.toCharArray())
+                    {
+                        if(!WordScanner.isAcceptableCharacter(c))
+                        {
+                            good_segment = false;
+                            break;
+                        }
+                    }
+                    if(good_segment)
                         pos++;
                     else
                         break;
@@ -96,7 +106,7 @@ public class WordSplitter
             //until we've tried all lengths and failed
             while(pos > start)
             {
-                WordScanner word = new WordScanner(text.substring(start, pos));//deconjugate
+                WordScanner word = new WordScanner(Segmenter.Unsegment(segments, start, pos));//deconjugate
                 matchedWord = new FoundWord(word.getWord());//prototype definition
                 attachDefinitions(matchedWord, word);//add cached definitions
                 //override: match more words than usual
@@ -123,7 +133,7 @@ public class WordSplitter
             }
             if(matchedWord == null)//if we failed
             {
-                words.add(new FoundWord(text.charAt(start) + ""));//add the character as an 'unknown word'
+                words.add(new FoundWord(segments.get(start) + ""));//add the segment as an 'unknown word'
                 start++;
             }
             else words.add(matchedWord);
