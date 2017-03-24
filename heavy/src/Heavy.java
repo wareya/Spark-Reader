@@ -8,31 +8,42 @@ import java.util.List;
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
 
+import static main.Main.options;
+
 class HeavySegmenter extends Segmenter
 {
     Tokenizer kuro;
-    public ArrayList<String> Segment(String text)
+    public ArrayList<Piece> Segment(String text)
     {
         List<Token> tokens = kuro.tokenize(text);
-        ArrayList<String> r = new ArrayList<>();
+        ArrayList<Piece> r = new ArrayList<>();
 
         for(int i = 0; i < tokens.size(); i++)
         {
             Token t = tokens.get(i);
-            if(i+1 == tokens.size() || t.getSurface().length() > 1)
-                r.add(t.getSurface());
-            // Reduce segmentation errors caused by single-character verb stems (e.g. しかい|なかった vs しか|いなかった)
+            if(i+1 == tokens.size())
+            {
+                r.add(new Piece(t.getSurface(), false));
+            }
+            // Reduce segmentation errors caused by single-character verb stems (e.g. しかい|なかった vs しか|いなかった) and particles (e.g. 私はそう)
+            // Method 1: directly combining single-character verb stems with their auxiliaries, so they don't get bound to an earlier word (しかい, ことし)
+            // Method 2: make strong segmentations between token sequences that often cause problems (particles followed by non-particles)
             // Wouldn't be necessary if the segmenter exposed more information to the word splitter, but that's just the way that it goes.
             else
             {
                 Token n = tokens.get(i+1);
-                if(t.getPartOfSpeechLevel2().contains("自立") && n.getPartOfSpeechLevel1().contains("助"))
+
+                boolean strong = (t.getPartOfSpeechLevel1().contains("助詞") && ! n.getPartOfSpeechLevel1().contains("助詞") && options.getOptionBool("kuromojiExtendedUse"));
+
+                if(t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().contains("自立") && n.getPartOfSpeechLevel1().contains("助"))
                 {
-                    r.add(t.getSurface()+n.getSurface());
+                    r.add(new Piece(t.getSurface()+n.getSurface(), false));
                     i++;
                 }
                 else
-                    r.add(t.getSurface());
+                {
+                    r.add(new Piece(t.getSurface(), strong));
+                }
             }
         }
         System.out.println("Segmenter output: " + Unsegment(r,0,r.size()));
@@ -48,6 +59,7 @@ public class Heavy
 {
     public static void main(String[] args) throws Exception
     {
+        Segmenter.extended = true;
         Segmenter.instance = new HeavySegmenter();
         Main.main(args);
     }

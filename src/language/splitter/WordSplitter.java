@@ -17,6 +17,7 @@
 package language.splitter;
 
 import language.Segmenter;
+import language.Segmenter.*;
 import language.deconjugator.ValidWord;
 import language.deconjugator.WordScanner;
 import language.dictionary.*;
@@ -49,15 +50,27 @@ public class WordSplitter
     }
     private List<FoundWord> splitSection(String text, boolean firstSection)
     {
-        ArrayList<String> segments = instance.Segment(text);
+        ArrayList<Piece> segments = instance.Segment(text);
         ArrayList<FoundWord> words = new ArrayList<>();
         int start = 0;
         //until we've covered all words
         while(start < segments.size())
         {
             // select the initial "overly long and certainly bogus" segment for deconjugation
-
             int pos = segments.size();
+
+            // don't segment after strong segments
+            if(options.getOption("automaticallyParse").equals("full"))
+            {
+                for(int i = segments.size(); i > start; i--)
+                {
+                    if(segments.get(i-1).strong)
+                    {
+                        pos = i;
+                    }
+                }
+            }
+            int pos_max = pos;
 
             System.out.println("before segment optimization: start: " + start + " pos: " + pos);
 
@@ -87,9 +100,9 @@ public class WordSplitter
                 }
                 if(pos == start) pos = start+1;
                 // extend it until it's about to pick up characters that aren't acceptable in conjugations
-                while(pos < segments.size())
+                while(pos < pos_max)
                 {
-                    String nextSegment = segments.get(pos);
+                    String nextSegment = segments.get(pos).txt;
                     boolean good_segment = true;
                     for(char c : nextSegment.toCharArray())
                     {
@@ -141,7 +154,7 @@ public class WordSplitter
             }
             if(matchedWord == null)//if we failed
             {
-                words.add(new FoundWord(segments.get(start) + ""));//add the segment as an 'unknown word'
+                words.add(new FoundWord(segments.get(start).txt + ""));//add the segment as an 'unknown word'
                 start++;
             }
             else words.add(matchedWord);

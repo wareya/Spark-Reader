@@ -110,6 +110,7 @@ public class Options
         options.put("fullscreenScreenshot", "false");
         options.put("automaticallyParse", "true");
         options.put("useOldParser", "false");
+        options.put("kuromojiExtendedUse", "false");
 
     }
     public Options(File file)throws IOException

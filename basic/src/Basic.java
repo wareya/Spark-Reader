@@ -6,12 +6,12 @@ import java.util.ArrayList;
 
 class BasicSegmenter extends Segmenter
 {
-    public ArrayList<String> Segment(String text)
+    public ArrayList<Piece> Segment(String text)
     {
-        ArrayList<String> r = new ArrayList<>();
+        ArrayList<Piece> r = new ArrayList<>();
         for(char c : text.toCharArray())
         {
-            r.add(c+"");
+            r.add(new Piece(c+"", false));
         }
         return r;
     }
