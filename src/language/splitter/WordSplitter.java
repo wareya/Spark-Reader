@@ -64,7 +64,7 @@ public class WordSplitter
             {
                 for(int i = segments.size(); i > start; i--)
                 {
-                    if(segments.get(i-1).strong)
+                    if(segments.get(i-1).strong && i-1 == start)
                     {
                         pos = i;
                     }

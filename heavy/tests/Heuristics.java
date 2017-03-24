@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 public class Heuristics
 {
     @Test
-    public void testCaseParticle() throws IOException
+    public void testHeuristics() throws IOException
     {
         Segmenter.extended = true;
         Segmenter.instance = new HeavySegmenter();
@@ -68,6 +68,11 @@ public class Heuristics
         {
             assertEquals(word.getText().equals("がいい"), false); // false split
             assertEquals(word.getText().equals("ない"), false); // false forced split
+        }
+        words = splitter.split("そんな難しく考えないほうがいいよな",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("ほうが"), false); // false split
         }
     }
 }
