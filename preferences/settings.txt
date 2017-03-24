@@ -95,4 +95,4 @@ epwingBlacklistMinLines = 10
 epwingStartBlacklist = ・
 resetDefScroll = true
 useOldParser = false
-kuromojiExtendedUse = false
+kuromojiExtendedUse = true

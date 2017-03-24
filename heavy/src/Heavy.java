@@ -21,21 +21,25 @@ class HeavySegmenter extends Segmenter
         for(int i = 0; i < tokens.size(); i++)
         {
             Token t = tokens.get(i);
-            if(i+1 == tokens.size())
+            if(i+1 == tokens.size() || !options.getOptionBool("kuromojiExtendedUse"))
             {
                 r.add(new Piece(t.getSurface(), false));
             }
-            // Reduce segmentation errors caused by single-character verb stems (e.g. しかい|なかった vs しか|いなかった) and particles (e.g. 私はそう)
+            // Reduce segmentation errors caused by the word splitter binding the segment list back together into words
             // Method 1: directly combining single-character verb stems with their auxiliaries, so they don't get bound to an earlier word (しかい, ことし)
-            // Method 2: make strong segmentations between token sequences that often cause problems (particles followed by non-particles)
+            // Method 2: make strong segmentations between token sequences that often cause problems (particles followed by non-particles) (はそう, がいい)
             // Wouldn't be necessary if the segmenter exposed more information to the word splitter, but that's just the way that it goes.
             else
             {
                 Token n = tokens.get(i+1);
 
-                boolean strong = (t.getPartOfSpeechLevel1().contains("助詞") && ! n.getPartOfSpeechLevel1().contains("助詞") && options.getOptionBool("kuromojiExtendedUse"));
+                // Force split
+                boolean strong = (t.getPartOfSpeechLevel1().equals("助詞")
+                                && (t.getPartOfSpeechLevel2().equals("格助詞") || n.getPartOfSpeechLevel1().equals("副詞")) // most unsegmentation errors
+                                && !n.getPartOfSpeechLevel1().contains("助詞"));
 
-                if(t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().contains("自立") && n.getPartOfSpeechLevel1().contains("助"))
+                // Force non-split on one-character-surface independent verbs followed by auxiliaries
+                if(t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().equals("自立") && n.getPartOfSpeechLevel1().contains("助動"))
                 {
                     r.add(new Piece(t.getSurface()+n.getSurface(), false));
                     i++;
