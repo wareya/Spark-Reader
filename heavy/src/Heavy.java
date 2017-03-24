@@ -37,6 +37,9 @@ class HeavySegmenter extends Segmenter
                 boolean strong = (t.getPartOfSpeechLevel1().equals("助詞")
                                 && (t.getPartOfSpeechLevel2().equals("格助詞") || n.getPartOfSpeechLevel1().equals("副詞")) // most unsegmentation errors
                                 && !n.getPartOfSpeechLevel1().contains("助詞"));
+                strong = strong
+                      || (t.getPartOfSpeechLevel2().contains("終助詞")
+                       && n.getPartOfSpeechLevel1().contains("助詞"));
 
                 // Force non-split on one-character-surface independent verbs followed by auxiliaries
                 if(t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().equals("自立") && n.getPartOfSpeechLevel1().contains("助動"))

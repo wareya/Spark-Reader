@@ -57,22 +57,29 @@ public class Heuristics
             assertEquals(word.getText().equals("はそう"), false); // false split
         }
 
-        words = splitter.split("原因なのかも知れない",  new HashSet<>());
-        for(FoundWord word : words)
-        {
-            assertEquals(word.getText().equals("かも"), false); // false forced split
-        }
-
         words = splitter.split("別段なにがいいってわけでもない",  new HashSet<>());
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("がいい"), false); // false split
             assertEquals(word.getText().equals("ない"), false); // false forced split
         }
+
         words = splitter.split("そんな難しく考えないほうがいいよな",  new HashSet<>());
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("ほうが"), false); // false split
+        }
+
+        words = splitter.split("原因なのかも知れない",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("かも"), false); // false forced split
+        }
+
+        words = splitter.split("気温は亜熱帯かと思うほど高いのに",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("かと"), false); // false split
         }
     }
 }
