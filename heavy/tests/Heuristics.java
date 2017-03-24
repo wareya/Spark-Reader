@@ -94,6 +94,12 @@ public class Heuristics
             assertEquals(word.getText().equals("はいる"), false); // false split
         }
 
+        words = splitter.split("あれが大人になると、",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("なると"), false); // false split
+        }
+
         // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
 }
