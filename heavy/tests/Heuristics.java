@@ -100,6 +100,14 @@ public class Heuristics
             assertEquals(word.getText().equals("なると"), false); // false split
         }
 
+        words = splitter.split("俺がしっかりしていれば、",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("し"), false); // false split
+        }
+
+        //
+
         // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
 }
