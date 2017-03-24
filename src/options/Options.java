@@ -108,7 +108,7 @@ public class Options
         options.put("lineExportPath", "savedLines.csv");
         options.put("screenshotExportPath", "screenshots/");
         options.put("fullscreenScreenshot", "false");
-        options.put("automaticallyParse", "true");
+        options.put("automaticallyParse", "full");
         options.put("useOldParser", "false");
         options.put("kuromojiExtendedUse", "false");
 
