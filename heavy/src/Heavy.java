@@ -13,6 +13,12 @@ import static main.Main.options;
 class HeavySegmenter extends Segmenter
 {
     Tokenizer kuro;
+
+    public List<Token> DebugSegment(String text)
+    {
+        return kuro.tokenize(text);
+    }
+
     public ArrayList<Piece> Segment(String text)
     {
         List<Token> tokens = kuro.tokenize(text);
@@ -45,7 +51,7 @@ class HeavySegmenter extends Segmenter
                        && n.getPartOfSpeechLevel2().contains("係助詞"));
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("動詞")
-                       && t.getSurface().length() > 1
+                       && t.getConjugationForm().equals("基本形")
                        && n.getPartOfSpeechLevel1().equals("助詞"));
 
                 // Force non-split on one-character-surface independent verbs followed by auxiliaries

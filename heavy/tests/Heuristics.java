@@ -1,3 +1,4 @@
+import com.atilika.kuromoji.ipadic.Token;
 import language.Segmenter;
 import language.Segmenter.*;
 import language.dictionary.Dictionary;
@@ -94,6 +95,13 @@ public class Heuristics
             assertEquals(word.getText().equals("はいる"), false); // false split
         }
 
+        /*
+        List<Token> tokenlist;
+
+        tokenlist = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("あれが大人になると");
+        for(Token token : tokenlist)
+            System.out.println(token.getConjugationForm());
+        */
         words = splitter.split("あれが大人になると、",  new HashSet<>());
         for(FoundWord word : words)
         {
@@ -106,7 +114,11 @@ public class Heuristics
             assertEquals(word.getText().equals("し"), false); // false split
         }
 
-        //
+        words = splitter.split("連れて帰ろう、",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("て"), false); // false split
+        }
 
         // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
