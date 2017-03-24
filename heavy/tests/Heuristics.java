@@ -88,5 +88,12 @@ public class Heuristics
             assertEquals(word.getText().equals("さは"), false); // false split
         }
 
+        words = splitter.split("武装してはいるが不安は消えない、",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はいる"), false); // false split
+        }
+
+        // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
 }
