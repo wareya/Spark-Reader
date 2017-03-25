@@ -19,7 +19,7 @@ class HeavySegmenter extends Segmenter
     {
         if(kuro == null)
             kuro = new Tokenizer.Builder()
-                .mode(TokenizerBase.Mode.EXTENDED) // punish long terms and emit single character tokens for unknown terms
+                .mode(TokenizerBase.Mode.SEARCH) // punish long terms
                 .kanjiPenalty(options.getOptionInt("kuromojiKanjiPenaltyLength"), options.getOptionInt("kuromojiKanjiPenalty"))
                 .otherPenalty(options.getOptionInt("kuromojiOtherPenaltyLength"), options.getOptionInt("kuromojiOtherPenalty"))
                 .build();
@@ -32,11 +32,21 @@ class HeavySegmenter extends Segmenter
         return kuro.tokenize(text);
     }
 
+    // unigram unknown tokens before adding them
+    private void addWithUnigramCheck(ArrayList<Piece> r, Token t, boolean strong)
+    {
+        if(t.isKnown())
+            r.add(new Piece(t.getSurface(), strong));
+        else for(char c : t.getSurface().toCharArray())
+            r.add(new Piece(c+"", strong));
+    }
+
     public ArrayList<Piece> Segment(String text)
     {
         ensureInitialized();
 
         List<Token> tokens = kuro.tokenize(text);
+        System.out.println("Tokenizer output: " + tokens);
         ArrayList<Piece> r = new ArrayList<>();
 
         for(int i = 0; i < tokens.size(); i++)
@@ -44,7 +54,7 @@ class HeavySegmenter extends Segmenter
             Token t = tokens.get(i);
             if(i+1 == tokens.size() || !options.getOptionBool("kuromojiExtendedUse"))
             {
-                r.add(new Piece(t.getSurface(), false));
+                addWithUnigramCheck(r, t, false);
             }
             // Reduce segmentation errors caused by the word splitter binding the segment list back together into words
             // Method 1: directly combining single-character verb stems with their auxiliaries, so they don't get bound to an earlier word (しかい, ことし)
@@ -70,14 +80,15 @@ class HeavySegmenter extends Segmenter
                        && n.getPartOfSpeechLevel1().equals("助詞"));
 
                 // Force non-split on one-character-surface independent verbs followed by auxiliaries
-                if(t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().equals("自立") && n.getPartOfSpeechLevel1().contains("助動"))
+                if(t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().equals("自立") && n.getPartOfSpeechLevel1().contains("助動")
+                && t.isKnown() && n.isKnown())
                 {
                     r.add(new Piece(t.getSurface()+n.getSurface(), false));
                     i++;
                 }
                 else
                 {
-                    r.add(new Piece(t.getSurface(), strong));
+                    addWithUnigramCheck(r, t, strong);
                 }
             }
         }

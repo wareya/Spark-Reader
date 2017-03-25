@@ -195,7 +195,6 @@ public class WordScannerNew extends WordScanner implements SubScanner
         // negative
         // verbs
         ruleList.add(new ContextRule("ない", "", "negative", DefTag.stem_mizenkei, DefTag.adj_i, (rule, word) -> {
-            System.out.println(word.getConjugationTags());
             if(word.getConjugationTags().size() < 2) return true;
             DefTag tagOfInterest = word.getConjugationTags().get(word.getConjugationTags().size()-2);
             //noinspection RedundantIfStatement
@@ -207,7 +206,6 @@ public class WordScannerNew extends WordScanner implements SubScanner
         ruleList.add(new OnlyFinalRule("ずに", "", "without doing so", DefTag.stem_mizenkei, DefTag.uninflectable)); // exactly the same meaning, despite the difference in label
         // i-adjectives
         ruleList.add(new ContextRule("ない", "", "negative", DefTag.stem_ku, DefTag.adj_i, (rule, word) -> {
-            System.out.println(word.getConjugationTags());
             if(word.getConjugationTags().size() < 2) return true;
             DefTag tagOfInterest = word.getConjugationTags().get(word.getConjugationTags().size()-2);
             //noinspection RedundantIfStatement
@@ -401,12 +399,6 @@ public class WordScannerNew extends WordScanner implements SubScanner
                 System.out.println("original: " +  matches.get(matches.size()-1).getOriginalWord());
                 System.out.println("iteration " + Integer.toString(iters));
                 break;
-            }
-            //System.out.println("Matches: " + matches.size());
-            System.out.println("New matches: " + number_of_new_matches);
-            for(int i = matches_before_testing; i < matches.size(); i++)
-            {
-                System.out.println(matches.get(i).getSeenForms());
             }
 
             iters++;
