@@ -112,6 +112,11 @@ public class Options
         options.put("useOldParser", "false");
         options.put("kuromojiExtendedUse", "false");
 
+        options.put("kuromojiKanjiPenaltyLength", "2"); // original default: 2
+        options.put("kuromojiKanjiPenalty", "3000"); // original default: 3000
+        options.put("kuromojiOtherPenaltyLength", "2"); // original default: 7
+        options.put("kuromojiOtherPenalty", "1700"); // original default: 1700
+
     }
     public Options(File file)throws IOException
     {

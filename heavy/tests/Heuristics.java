@@ -45,7 +45,6 @@ public class Heuristics
         //ArrayList<Piece> pieces = Segmenter.instance.Segment();
         List<FoundWord> words;
 
-
         words = splitter.split("男を入れて三人しかいなかった",  new HashSet<>());
         for(FoundWord word : words)
         {

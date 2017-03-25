@@ -1,4 +1,5 @@
 
+import com.atilika.kuromoji.TokenizerBase;
 import main.Main;
 import language.Segmenter;
 
@@ -14,13 +15,27 @@ class HeavySegmenter extends Segmenter
 {
     Tokenizer kuro;
 
+    private void ensureInitialized()
+    {
+        if(kuro == null)
+            kuro = new Tokenizer.Builder()
+                .mode(TokenizerBase.Mode.EXTENDED) // punish long terms and emit single character tokens for unknown terms
+                .kanjiPenalty(options.getOptionInt("kuromojiKanjiPenaltyLength"), options.getOptionInt("kuromojiKanjiPenalty"))
+                .otherPenalty(options.getOptionInt("kuromojiOtherPenaltyLength"), options.getOptionInt("kuromojiOtherPenalty"))
+                .build();
+    }
+
     public List<Token> DebugSegment(String text)
     {
+        ensureInitialized();
+
         return kuro.tokenize(text);
     }
 
     public ArrayList<Piece> Segment(String text)
     {
+        ensureInitialized();
+
         List<Token> tokens = kuro.tokenize(text);
         ArrayList<Piece> r = new ArrayList<>();
 
@@ -71,7 +86,6 @@ class HeavySegmenter extends Segmenter
     }
     HeavySegmenter()
     {
-        kuro = new Tokenizer();
     }
 }
 
