@@ -17,6 +17,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -83,18 +85,17 @@ public class Main
         }
         System.out.println("init done");
         UI.runUI();
-        System.out.println("UI done");
     }
     private static void loadDictionaries()throws IOException
     {
         EPWINGDefinition.loadBlacklist();
 
-        //TODO display some sort of progress bar during this operation
         dict = new Dictionary(new File(Main.options.getOption("dictionaryPath")));
         System.out.println("loaded " + Dictionary.getLoadedWordCount() + " in total");
 
     }
 
+    //loading screen-specific variables
     private static JDialog loadScreen;
     private static JProgressBar loadProgress;
     private static JLabel loadStatus;
@@ -119,7 +120,18 @@ public class Main
         loadScreen.setSize(300,100);
         Utils.centerWindow(loadScreen);
         loadScreen.setIconImage(ImageIO.read(loadScreen.getClass().getResourceAsStream("/ui/icon.gif")));
-        //loadScreen.set
+        loadScreen.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                if(!doneLoading)
+                {
+                    System.out.println("Startup aborted");
+                    System.exit(0);
+                }
+            }
+        });
         loadScreen.setVisible(true);
 
         loadUpdater = new Timer(50, e ->
@@ -138,6 +150,7 @@ public class Main
             {
                 loadUpdater.stop();
                 loadScreen.setVisible(false);
+                loadScreen.dispose();
             }
         });
         loadUpdater.setRepeats(true);
