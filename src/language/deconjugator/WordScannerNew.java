@@ -351,6 +351,7 @@ public class WordScannerNew extends WordScanner implements SubScanner
         ruleList.add(new RewriteRule("でした", "です", "past", DefTag.aux, DefTag.aux));
 
         // enable deconjugation of bound noun+suru dictionary entries that might have archaic equivalents, like 冠する
+        // only has an effect on the kuromoji backend, on the normal one the archaic equivalent doesn't cause problems
         ruleList.add(new StdRule("する", "する", "", DefTag.vs_s, DefTag.vs_i));
     }
     private int test_rules(int start)
