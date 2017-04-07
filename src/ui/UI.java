@@ -23,8 +23,10 @@ import ui.popup.DefPopup;
 import ui.popup.MenuPopup;
 import ui.popup.WordPopup;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -321,6 +323,21 @@ public class UI implements MouseListener, MouseMotionListener, MouseWheelListene
             {
                 Thread.sleep(100);
             }catch(InterruptedException ignored){}
+
+            // UI has become inaccessible (most likely closed via alt+f4)
+            if(!ui.disp.getFrame().isVisible() && !ui.tray.isShowing())
+            {
+                try
+                {
+                    Main.known.save();
+                    Main.prefDef.save();
+                }catch(IOException err)
+                {
+                    JOptionPane.showMessageDialog(ui.disp.getFrame(), "Error while saving changes");
+                    err.printStackTrace();
+                }
+                System.exit(0);
+            }
         }
         
     }
