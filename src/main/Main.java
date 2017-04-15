@@ -4,6 +4,7 @@ import hooker.ClipboardHook;
 import hooker.Hook;
 import hooker.Log;
 import language.Segmenter;
+import language.deconjugator.WordScanner;
 import language.dictionary.Dictionary;
 import language.dictionary.EPWINGDefinition;
 import language.splitter.WordSplitter;
@@ -15,7 +16,6 @@ import ui.UI;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -23,11 +23,11 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by Laurens on 2/19/2017.
+ * Main entry point and holds global program objects and methods.
  */
 public class Main
 {
-    public static final String VERSION = "Beta 0.6";
+    public static final String VERSION = "Beta 0.7";
 
     public static UI ui;
     /**
@@ -92,7 +92,27 @@ public class Main
 
         dict = new Dictionary(new File(Main.options.getOption("dictionaryPath")));
         System.out.println("loaded " + Dictionary.getLoadedWordCount() + " in total");
+        WordScanner.init();
+    }
 
+    /**
+     * A call to this method cleanly exits the program, saving changes if possible.
+     */
+    public static void exit()
+    {
+        JFrame frame = null;
+        if(ui != null && ui.disp != null)frame = ui.disp.getFrame();
+        try
+        {
+            if(known != null)Main.known.save();
+            if(prefDef != null)Main.prefDef.save();
+        }catch(IOException err)
+        {
+            JOptionPane.showMessageDialog(frame, "Error while saving changes:\n" + err);
+            err.printStackTrace();
+        }
+        if(frame != null)frame.setVisible(false);
+        System.exit(0);
     }
 
     //loading screen-specific variables
@@ -128,7 +148,7 @@ public class Main
                 if(!doneLoading)
                 {
                     System.out.println("Startup aborted");
-                    System.exit(0);
+                    exit();
                 }
             }
         });

@@ -24,12 +24,30 @@ import language.dictionary.Japanese;
 
 import java.util.ArrayList;
 
-public class WordScannerNew extends WordScanner implements SubScanner
+public class WordScannerNew extends WordScanner implements WordScanner.SubScanner
 {
-    public void subinit()
+    public void subInit()
     {
         if(ruleList != null)return;
         ruleList = new ArrayList<>();
+
+        //Decensor: simple, but actually works well enough with a lot of 'censored' words
+        ruleList.add(word ->
+        {
+            if(word.getNumConjugations() == 0 && word.getWord().contains("○"))
+            {
+                return new ValidWord(word.getWord().replace('○', 'っ'), (word.getProcess() + " " + "censored").trim());
+            }
+            else return null;
+        });
+        ruleList.add(word ->
+        {
+            if(word.getNumConjugations() == 0 && word.getWord().contains("○"))
+            {
+                return new ValidWord(word.getWord().replace('○', 'ん'), (word.getProcess() + " " + "censored").trim());
+            }
+            else return null;
+        });
 
         /*
         // handle "must" in a single block because it's dumb and long
@@ -378,7 +396,7 @@ public class WordScannerNew extends WordScanner implements SubScanner
         }
         return new_matches;
     }
-    public void ScanWord(String word)
+    public void scanWord(String word)
     {
         matches.add(new ValidWord(word, ""));//add initial unmodified word
         // convert to kana and add that too if it's not already in hiragana
@@ -396,14 +414,7 @@ public class WordScannerNew extends WordScanner implements SubScanner
 
             // the safeguards in process() should be enough, but in case they're not, or they break...
             if(iters > 24)
-            {
-                System.out.println("bailing out from deconjugation");
-                System.out.println("conjugation tags: " + matches.get(matches.size()-1).getConjugationTags());
-                System.out.println("conjugation path: " + matches.get(matches.size()-1).getProcess());
-                System.out.println("original: " +  matches.get(matches.size()-1).getOriginalWord());
-                System.out.println("iteration " + Integer.toString(iters));
                 break;
-            }
 
             iters++;
 

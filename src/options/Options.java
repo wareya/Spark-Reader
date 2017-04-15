@@ -109,8 +109,10 @@ public class Options
         options.put("exportDisplay", "external");
         options.put("screenshotExportPath", "screenshots/");
         options.put("fullscreenScreenshot", "false");
-        options.put("automaticallyParse", "full");
-        options.put("useOldParser", "false");
+
+        options.put("splitterMode", "full");
+        options.put("deconMode", "recursive");
+
         options.put("kuromojiExtendedUse", "false");
 
         options.put("kuromojiKanjiPenaltyLength", "2"); // original default: 2
