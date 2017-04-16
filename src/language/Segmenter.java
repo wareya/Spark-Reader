@@ -1,5 +1,6 @@
 package language;
 
+import java.util.List;
 import java.util.ArrayList;
 
 abstract public class Segmenter
@@ -16,7 +17,7 @@ abstract public class Segmenter
             this.strong = strong;
         }
     }
-    static public String Unsegment(ArrayList<Piece> array, Integer start, Integer end)
+    static public String Unsegment(List<Piece> array, Integer start, Integer end)
     {
         String r = "";
         for(Integer i = start; i < end; i++)
@@ -25,9 +26,9 @@ abstract public class Segmenter
         }
         return r;
     }
-    static public ArrayList<Piece> subList(ArrayList<Piece> array, Integer start, Integer end)
+    static public List<Piece> subList(List<Piece> array, Integer start, Integer end)
     {
-        ArrayList<Piece> r = new ArrayList<>();
+        List<Piece> r = new ArrayList<>();
         for(; start < end; start++)
         {
             r.add(array.get(start));
@@ -35,5 +36,5 @@ abstract public class Segmenter
         return r;
     }
 
-    abstract public ArrayList<Piece> Segment(String input);
+    abstract public List<Piece> Segment(String input);
 }
