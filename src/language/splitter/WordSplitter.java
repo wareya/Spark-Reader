@@ -87,83 +87,91 @@ public class WordSplitter
         List<FoundWord> words = new ArrayList<>();
 
         //until we've covered all words
-        while(segments.size() > 0)
+        int start = 0;
+        while(segments.size()-start > 0)
         {
             // select the initial "overly long and certainly bogus" segment list to test for validity
-            int length = segments.size();
+            int end = segments.size();
 
             // if the first segment is strong, use it in isolation
             if(options.getOption("splitterMode").equals("full"))
             {
-                if(segments.get(0).strong)
-                    length = 1;
+                if(segments.get(start).strong)
+                    end = start+1;
             }
-            int limit = length;
+            int limit = end;
 
             // reduce length of plausible segment list unless parsing is completely disabled
             if(!options.getOption("splitterMode").equals("none"))
             {
                 // look for the longest segment covered as-is in the dictionary
-                while(length > 0)
+                while(end > start)
                 {
-                    String textHere = Segmenter.Unsegment(segments, 0, length);
+                    String textHere = Segmenter.Unsegment(segments, start, end);
                     if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
                         break;
-                    length--;
+                    end--;
                 }
-                // no good, try splitting the first segment
-                if(length == 0)
+                // no good, try splitting the first segment (uncommon, performance impact isn't big)
+                if(end <= start)
                 {
-                    List<Piece> workingList;
-
-                    String workingText = segments.get(0).txt;
-                    int position = workingText.length();
-                    while(position > 1)
+                    // only bother for weak non-unigrams
+                    if(segments.get(start).txt.length() > 1 && !segments.get(start).strong)
                     {
-                        String textHere = workingText.substring(0, position);
-                        if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
-                            break;
-                        position--;
+                        List<Piece> workingList;
+
+                        String workingText = segments.get(start).txt;
+                        int position = workingText.length();
+                        while(position > 1)
+                        {
+                            String textHere = workingText.substring(0, position);
+                            if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
+                                break;
+                            position--;
+                        }
+
+                        workingList = new ArrayList<>();
+                        workingList.add(instance.new Piece(workingText.substring(0, position), false));
+                        workingList.add(instance.new Piece(workingText.substring(position, workingText.length()), false));
+                        for(int i = start+1; i < segments.size(); i++)
+                            workingList.add(segments.get(i));
+
+                        segments = workingList;
+                        limit = segments.size();
+                        start = 0;
                     }
-
-                    workingList = new ArrayList<>();
-                    workingList.add(instance.new Piece(workingText.substring(0, position), false));
-                    workingList.add(instance.new Piece(workingText.substring(position, workingText.length()), false));
-                    for(int i = 1; i < segments.size(); i++)
-                        workingList.add(segments.get(i));
-
-                    segments = workingList;
-                    length = 1;
+                    end = start+1;
                 }
 
                 // extend it to include any contiguous segments that might be conjugation
-                while(length < limit)
+                while(end < limit)
                 {
-                    String nextSegment = segments.get(length).txt;
+                    String nextSegment = segments.get(end).txt;
                     if(mightBeConjugation(nextSegment))
-                        length++;
+                        end++;
                     else
                         break;
                 }
             }
 
             //until we've tried all lengths (condition never actually hit)
-            while(length > 0)
+            while(end > start)
             {
-                String str = Segmenter.Unsegment(segments, 0, length);
+                String str = Segmenter.Unsegment(segments, start, end);
 
                 WordScanner word = new WordScanner(str);//deconjugate
                 FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
                 attachDefinitions(matchedWord, word);//add cached definitions
 
                 // Return current string if it's a good word or if we do not have full parsing enabled or if it's the shortest we can get
-                if(matchedWord.getDefinitionCount() > 0 || dict.hasEpwingDef(word.getWord()) || !options.getOption("splitterMode").equals("full") || length == 1)
+                if(matchedWord.getDefinitionCount() > 0 || dict.hasEpwingDef(word.getWord()) || !options.getOption("splitterMode").equals("full") || end == start+1)
                 {
                     words.add(matchedWord);
-                    segments = segments.subList(length, segments.size());
+                    //segments = segments.subList(end, segments.size());
+                    start = end;
                     break;
                 }
-                length--;//try shorter word
+                end--;//try shorter word
             }
         }
         return words;
