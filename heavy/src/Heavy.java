@@ -67,7 +67,7 @@ class HeavySegmenter extends Segmenter
                 // Force split
                 boolean strong = (t.getPartOfSpeechLevel1().equals("助詞")
                                 && (t.getPartOfSpeechLevel2().equals("格助詞") || t.getPartOfSpeechLevel2().equals("係助詞") || n.getPartOfSpeechLevel1().equals("副詞")) // most unsegmentation errors
-                                && !n.getPartOfSpeechLevel1().contains("助詞"));
+                                && !n.getPartOfSpeechLevel1().contains("助詞")) && !n.getPartOfSpeechLevel2().equals("接尾");
                 strong = strong
                       || (t.getPartOfSpeechLevel2().contains("終助詞")
                        && n.getPartOfSpeechLevel1().contains("助詞"));
