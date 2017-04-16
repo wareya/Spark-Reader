@@ -46,7 +46,7 @@ class HeavySegmenter extends Segmenter
         ensureInitialized();
 
         List<Token> tokens = kuro.tokenize(text);
-        System.out.println("Tokenizer output: " + tokens);
+        //System.out.println("Tokenizer output: " + tokens);
         ArrayList<Piece> r = new ArrayList<>();
 
         for(int i = 0; i < tokens.size(); i++)
@@ -92,7 +92,7 @@ class HeavySegmenter extends Segmenter
                 }
             }
         }
-        System.out.println("Segmenter output: " + Unsegment(r,0,r.size()));
+        //System.out.println("Segmenter output: " + Unsegment(r,0,r.size()));
         return r;
     }
     HeavySegmenter()

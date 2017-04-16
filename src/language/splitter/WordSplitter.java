@@ -54,17 +54,6 @@ public class WordSplitter
         }
     }
 
-    private class splitWordResult
-    {
-        protected FoundWord term;
-        protected List<Piece> segments;
-        splitWordResult(FoundWord term, List<Piece> segments)
-        {
-            this.term = term;
-            this.segments = segments;
-        }
-    }
-
     private boolean mightBeDeconjugatable(String text)
     {
         boolean goodMatch = false;
@@ -92,79 +81,6 @@ public class WordSplitter
         return goodMatch;
     }
 
-    private splitWordResult splitWord(List<Piece> segments)
-    {
-        // select the initial "overly long and certainly bogus" segment list to test for validity
-        int length = segments.size();
-
-        // fixme: reintroduce "strong piece" logic
-
-        // reduce length of plausible segment list unless parsing is completely disabled
-        if(!options.getOption("splitterMode").equals("none"))
-        {
-            // look for the longest segment covered as-is in the dictionary
-            while(length > 0)
-            {
-                String textHere = Segmenter.Unsegment(segments, 0, length);
-                if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
-                    break;
-                length--;
-            }
-            // no good, try splitting the first segment
-            if(length == 0)
-            {
-                List<Piece> workingList;
-
-                String workingText = segments.get(0).txt;
-                int position = workingText.length();
-                while(position > 1)
-                {
-                    String textHere = workingText.substring(0, position);
-                    if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
-                        break;
-                    position--;
-                }
-
-                workingList = new ArrayList<>();
-                workingList.add(instance.new Piece(workingText.substring(0, position), false));
-                workingList.add(instance.new Piece(workingText.substring(position, workingText.length()), false));
-                for(int i = 1; i < segments.size(); i++)
-                    workingList.add(segments.get(i));
-
-                segments = workingList;
-                length = 1;
-            }
-
-            // extend it to include any contiguous segments that might be conjugation
-            while(length < segments.size())
-            {
-                String nextSegment = segments.get(length).txt;
-                if(mightBeConjugation(nextSegment))
-                    length++;
-                else
-                    break;
-            }
-        }
-
-        //until we've tried all lengths and failed
-        while(length > 0)
-        {
-            String str = Segmenter.Unsegment(segments, 0, length);
-
-            WordScanner word = new WordScanner(str);//deconjugate
-            FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
-            attachDefinitions(matchedWord, word);//add cached definitions
-
-            // Return current string if it's a good word or if we do not have full parsing enabled
-            if(matchedWord.getDefinitionCount() > 0 || dict.hasEpwingDef(word.getWord()) || !options.getOption("splitterMode").equals("full"))
-                return new splitWordResult(matchedWord, segments.subList(length, segments.size()));
-            else
-                length--;//try shorter word
-        }
-        // fall through = no valid word here, return first segment alone
-        return new splitWordResult(new FoundWord(segments.get(0).txt + ""), segments.subList(1, segments.size()));
-    }
-
     private List<FoundWord> splitSection(String text, boolean firstSection)
     {
         List<Piece> segments = instance.Segment(text);
@@ -173,9 +89,76 @@ public class WordSplitter
         //until we've covered all words
         while(segments.size() > 0)
         {
-            splitWordResult result = splitWord(segments);
-            words.add(result.term);
-            segments = result.segments;
+            // select the initial "overly long and certainly bogus" segment list to test for validity
+            int length = segments.size();
+
+            // fixme: reintroduce "strong piece" logic
+
+            // reduce length of plausible segment list unless parsing is completely disabled
+            if(!options.getOption("splitterMode").equals("none"))
+            {
+                // look for the longest segment covered as-is in the dictionary
+                while(length > 0)
+                {
+                    String textHere = Segmenter.Unsegment(segments, 0, length);
+                    if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
+                        break;
+                    length--;
+                }
+                // no good, try splitting the first segment
+                if(length == 0)
+                {
+                    List<Piece> workingList;
+
+                    String workingText = segments.get(0).txt;
+                    int position = workingText.length();
+                    while(position > 1)
+                    {
+                        String textHere = workingText.substring(0, position);
+                        if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
+                            break;
+                        position--;
+                    }
+
+                    workingList = new ArrayList<>();
+                    workingList.add(instance.new Piece(workingText.substring(0, position), false));
+                    workingList.add(instance.new Piece(workingText.substring(position, workingText.length()), false));
+                    for(int i = 1; i < segments.size(); i++)
+                        workingList.add(segments.get(i));
+
+                    segments = workingList;
+                    length = 1;
+                }
+
+                // extend it to include any contiguous segments that might be conjugation
+                while(length < segments.size())
+                {
+                    String nextSegment = segments.get(length).txt;
+                    if(mightBeConjugation(nextSegment))
+                        length++;
+                    else
+                        break;
+                }
+            }
+
+            //until we've tried all lengths (condition never actually hit)
+            while(length > 0)
+            {
+                String str = Segmenter.Unsegment(segments, 0, length);
+
+                WordScanner word = new WordScanner(str);//deconjugate
+                FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+                attachDefinitions(matchedWord, word);//add cached definitions
+
+                // Return current string if it's a good word or if we do not have full parsing enabled or if it's the shortest we can get
+                if(matchedWord.getDefinitionCount() > 0 || dict.hasEpwingDef(word.getWord()) || !options.getOption("splitterMode").equals("full") || length == 1)
+                {
+                    words.add(matchedWord);
+                    segments = segments.subList(length, segments.size());
+                    break;
+                }
+                length--;//try shorter word
+            }
         }
         return words;
 
