@@ -92,7 +92,13 @@ public class WordSplitter
             // select the initial "overly long and certainly bogus" segment list to test for validity
             int length = segments.size();
 
-            // fixme: reintroduce "strong piece" logic
+            // if the first segment is strong, use it in isolation
+            if(options.getOption("splitterMode").equals("full"))
+            {
+                if(segments.get(0).strong)
+                    length = 1;
+            }
+            int limit = length;
 
             // reduce length of plausible segment list unless parsing is completely disabled
             if(!options.getOption("splitterMode").equals("none"))
@@ -131,7 +137,7 @@ public class WordSplitter
                 }
 
                 // extend it to include any contiguous segments that might be conjugation
-                while(length < segments.size())
+                while(length < limit)
                 {
                     String nextSegment = segments.get(length).txt;
                     if(mightBeConjugation(nextSegment))

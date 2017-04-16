@@ -119,7 +119,12 @@ public class Heuristics
             assertEquals(word.getText().equals("て"), false); // false split
         }
 
-        // TODO: Add 飛び掛ってきても
+        words = splitter.split("飛び掛ってきても、",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("飛び掛っ"), false); // false split
+        }
+
         // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
 }
