@@ -94,34 +94,46 @@ public class WordSplitter
 
     private splitWordResult splitWord(List<Piece> segments)
     {
-        //until we've covered all words
-
         // select the initial "overly long and certainly bogus" segment list to test for validity
         int length = segments.size();
 
-        List<Piece> workingList = new ArrayList<>();
+        // fixme: reintroduce "strong piece" logic
 
         // reduce length of plausible segment list unless parsing is completely disabled
         if(!options.getOption("splitterMode").equals("none"))
         {
             // look for the longest segment covered as-is in the dictionary
-            while(length > 1)
+            while(length > 0)
             {
                 String textHere = Segmenter.Unsegment(segments, 0, length);
                 if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
                     break;
                 length--;
             }
-            /*
+            // no good, try splitting the first segment
             if(length == 0)
             {
+                List<Piece> workingList;
 
-            }*/
+                String workingText = segments.get(0).txt;
+                int position = workingText.length();
+                while(position > 1)
+                {
+                    String textHere = workingText.substring(0, position);
+                    if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
+                        break;
+                    position--;
+                }
 
-            //int position = length;
-            //if(position <= 0) position = 1;
+                workingList = new ArrayList<>();
+                workingList.add(instance.new Piece(workingText.substring(0, position), false));
+                workingList.add(instance.new Piece(workingText.substring(position, workingText.length()), false));
+                for(int i = 1; i < segments.size(); i++)
+                    workingList.add(segments.get(i));
 
-            //if(length <= 0) length = 1;
+                segments = workingList;
+                length = 1;
+            }
 
             // extend it to include any contiguous segments that might be conjugation
             while(length < segments.size())
@@ -138,7 +150,6 @@ public class WordSplitter
         while(length > 0)
         {
             String str = Segmenter.Unsegment(segments, 0, length);
-            System.out.println("length: " + length + " str: " + str);
 
             WordScanner word = new WordScanner(str);//deconjugate
             FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
@@ -159,6 +170,7 @@ public class WordSplitter
         List<Piece> segments = instance.Segment(text);
         List<FoundWord> words = new ArrayList<>();
 
+        //until we've covered all words
         while(segments.size() > 0)
         {
             splitWordResult result = splitWord(segments);

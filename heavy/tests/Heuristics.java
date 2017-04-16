@@ -119,6 +119,7 @@ public class Heuristics
             assertEquals(word.getText().equals("て"), false); // false split
         }
 
+        // TODO: Add 飛び掛ってきても
         // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
 }
