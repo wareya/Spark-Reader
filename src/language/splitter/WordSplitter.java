@@ -111,6 +111,8 @@ public class WordSplitter
                 // todo: make this be an option?
                 if(end-start > 100)
                     end = start+100;
+                if(end-start > 50 && Segmenter.extended) // If the segmenter is "smart" then each segment is larger than a single character and we should be more aggressive
+                    end = start+50;
 
                 // look for the longest section covered as-is in the dictionary
                 while(end > start)

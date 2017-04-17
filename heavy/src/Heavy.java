@@ -1,5 +1,7 @@
 
 import com.atilika.kuromoji.TokenizerBase;
+import jdk.nashorn.internal.runtime.options.Options;
+import language.segmenter.BasicSegmenter;
 import main.Main;
 import language.segmenter.Segmenter;
 
@@ -14,6 +16,8 @@ import static main.Main.options;
 class HeavySegmenter extends Segmenter
 {
     Tokenizer kuro;
+
+    Segmenter basic = new BasicSegmenter();
 
     private void ensureInitialized()
     {
@@ -41,18 +45,20 @@ class HeavySegmenter extends Segmenter
             r.add(new Piece(c+"", strong));
     }
 
-    public ArrayList<Piece> Segment(String text)
+    public List<Piece> Segment(String text)
     {
+        if(!options.getOption("kuromojiSupportLevel").equals("disabled"))
+            return basic.Segment(text);
+
         ensureInitialized();
 
         List<Token> tokens = kuro.tokenize(text);
-        //System.out.println("Tokenizer output: " + tokens);
         ArrayList<Piece> r = new ArrayList<>();
 
         for(int i = 0; i < tokens.size(); i++)
         {
             Token t = tokens.get(i);
-            if(i+1 == tokens.size() || !options.getOptionBool("kuromojiExtendedUse"))
+            if(i+1 == tokens.size() || !options.getOption("kuromojiSupportLevel").equals("heuristics"))
             {
                 addWithUnigramCheck(r, t, false);
             }
@@ -64,9 +70,9 @@ class HeavySegmenter extends Segmenter
             {
                 Token n = tokens.get(i+1);
 
-                // Force split
+                // Heuristics to make "strong" segments, which force a split immediately after themselves if they're the first one in the section being split
                 boolean strong = (t.getPartOfSpeechLevel1().equals("助詞")
-                                && (t.getPartOfSpeechLevel2().equals("格助詞") || t.getPartOfSpeechLevel2().equals("係助詞") || n.getPartOfSpeechLevel1().equals("副詞")) // most unsegmentation errors
+                                && (t.getPartOfSpeechLevel2().equals("格助詞") || t.getPartOfSpeechLevel2().equals("係助詞") || n.getPartOfSpeechLevel1().equals("副詞"))
                                 && !n.getPartOfSpeechLevel1().contains("助詞")) && !n.getPartOfSpeechLevel2().equals("接尾");
                 strong = strong
                       || (t.getPartOfSpeechLevel2().contains("終助詞")
@@ -92,7 +98,6 @@ class HeavySegmenter extends Segmenter
                 }
             }
         }
-        //System.out.println("Segmenter output: " + Unsegment(r,0,r.size()));
         return r;
     }
     HeavySegmenter()

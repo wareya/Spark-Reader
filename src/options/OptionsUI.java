@@ -54,6 +54,7 @@ public class OptionsUI extends JFrame
 
     private final static String parserConfig ="full=Full;partial=Basic;none=Disable";
     private final static String deconConfig ="recursive=Recursive (better, slow);legacy=Legacy (faster, less accurate)";
+    private final static String kuromojiConfig ="heuristics=Enabled with heuristics;basic=Enabled;disabled=Disabled (not recommended)";
 
     public OptionsUI() throws HeadlessException
     {
@@ -110,7 +111,7 @@ public class OptionsUI extends JFrame
             splitter.add(new RadioOption("splitterMode", parserConfig, "Auto text splitter mode", null)); // If enabled, text will undergo a basic automatic parsing pass. Note that punctuation always causes segmentations.
             splitter.add(new RadioOption("deconMode", deconConfig, "Deconjugation mode", null)); // If enabled, text will undergo a basic automatic parsing pass. Note that punctuation always causes segmentations.
             if(Segmenter.extended)
-                splitter.add(new ToggleOption("kuromojiExtendedUse", "Use kuromoji aggressively", "Causes extra segmentations, but prevents specific mis-segmentations like はそう instead of は|そう."));
+                splitter.add(new RadioOption("kuromojiSupportLevel", kuromojiConfig, "Kuromoji support level", null));
 
         root.add(splitter);
 

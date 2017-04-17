@@ -113,7 +113,7 @@ public class Options
         options.put("splitterMode", "full");
         options.put("deconMode", "recursive");
 
-        options.put("kuromojiExtendedUse", "false");
+        options.put("kuromojiSupportLevel", "basic");
 
         options.put("kuromojiKanjiPenaltyLength", "2"); // original default: 2
         options.put("kuromojiKanjiPenalty", "3000"); // original default: 3000
