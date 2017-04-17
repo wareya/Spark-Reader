@@ -30,9 +30,9 @@ public class Heuristics
         Main.known = new Known(Main.options.getFile("knownWordsPath"));
         Main.prefDef = new PrefDef(Main.options.getFile("preferredDefsPath"));
 
-        Main.options.setOption("automaticallyParse", "full");
-        Main.options.setOption("useOldParser", "false");
-        Main.options.setOption("kuromojiExtendedUse", "true");
+        Main.options.setOption("splitterMode", "full");
+        Main.options.setOption("deconMode", "recursive");
+        Main.options.setOption("kuromojiSupportLevel", "heuristics");
 
         Dictionary dict = new Dictionary(new File("../dictionaries"));
         WordSplitter splitter = new WordSplitter(dict);

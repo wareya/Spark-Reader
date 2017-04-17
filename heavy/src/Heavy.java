@@ -47,7 +47,7 @@ class HeavySegmenter extends Segmenter
 
     public List<Piece> Segment(String text)
     {
-        if(!options.getOption("kuromojiSupportLevel").equals("disabled"))
+        if(options.getOption("kuromojiSupportLevel").equals("disabled"))
             return basic.Segment(text);
 
         ensureInitialized();
