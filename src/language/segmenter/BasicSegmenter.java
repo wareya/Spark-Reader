@@ -1,10 +1,10 @@
+package language.segmenter;
 
 import main.Main;
-import language.Segmenter;
 
 import java.util.ArrayList;
 
-class BasicSegmenter extends Segmenter
+public class BasicSegmenter extends Segmenter
 {
     public ArrayList<Piece> Segment(String text)
     {
@@ -14,14 +14,5 @@ class BasicSegmenter extends Segmenter
             r.add(new Piece(c+"", false));
         }
         return r;
-    }
-}
-
-public class Basic
-{
-    public static void main(String[] args) throws Exception
-    {
-        Segmenter.instance = new BasicSegmenter();
-        Main.main(args);
     }
 }

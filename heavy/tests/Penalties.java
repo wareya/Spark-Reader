@@ -1,17 +1,10 @@
 import com.atilika.kuromoji.ipadic.Token;
-import language.Segmenter;
-import language.dictionary.Dictionary;
-import language.splitter.FoundWord;
-import language.splitter.WordSplitter;
+import language.segmenter.Segmenter;
 import main.Main;
-import options.Known;
 import options.Options;
-import options.PrefDef;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;

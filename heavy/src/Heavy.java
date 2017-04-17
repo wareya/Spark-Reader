@@ -1,7 +1,7 @@
 
 import com.atilika.kuromoji.TokenizerBase;
 import main.Main;
-import language.Segmenter;
+import language.segmenter.Segmenter;
 
 import java.util.ArrayList;
 import java.util.List;

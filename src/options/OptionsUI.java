@@ -16,7 +16,7 @@
  */
 package options;
 
-import language.Segmenter;
+import language.segmenter.Segmenter;
 import language.dictionary.DefSource;
 import main.Main;
 import main.Utils;

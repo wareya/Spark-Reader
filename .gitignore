@@ -1,7 +1,6 @@
 build/
 dist/
 Spark Reader.jar
-Spark Reader Basic.jar
 Spark Reader Heavy.jar
 forAnki.csv
 dictionaries/kanji.txt

@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/basic/Spark Reader Basic.iml" filepath="$PROJECT_DIR$/basic/Spark Reader Basic.iml" />
       <module fileurl="file://$PROJECT_DIR$/Spark Reader Core.iml" filepath="$PROJECT_DIR$/Spark Reader Core.iml" />
       <module fileurl="file://$PROJECT_DIR$/heavy/Spark Reader Heavy.iml" filepath="$PROJECT_DIR$/heavy/Spark Reader Heavy.iml" />
     </modules>

@@ -1,6 +1,4 @@
-import com.atilika.kuromoji.ipadic.Token;
-import language.Segmenter;
-import language.Segmenter.*;
+import language.segmenter.Segmenter;
 import language.dictionary.Dictionary;
 import language.splitter.FoundWord;
 import language.splitter.WordSplitter;
@@ -9,15 +7,12 @@ import options.Known;
 import options.Options;
 import options.PrefDef;
 import org.junit.Test;
-import sun.misc.JavaIOAccess;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -122,7 +117,7 @@ public class Heuristics
         words = splitter.split("飛び掛ってきても、",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("飛び掛っ"), false); // false split
+            assertEquals(word.getText().equals("飛び掛っ"), false); // failed to split segment that wasn't in a dictionary
         }
 
         words = splitter.split("やっぱり覚えてやがったな",  new HashSet<>());

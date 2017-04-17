@@ -1,4 +1,4 @@
-package language;
+package language.segmenter;
 
 import java.util.List;
 import java.util.ArrayList;

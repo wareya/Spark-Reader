@@ -16,8 +16,8 @@
  */
 package language.splitter;
 
-import language.Segmenter;
-import language.Segmenter.*;
+import language.segmenter.Segmenter;
+import language.segmenter.Segmenter.*;
 import language.deconjugator.ValidWord;
 import language.deconjugator.WordScanner;
 import language.dictionary.Definition;
@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static language.Segmenter.instance;
+import static language.segmenter.Segmenter.instance;
 import static main.Main.options;
 
 /**
@@ -101,18 +101,27 @@ public class WordSplitter
             }
             int limit = end;
 
-            // reduce length of plausible segment list unless parsing is completely disabled
+            // Parsing is faster if we start with a relatively short segment instead of the entire string.
+            // Otherwise, deconjugation can be unnecessarily expensive, since it'll be passing around tons of memory unnecessarily
+            // Luckily, even for words that can be deconjugated, we can make a pretty good guess at the longest string that could possibly be valid
             if(!options.getOption("splitterMode").equals("none"))
             {
-                // look for the longest segment covered as-is in the dictionary
+                // We only need to start with a length as the longest dictionary term, because it can be extended to pick up conjugation characters
+                // 100 is a good conservative "no way there's a dictionary term this long" limit, and prevents long text from taking several seconds to parse
+                // todo: make this be an option?
+                if(end-start > 100)
+                    end = start+100;
+
+                // look for the longest section covered as-is in the dictionary
                 while(end > start)
                 {
                     String textHere = Segmenter.Unsegment(segments, start, end);
-                    if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
+                    // only check the epwing dictionary if this is the first segment in the section (for speed reasons)
+                    if(dict.find(textHere) != null || (dict.hasEpwingDef(textHere) && firstSection) || mightBeDeconjugatable(textHere))
                         break;
                     end--;
                 }
-                // no good, try splitting the first segment (uncommon, performance impact isn't big)
+                // Fell through: no good, try splitting the first segment (uncommon, performance impact isn't big even though we rewrite the segment list)
                 if(end <= start)
                 {
                     // only bother for weak non-unigrams
@@ -125,7 +134,7 @@ public class WordSplitter
                         while(position > 1)
                         {
                             String textHere = workingText.substring(0, position);
-                            if(dict.find(textHere) != null || dict.hasEpwingDef(textHere) || mightBeDeconjugatable(textHere))
+                            if(dict.find(textHere) != null || (dict.hasEpwingDef(textHere) && firstSection)  || mightBeDeconjugatable(textHere))
                                 break;
                             position--;
                         }
@@ -140,10 +149,10 @@ public class WordSplitter
                         limit = segments.size();
                         start = 0;
                     }
-                    end = start+1;
+                    end = start+1; // only pick up exactly one segment
                 }
 
-                // extend it to include any contiguous segments that might be conjugation
+                // extend it to include any contiguous segments that might be conjugation text
                 while(end < limit)
                 {
                     String nextSegment = segments.get(end).txt;
@@ -154,7 +163,7 @@ public class WordSplitter
                 }
             }
 
-            //until we've tried all lengths (condition never actually hit)
+            // Now check if our string is a word, conjugated or not. If it isn't, shorten the string and try again until we only have one segment left.
             while(end > start)
             {
                 String str = Segmenter.Unsegment(segments, start, end);
@@ -163,8 +172,8 @@ public class WordSplitter
                 FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
                 attachDefinitions(matchedWord, word);//add cached definitions
 
-                // Return current string if it's a good word or if we do not have full parsing enabled or if it's the shortest we can get
-                if(matchedWord.getDefinitionCount() > 0 || dict.hasEpwingDef(word.getWord()) || !options.getOption("splitterMode").equals("full") || end == start+1)
+                // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
+                if(matchedWord.getDefinitionCount() > 0 || (dict.hasEpwingDef(word.getWord()) && firstSection) || !options.getOption("splitterMode").equals("full") || end == start+1)
                 {
                     words.add(matchedWord);
                     //segments = segments.subList(end, segments.size());
@@ -173,6 +182,7 @@ public class WordSplitter
                 }
                 end--;//try shorter word
             }
+            firstSection = false;
         }
         return words;
 

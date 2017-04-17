@@ -3,7 +3,7 @@ package main;
 import hooker.ClipboardHook;
 import hooker.Hook;
 import hooker.Log;
-import language.Segmenter;
+import language.segmenter.Segmenter;
 import language.deconjugator.WordScanner;
 import language.dictionary.Dictionary;
 import language.dictionary.EPWINGDefinition;
@@ -58,10 +58,12 @@ public class Main
 
     public static void main(String[] args)throws Exception
     {
+        // If segmenter was not initialized, then this is /actually/ the main class function of the executable, and we need to make our own segmenter instance.
+        // (the "heavy" module links in the core module and calls core main directly after making its own instance)
         if(Segmenter.instance == null)
         {
-            System.out.println("Segmenter was not initialized. Rebuild Spark Reader with a segmenter as the artefact.");
-            return;
+            Segmenter.extended = false;
+            Segmenter.instance = new language.segmenter.BasicSegmenter();
         }
         System.out.println(VERSION);
         initLoadingScreen();
