@@ -54,14 +54,15 @@ public class WordSplitter
         }
     }
 
-    private boolean mightBeDeconjugatable(String text)
+    // not in dictionary, see if adding possible deconjugation match endings to it gives us a dictionary entry (fixes 振り返ります etc)
+    private boolean mightBeDeconjugatable(String text, boolean firstSection)
     {
         boolean goodMatch = false;
 
         for(String ending:WordScanner.possibleEndings())
         {
             String attempt = text+ending;
-            if(dict.find(attempt) != null || dict.hasEpwingDef(attempt))
+            if(dict.find(attempt) != null || (dict.hasEpwingDef(text) && firstSection))
                 goodMatch = true;
         }
         return goodMatch;
@@ -119,7 +120,7 @@ public class WordSplitter
                 {
                     String textHere = Segmenter.Unsegment(segments, start, end);
                     // only check the epwing dictionary if this is the first segment in the section (for speed reasons)
-                    if(dict.find(textHere) != null || (dict.hasEpwingDef(textHere) && firstSection) || mightBeDeconjugatable(textHere))
+                    if(dict.find(textHere) != null || (dict.hasEpwingDef(textHere) && firstSection) || mightBeDeconjugatable(textHere, firstSection))
                         break;
                     end--;
                 }
@@ -136,7 +137,7 @@ public class WordSplitter
                         while(position > 1)
                         {
                             String textHere = workingText.substring(0, position);
-                            if(dict.find(textHere) != null || (dict.hasEpwingDef(textHere) && firstSection)  || mightBeDeconjugatable(textHere))
+                            if(dict.find(textHere) != null || (dict.hasEpwingDef(textHere) && firstSection)  || mightBeDeconjugatable(textHere, firstSection))
                                 break;
                             position--;
                         }
