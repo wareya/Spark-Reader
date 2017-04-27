@@ -23,6 +23,7 @@ import language.dictionary.DefTag;
 import language.dictionary.Japanese;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class WordScannerNew extends WordScanner implements WordScanner.SubScanner
 {
@@ -31,23 +32,9 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
         if(ruleList != null)return;
         ruleList = new ArrayList<>();
 
-        //Decensor: simple, but actually works well enough with a lot of 'censored' words
-        ruleList.add(word ->
-        {
-            if(word.getNumConjugations() == 0 && word.getWord().contains("○"))
-            {
-                return new ValidWord(word.getWord().replace('○', 'っ'), (word.getProcess() + " " + "censored").trim());
-            }
-            else return null;
-        });
-        ruleList.add(word ->
-        {
-            if(word.getNumConjugations() == 0 && word.getWord().contains("○"))
-            {
-                return new ValidWord(word.getWord().replace('○', 'ん'), (word.getProcess() + " " + "censored").trim());
-            }
-            else return null;
-        });
+        //Decensor
+        ruleList.add(new DecensorRule('ん'));
+        ruleList.add(new DecensorRule('っ'));
 
         /*
         // handle "must" in a single block because it's dumb and long
@@ -398,11 +385,11 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
     }
     public void scanWord(String word)
     {
-        matches.add(new ValidWord(word, ""));//add initial unmodified word
+        matches.add(new ValidWord(word));//add initial unmodified word
         // convert to kana and add that too if it's not already in hiragana
         String hiragana = Japanese.toHiragana(word, false);
         if(!word.equals(hiragana))
-            matches.add(new ValidWord(hiragana, ""));
+            matches.add(new ValidWord(hiragana));
 
         // start from the top of the list when we have a successful deconjugation
         int fully_covered_matches = 0;

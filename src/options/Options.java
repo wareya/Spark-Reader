@@ -112,6 +112,7 @@ public class Options
 
         options.put("splitterMode", "full");
         options.put("deconMode", "recursive");
+        options.put("hookKeyboard", "false");
 
         options.put("kuromojiSupportLevel", "heuristics");
 

@@ -85,7 +85,7 @@ public class WordPopup extends JPopupMenu
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                ClipboardHook.setClipboard(Main.text);
+                ClipboardHook.setClipboard(Main.currPage.getText());
             }
         });
         addBreak = new JMenuItem(new AbstractAction("Toggle break here (middle click)")
@@ -95,7 +95,7 @@ public class WordPopup extends JPopupMenu
             {
                 System.out.println("adding break");
                 //simulate middle button press at window origin (placing a break there)
-                ui.mouseClicked(new MouseEvent(ui.disp.getFrame(), -1, System.currentTimeMillis(), 0, x, y, 1, true, 2));
+                ui.mouseHandler.middleClick(new Point(x, y));
             }
         });
         
@@ -124,7 +124,7 @@ public class WordPopup extends JPopupMenu
         add(markKnown);
         add(new Separator());
         add(copy);
-        if(Main.text.contains(clipboard) && Main.text.contains(clipboard + word.getText()))add(append);
+        if(Main.currPage.getText().contains(clipboard) && Main.currPage.getText().contains(clipboard + word.getText()))add(append);
         add(copyFull);
 
         addPopupMenuListener(new IgnoreExitListener());
@@ -179,7 +179,7 @@ public class WordPopup extends JPopupMenu
             Writer fr = new OutputStreamWriter(new FileOutputStream(textFile, true), Charset.forName("UTF-8"));
             fr.append(df.format(date))
                     .append("\t")
-                    .append(Main.text.replace("\n", "<br>"))
+                    .append(Main.currPage.getText().replace("\n", "<br>"))
                     .append("\t")
                     .append(note)
                     .append("\n");
