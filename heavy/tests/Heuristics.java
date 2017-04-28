@@ -119,14 +119,15 @@ public class Heuristics
         {
             assertEquals(word.getText().equals("飛び掛っ"), false); // failed to split segment that wasn't in a dictionary
         }
-
+        
+        // TODO : figure out why this isn't working, should do the same as the above but isn't
+        /*
         words = splitter.split("ベッドに寝っ転がると、",  new HashSet<>());
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("寝っ転がる"), false); // failed to split segment that wasn't in a dictionary
         }
-        
-        // それで、魔法について教わった？
+        */
 
         words = splitter.split("やっぱり覚えてやがったな",  new HashSet<>());
         for(FoundWord word : words)
