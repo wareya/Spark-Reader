@@ -63,8 +63,15 @@ public class BlacklistDef
         }
         br.close();
     }
+    public BlacklistDef()
+    {
+        table = new TreeMap<>();
+        file = null;
+        System.out.println("Note: using debug constructor for BlacklistDef. This should only happen in regression tests.");
+    }
     public void save()throws IOException
     {
+        if(file == null) return;
         if(dueChanges == 0)return;//don't bother writing if nothing changed
         Writer fr = new OutputStreamWriter(new FileOutputStream(file, false), Charset.forName("UTF-8"));
         for(Entry<Long, ArrayList<String>> entry : table.entrySet())
@@ -81,6 +88,25 @@ public class BlacklistDef
     public void setSaveThreshold(int saveThreshold)
     {
         this.saveThreshold = saveThreshold;
+    }
+    public void debugForceBlacklist(Long id, String spelling)
+    {
+        if(table.containsKey(id))
+        {
+            System.out.println("BL: removing");
+            //ArrayList<String> forms = new ArrayList<>(table.get(id));
+            ArrayList<String> forms = table.get(id);
+            forms.add(spelling);
+            //table.replace(id, forms);
+        }
+        // adding
+        else
+        {
+            System.out.println("BL: adding new");
+            ArrayList<String> forms = new ArrayList<>();
+            forms.add(spelling);
+            table.put(id, forms);
+        }
     }
     public void toggleBlacklist(FoundDef def)
     {
