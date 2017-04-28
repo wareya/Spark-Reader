@@ -3,6 +3,7 @@ import language.segmenter.Segmenter;
 import language.splitter.FoundWord;
 import language.splitter.WordSplitter;
 import main.Main;
+import options.BlacklistDef;
 import options.Known;
 import options.Options;
 import options.PrefDef;
@@ -29,7 +30,8 @@ public class Deconjugation
 
         Main.known = new Known(Main.options.getFile("knownWordsPath"));
         Main.prefDef = new PrefDef(Main.options.getFile("preferredDefsPath"));
-
+        Main.blacklistDef = new BlacklistDef();
+        
         Main.options.setOption("splitterMode", "full");
         Main.options.setOption("deconMode", "recursive");
         Main.options.setOption("kuromojiSupportLevel", "heuristics");
