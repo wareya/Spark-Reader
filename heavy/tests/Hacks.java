@@ -19,10 +19,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test for the heuristics used to prevent the word splitter from inventing words
  */
-public class Deconjugation
+public class Hacks
 {
     @Test
-    public void testDeconjugation() throws IOException
+    public void testHeuristics() throws IOException
     {
         Segmenter.extended = true;
         Segmenter.instance = new HeavySegmenter();
@@ -31,7 +31,7 @@ public class Deconjugation
         Main.known = new Known(Main.options.getFile("knownWordsPath"));
         Main.prefDef = new PrefDef(Main.options.getFile("preferredDefsPath"));
         Main.blacklistDef = new BlacklistDef();
-        
+
         Main.options.setOption("splitterMode", "full");
         Main.options.setOption("deconMode", "recursive");
         Main.options.setOption("kuromojiSupportLevel", "heuristics");
@@ -39,12 +39,27 @@ public class Deconjugation
         Dictionary dict = new Dictionary(new File("../dictionaries"));
         WordSplitter splitter = new WordSplitter(dict);
 
+        //ArrayList<Piece> pieces = Segmenter.instance.Segment();
         List<FoundWord> words;
 
-        words = splitter.split("それじゃ最近してたことって何？",  new HashSet<>());
+        words = splitter.split("飛び掛ってきても、",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("た"), false); // failed to deconjugate to た
+            assertEquals(word.getText().equals("飛び掛っ"), false); // failed to split segment that wasn't in a dictionary
         }
+
+        words = splitter.split("「絡んだっつうか…」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("だっ"), false); // failed to split segment that wasn't in a dictionary
+        }
+        
+        words = splitter.split("ベッドに寝っ転がると、",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("寝っ転がる"), false); // failed to split segment that wasn't in a dictionary
+        }
+
+        // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
 }

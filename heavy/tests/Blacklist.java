@@ -43,7 +43,6 @@ public class Blacklist
         Dictionary dict = new Dictionary(new File("../dictionaries"));
         WordSplitter splitter = new WordSplitter(dict);
 
-        //ArrayList<Piece> pieces = Segmenter.instance.Segment();
         List<FoundWord> words;
 
         words = splitter.split("次からはちゃんと姫様と話すがいいです",  new HashSet<>());

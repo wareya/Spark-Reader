@@ -110,11 +110,23 @@ public class WordSplitter
                 // We only need to start with a length as the longest dictionary term, because it can be extended to pick up conjugation characters
                 // 100 is a good conservative "no way there's a dictionary term this long" limit, and prevents long text from taking several seconds to parse
                 // todo: make this be an option?
-                if(end-start > 100)
-                    end = start+100;
-                if(end-start > 50 && Segmenter.extended) // If the segmenter is "smart" then each segment is larger than a single character and we should be more aggressive
-                    end = start+50;
-
+                if(!Segmenter.extended)
+                {
+                    if(end-start > 100)
+                        end = start+100;
+                }
+                else // If the segmenter is "smart" then each segment is larger than a single character and we should be more aggressive
+                {
+                    int scratch_length = 0;
+                    for(Piece s : Segmenter.subList(segments, start, segments.size()-1))
+                    {
+                        scratch_length += s.txt.length();
+                        if(scratch_length >= 100) break;
+                    }
+                    if(end-start > scratch_length)
+                        end = start+scratch_length;
+                }
+                
                 // look for the longest section covered as-is in the dictionary
                 while(end > start)
                 {
@@ -127,21 +139,20 @@ public class WordSplitter
                 // Fell through: no good, try splitting the first segment (uncommon, performance impact isn't big even though we rewrite the segment list)
                 if(end <= start)
                 {
-                    // only bother for weak non-unigrams
-                    if(segments.get(start).txt.length() > 1 && !segments.get(start).strong)
+                    // only bother for weak non-unigrams or long things
+                    if((segments.get(start).txt.length() > 1 && !segments.get(start).strong) || segments.get(start).txt.length() >= 3)
                     {
-                        List<Piece> workingList;
-
                         String workingText = segments.get(start).txt;
                         int position = workingText.length();
                         while(position > 1)
                         {
                             String textHere = workingText.substring(0, position);
-                            if(dict.find(textHere) != null || (dict.hasEpwingDef(textHere) && firstSection)  || mightBeDeconjugatable(textHere, firstSection))
+                            if(dict.find(textHere) != null || (firstSection && dict.hasEpwingDef(textHere))  || mightBeDeconjugatable(textHere, firstSection))
                                 break;
                             position--;
                         }
 
+                        List<Piece> workingList;
                         workingList = new ArrayList<>();
                         workingList.add(instance.new Piece(workingText.substring(0, position), false));
                         workingList.add(instance.new Piece(workingText.substring(position, workingText.length()), false));
@@ -165,6 +176,8 @@ public class WordSplitter
                         break;
                 }
             }
+            
+            int safe_end = end;
 
             // Now check if our string is a word, conjugated or not. If it isn't, shorten the string and try again until we only have one segment left.
             while(end > start)
@@ -176,14 +189,21 @@ public class WordSplitter
                 attachDefinitions(matchedWord, word);//add cached definitions
 
                 // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
-                if(matchedWord.getDefinitionCount() > 0 || (dict.hasEpwingDef(word.getWord()) && firstSection) || !options.getOption("splitterMode").equals("full") || end == start+1)
+                if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())) || !options.getOption("splitterMode").equals("full"))
                 {
                     words.add(matchedWord);
-                    //segments = segments.subList(end, segments.size());
                     start = end;
                     break;
                 }
-                end--;//try shorter word
+                // We failed to match a word and only have one segment left
+                else if(end == start+1)
+                {
+                    words.add(matchedWord);
+                    start = end;
+                    break;
+                }
+                else
+                    end--;//try shorter word
             }
             firstSection = false;
         }

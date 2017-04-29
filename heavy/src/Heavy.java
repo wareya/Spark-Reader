@@ -6,6 +6,8 @@ import main.Main;
 import language.segmenter.Segmenter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import com.atilika.kuromoji.ipadic.Token;
@@ -35,11 +37,19 @@ class HeavySegmenter extends Segmenter
 
         return kuro.tokenize(text);
     }
+    
+    static HashSet<String> badSegments = new HashSet<>(Arrays.asList(
+        "だっ"
+    ));
+    private boolean shouldForceUnigram(String s)
+    {
+        return (badSegments.contains(s));
+    }
 
     // unigram unknown tokens before adding them
     private void addWithUnigramCheck(ArrayList<Piece> r, Token t, boolean strong)
     {
-        if(t.isKnown())
+        if(t.isKnown() && !shouldForceUnigram(t.getSurface()))
             r.add(new Piece(t.getSurface(), strong));
         else for(char c : t.getSurface().toCharArray())
             r.add(new Piece(c+"", strong));
@@ -86,8 +96,9 @@ class HeavySegmenter extends Segmenter
                        && n.getPartOfSpeechLevel1().equals("助詞"));
 
                 // Force non-split on one-character-surface independent verbs followed by auxiliaries
-                if(t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().equals("自立") && n.getPartOfSpeechLevel1().contains("助動")
-                && t.isKnown() && n.isKnown())
+                // TODO: Figure out what this was needed for and add a test for it.
+                if(false)//t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().equals("自立") && n.getPartOfSpeechLevel1().contains("助動")
+                //&& t.isKnown() && n.isKnown())
                 {
                     r.add(new Piece(t.getSurface()+n.getSurface(), false));
                     i++;
