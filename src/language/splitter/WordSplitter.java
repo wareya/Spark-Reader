@@ -140,7 +140,8 @@ public class WordSplitter
                 if(end <= start)
                 {
                     // only bother for weak non-unigrams or long things
-                    if((segments.get(start).txt.length() > 1 && !segments.get(start).strong) || segments.get(start).txt.length() >= 3)
+                    //if((segments.get(start).txt.length() > 1 && !segments.get(start).strong) || segments.get(start).txt.length() >= 3)
+                    if(segments.get(start).txt.length() > 1)
                     {
                         String workingText = segments.get(start).txt;
                         int position = workingText.length();

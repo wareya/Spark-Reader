@@ -312,19 +312,19 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
         }));
 
         // volitional stem
-        ruleList.add(new StdRule("こう", "く", "volitional", DefTag.v5k, DefTag.stem_ren_less));
-        ruleList.add(new StdRule("そう", "す", "volitional", DefTag.v5s, DefTag.stem_ren_less));
-        ruleList.add(new StdRule("とう", "つ", "volitional", DefTag.v5t, DefTag.stem_ren_less));
-        ruleList.add(new StdRule("おう", "う", "volitional", DefTag.v5u, DefTag.stem_ren_less));
-        ruleList.add(new StdRule("ろう", "る", "volitional", DefTag.v5r, DefTag.stem_ren_less));
-        ruleList.add(new StdRule("ごう", "ぐ", "volitional", DefTag.v5g, DefTag.stem_ren_less_v));
-        ruleList.add(new StdRule("ぼう", "ぶ", "volitional", DefTag.v5b, DefTag.stem_ren_less_v));
-        ruleList.add(new StdRule("のう", "ぬ", "volitional", DefTag.v5n, DefTag.stem_ren_less_v));
-        ruleList.add(new StdRule("もう", "む", "volitional", DefTag.v5m, DefTag.stem_ren_less_v));
-        ruleList.add(new StdRule("よう"  , "る", "volitional", DefTag.v1,  DefTag.stem_ren_less));
+        ruleList.add(new StdRule("こう", "く", "volitional", DefTag.v5k, DefTag.form_volition));
+        ruleList.add(new StdRule("そう", "す", "volitional", DefTag.v5s, DefTag.form_volition));
+        ruleList.add(new StdRule("とう", "つ", "volitional", DefTag.v5t, DefTag.form_volition));
+        ruleList.add(new StdRule("おう", "う", "volitional", DefTag.v5u, DefTag.form_volition));
+        ruleList.add(new StdRule("ろう", "る", "volitional", DefTag.v5r, DefTag.form_volition));
+        ruleList.add(new StdRule("ごう", "ぐ", "volitional", DefTag.v5g, DefTag.form_volition));
+        ruleList.add(new StdRule("ぼう", "ぶ", "volitional", DefTag.v5b, DefTag.form_volition));
+        ruleList.add(new StdRule("のう", "ぬ", "volitional", DefTag.v5n, DefTag.form_volition));
+        ruleList.add(new StdRule("もう", "む", "volitional", DefTag.v5m, DefTag.form_volition));
+        ruleList.add(new StdRule("よう"  , "る", "volitional", DefTag.v1,  DefTag.form_volition));
         // marginal categories
-        ruleList.add(new StdRule("おう", "う", "volitional", DefTag.v5u_s, DefTag.stem_ren_less));
-        ruleList.add(new StdRule("こう", "く", "volitional", DefTag.v5k_s, DefTag.stem_ren_less));
+        ruleList.add(new StdRule("おう", "う", "volitional", DefTag.v5u_s, DefTag.form_volition));
+        ruleList.add(new StdRule("こう", "く", "volitional", DefTag.v5k_s, DefTag.form_volition));
 
         // irregulars
         ruleList.add(new ContextRule("し", "する", "(infinitive)", DefTag.vs_i,  DefTag.stem_ren, (rule, word) -> {

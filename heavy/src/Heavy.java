@@ -38,8 +38,11 @@ class HeavySegmenter extends Segmenter
         return kuro.tokenize(text);
     }
     
+    // Considered a hack
     static HashSet<String> badSegments = new HashSet<>(Arrays.asList(
-        "だっ"
+        "だっ",
+        "たろ",
+        "てよ"
     ));
     private boolean shouldForceUnigram(String s)
     {

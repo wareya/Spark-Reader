@@ -50,5 +50,7 @@ public class Blacklist
         {
             assertEquals(word.getText().equals("がいい"), false); // false split
         }
+        
+        // test かえって得体の知れないものを想像させる
     }
 }
