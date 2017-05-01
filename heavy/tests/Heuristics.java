@@ -57,7 +57,6 @@ public class Heuristics
         words = splitter.split("別段なにがいいってわけでもない",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("がいい"), false); // false split
             assertEquals(word.getText().equals("ない"), false); // false forced split
         }
 
@@ -91,13 +90,6 @@ public class Heuristics
             assertEquals(word.getText().equals("はいる"), false); // false split
         }
 
-        /*
-        List<Token> tokenlist;
-
-        tokenlist = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("あれが大人になると");
-        for(Token token : tokenlist)
-            System.out.println(token.getConjugationForm());
-        */
         words = splitter.split("あれが大人になると、",  new HashSet<>());
         for(FoundWord word : words)
         {

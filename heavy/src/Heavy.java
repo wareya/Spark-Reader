@@ -93,10 +93,12 @@ class HeavySegmenter extends Segmenter
 
                 // "Strong" means that a segment forces the word splitter to make a segment after it IF it is the first segment in the current attempt at finding a word.
                 
-                // ～しかいなかった and others
-                boolean strong = (t.getPartOfSpeechLevel1().equals("助詞") 
-                                && (t.getPartOfSpeechLevel2().equals("格助詞") || t.getPartOfSpeechLevel2().equals("係助詞") || n.getPartOfSpeechLevel1().equals("副詞"))
-                                && !n.getPartOfSpeechLevel1().contains("助詞")) && !n.getPartOfSpeechLevel2().equals("接尾");
+                boolean strong = false;
+                // しかいなかった
+                strong = strong
+                      || (t.getPartOfSpeechLevel2().contains("係助詞")
+                       && n.getPartOfSpeechLevel1().contains("動詞")
+                       && n.getPartOfSpeechLevel2().contains("自立"));
                 // ～かと思う
                 strong = strong
                       || (t.getPartOfSpeechLevel2().contains("終助詞")
@@ -111,6 +113,12 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel1().equals("動詞")
                        && t.getConjugationForm().equals("基本形")
                        && n.getPartOfSpeechLevel1().equals("助詞"));
+                // これですっ！
+                strong = strong
+                      || (t.getPartOfSpeechLevel2().equals("代名詞")
+                       && t.getPartOfSpeechLevel3().equals("一般")
+                       && n.getPartOfSpeechLevel2().equals("格助詞")
+                       && n.getPartOfSpeechLevel3().equals("一般"));
                 
                 if(i+2 < tokens.size())
                 {
@@ -122,14 +130,10 @@ class HeavySegmenter extends Segmenter
                          && n.getPartOfSpeechLevel1().equals("助動詞"));
                 }
                 
-                // これですっ！
-                if(t.getSurface().length() == 1 && shouldForceUnigram(n.getSurface()))
-                    strong = false;
-                
                 // Force non-split on one-character-surface independent verbs followed by auxiliaries
                 // TODO: Figure out what this was needed for and add a test for it.
                 if(false)//t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().equals("自立") && n.getPartOfSpeechLevel1().contains("助動")
-                //&& t.isKnown() && n.isKnown())
+                //    && t.isKnown() && n.isKnown())
                 {
                     r.add(new Piece(t.getSurface()+n.getSurface(), false));
                     i++;

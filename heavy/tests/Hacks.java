@@ -78,6 +78,13 @@ public class Hacks
             assertEquals(word.getText().equals("かっ"), false);
         }
         
+        words = splitter.split("これですっ！",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("すっ"), false);
+            assertEquals(word.getText().equals("す"), false);
+        }
+        
         
     }
 }
