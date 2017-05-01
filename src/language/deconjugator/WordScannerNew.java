@@ -184,7 +184,8 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
         // part-of-speech roles
         ruleList.add(new StdRule("に", "", "adverb", DefTag.adj_na));
         ruleList.add(new StdRule("な", "", "attributive", DefTag.adj_na));
-        ruleList.add(new StdRule("の", "", "attributive", DefTag.adj_no));
+        //ruleList.add(new StdRule("の", "", "attributive", DefTag.adj_no));
+        ruleList.add(new StdRule("の", "", "attributive", DefTag.n));
         ruleList.add(new StdRule("と", "", "adverb", DefTag.adv_to));
 
         // i-adjective stems
