@@ -177,6 +177,7 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
         ruleList.add(new OnlyFinalRule("ます", "", "polite", DefTag.stem_ren, DefTag.uninflectable));
         ruleList.add(new OnlyFinalRule("ません", "", "negative polite", DefTag.stem_ren, DefTag.uninflectable));
         ruleList.add(new OnlyFinalRule("ました", "", "past polite", DefTag.stem_ren, DefTag.uninflectable));
+        ruleList.add(new OnlyFinalRule("まして", "", "te polite", DefTag.stem_ren, DefTag.uninflectable));
         ruleList.add(new OnlyFinalRule("ませんでした", "", "past negative polite", DefTag.stem_ren, DefTag.uninflectable));
         ruleList.add(new OnlyFinalRule("ましょう", "", "polite volitional", DefTag.stem_ren, DefTag.uninflectable));
 
