@@ -147,6 +147,7 @@ class HeavySegmenter extends Segmenter
                     Token m = tokens.get(i+2);
                     strong = strong
                         || ((t.getSurface().length() == 1 || m.getSurface().length() == 1) 
+                         && t.getPartOfSpeechLevel2().equals("非自立")// しないでください
                          && m.getPartOfSpeechLevel2().equals("接続助詞")
                          && n.getPartOfSpeechLevel1().equals("助動詞"));
                 }
