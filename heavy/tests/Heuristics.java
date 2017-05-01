@@ -122,6 +122,12 @@ public class Heuristics
             assertEquals(word.getText().equals("や"), false); // false split
         }
 
+        words = splitter.split("お役に立てることなら手伝おうかな、と思って",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("か"), false); // false split
+        }
+
         // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
 }
