@@ -111,8 +111,7 @@ public class BlacklistDef
     public void toggleBlacklist(FoundDef def)
     {
         Long id = def.getDefinition().getID();
-        // "dict form" is a borderline misnomer from deconjugation; this is actually referring to the "surface form" of the word if it were uninflected in the original text, which is what we want
-        String spelling = def.getDictForm();
+        String spelling = def.getFoundForm().getOriginalWord();
         if(table.containsKey(id))
         {
             // removing
