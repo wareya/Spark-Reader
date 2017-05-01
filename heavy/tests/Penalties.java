@@ -24,17 +24,10 @@ public class Penalties
         Main.options = new Options();
 
         List<Token> tokens;
-
-        tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("何も悪いことしてなきゃいい人なんだな");
-        System.out.println(tokens);
-        boolean foundRightToken = false;
-        for(Token token : tokens)
-            if(token.getSurface().equals("こと")) foundRightToken = true;
-        assertEquals(foundRightToken, true);
         
         tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("それで、魔法について教わった？");
         System.out.println(tokens);
-        foundRightToken = false;
+        boolean foundRightToken = false;
         for(Token token : tokens)
             if(token.getSurface().equals("について")) foundRightToken = true;
         assertEquals(foundRightToken, true);
@@ -44,6 +37,13 @@ public class Penalties
         foundRightToken = false;
         for(Token token : tokens)
             if(token.getSurface().equals("という")) foundRightToken = true;
+        assertEquals(foundRightToken, true);
+        
+        tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("謙遜なんかしないでください。");
+        System.out.println(tokens);
+        foundRightToken = false;
+        for(Token token : tokens)
+            if(token.getSurface().equals("なんか")) foundRightToken = true;
         assertEquals(foundRightToken, true);
 
         //words = splitter.split("それで、魔法について教わった？",  new HashSet<>());

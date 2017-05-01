@@ -48,14 +48,19 @@ class HeavySegmenter extends Segmenter
     {
         return (badSegments.contains(s));
     }
+    
+    private void addAsUnigram(ArrayList<Piece> r, Token t)
+    {
+        for(char c : t.getSurface().toCharArray())
+            r.add(new Piece(c+"", false));
+    }
 
     // unigram unknown tokens before adding them
     private void addWithUnigramCheck(ArrayList<Piece> r, Token t, boolean strong)
     {
         if(!t.isKnown() || shouldForceUnigram(t.getSurface()))
         {
-            for(char c : t.getSurface().toCharArray())
-                r.add(new Piece(c+"", false));
+            addAsUnigram(r, t);
         }
         else if(t.getSurface().endsWith("っ") && t.getSurface().length() > 1)
         {
@@ -75,6 +80,10 @@ class HeavySegmenter extends Segmenter
 
         List<Token> tokens = kuro.tokenize(text);
         ArrayList<Piece> r = new ArrayList<>();
+        
+        System.out.println("Kuromoji output:");
+        for(Token t : tokens)
+            System.out.println(t.getSurface());
 
         for(int i = 0; i < tokens.size(); i++)
         {
@@ -90,6 +99,18 @@ class HeavySegmenter extends Segmenter
             else
             {
                 Token n = tokens.get(i+1);
+                
+                if(i-1 > 0)
+                {
+                    Token o = tokens.get(i-1);
+                    
+                    // Hack: kuromoji-ipadic's internal weights for こ and として are bogus
+                    if(o.getSurface().equals("こ") && t.getSurface().equals("として"))
+                    {
+                        addAsUnigram(r, t);
+                        continue;
+                    }
+                }
 
                 // "Strong" means that a segment forces the word splitter to make a segment after it IF it is the first segment in the current attempt at finding a word.
                 

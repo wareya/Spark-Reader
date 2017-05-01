@@ -86,6 +86,10 @@ public class WordSplitter
     {
         List<Piece> segments = instance.Segment(text);
         List<FoundWord> words = new ArrayList<>();
+        
+        System.out.println("Splitter output:");
+        for(Piece p : segments)
+            System.out.println(p.txt);
 
         //until we've covered all words
         int start = 0;
@@ -189,6 +193,7 @@ public class WordSplitter
                 FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
                 attachDefinitions(matchedWord, word);//add cached definitions
 
+                System.out.println(matchedWord.getText());
                 // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
                 if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())) || !options.getOption("splitterMode").equals("full"))
                 {

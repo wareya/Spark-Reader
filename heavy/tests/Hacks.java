@@ -1,3 +1,4 @@
+import com.atilika.kuromoji.ipadic.Token;
 import language.dictionary.Dictionary;
 import language.segmenter.Segmenter;
 import language.splitter.FoundWord;
@@ -85,6 +86,10 @@ public class Hacks
             assertEquals(word.getText().equals("す"), false);
         }
         
-        
+        words = splitter.split("何も悪いことしてなきゃいい人なんだな",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("こ"), false);
+        }
     }
 }
