@@ -40,7 +40,7 @@ class HeavySegmenter extends Segmenter
     
     // Considered a hack
     static HashSet<String> badSegments = new HashSet<>(Arrays.asList(
-        "だっ",
+        "すっ",
         "たろ",
         "てよ"
     ));
@@ -52,10 +52,18 @@ class HeavySegmenter extends Segmenter
     // unigram unknown tokens before adding them
     private void addWithUnigramCheck(ArrayList<Piece> r, Token t, boolean strong)
     {
-        if(t.isKnown() && !shouldForceUnigram(t.getSurface()) && !t.getSurface().endsWith("っ"))
+        if(!t.isKnown() || shouldForceUnigram(t.getSurface()))
+        {
+            for(char c : t.getSurface().toCharArray())
+                r.add(new Piece(c+"", false));
+        }
+        else if(t.getSurface().endsWith("っ") && t.getSurface().length() > 1)
+        {
+            r.add(new Piece(t.getSurface().substring(0, t.getSurface().length()-1), false));
+            r.add(new Piece("っ", false));
+        }
+        else
             r.add(new Piece(t.getSurface(), strong));
-        else for(char c : t.getSurface().toCharArray())
-            r.add(new Piece(c+"", strong));
     }
 
     public List<Piece> Segment(String text)
@@ -113,6 +121,10 @@ class HeavySegmenter extends Segmenter
                          && m.getPartOfSpeechLevel2().equals("接続助詞")
                          && n.getPartOfSpeechLevel1().equals("助動詞"));
                 }
+                
+                // これですっ！
+                if(t.getSurface().length() == 1 && shouldForceUnigram(n.getSurface()))
+                    strong = false;
                 
                 // Force non-split on one-character-surface independent verbs followed by auxiliaries
                 // TODO: Figure out what this was needed for and add a test for it.

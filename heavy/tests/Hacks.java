@@ -45,37 +45,37 @@ public class Hacks
         words = splitter.split("「絡んだっつうか…」",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("だっ"), false); // failed to split segment that should be forced to unigramize
+            assertEquals(word.getText().equals("だっ"), false);
         }
 
         words = splitter.split("さっき言ったろ、",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("たろ"), false); // failed to split segment that should be forced to unigramize
+            assertEquals(word.getText().equals("たろ"), false);
         }
 
         words = splitter.split("飛び掛ってきても、",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("飛び掛っ"), false); // failed to split segment that wasn't in a dictionary
+            assertEquals(word.getText().equals("飛び掛っ"), false);
         }
         
         words = splitter.split("ベッドに寝っ転がると、",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("寝っ転がる"), false); // failed to split segment that wasn't in a dictionary
+            assertEquals(word.getText().equals("寝っ転がる"), false);
         }
         
         words = splitter.split("戦ってようと",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("てよ"), false); // failed to split segment that wasn't in a dictionary
+            assertEquals(word.getText().equals("てよ"), false);
         }
         
         words = splitter.split("「な、なんでしょうかっ？」",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("かっ"), false); // failed to split segment that wasn't in a dictionary
+            assertEquals(word.getText().equals("かっ"), false);
         }
         
         
