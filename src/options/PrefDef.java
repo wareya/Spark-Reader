@@ -76,7 +76,7 @@ public class PrefDef
     }
     public void setPreferred(FoundDef def)
     {
-        String spelling = def.getDictForm();
+        String spelling = def.getFoundForm().getOriginalWord();
         System.out.println(spelling + " for " + def.getDefinition().getID() + " set");
         table.put(spelling, def.getDefinition().getID());
         dueChanges++;
@@ -94,14 +94,11 @@ public class PrefDef
         }
     }
 
-    public boolean isPreferred(Definition def)
+    public boolean isPreferred(String spelling, Definition def)
     {
-        for(String spelling:def.getSpellings())
+        if(table.containsKey(spelling) && table.get(spelling) == def.getID())
         {
-            if(table.containsKey(spelling) && table.get(spelling) == def.getID())
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }

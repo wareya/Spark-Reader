@@ -152,7 +152,7 @@ public class FoundDef implements Comparable<FoundDef>
         int score = 0;
 
         score += foundDef.getSource().getPriority() * 100;
-        if (Main.prefDef.isPreferred(foundDef)) score += 1000;//HIGHLY favour definitions the user preferred
+        if (Main.prefDef.isPreferred(foundForm.getOriginalWord(), foundDef)) score += 1000;//HIGHLY favour definitions the user preferred
 
         Set<DefTag> tags = foundDef.getTags();
         if (tags != null)
