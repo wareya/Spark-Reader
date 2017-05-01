@@ -119,8 +119,8 @@ public class Options
 
         options.put("kuromojiKanjiPenaltyLength", "2"); // original default: 2
         options.put("kuromojiKanjiPenalty", "3000"); // original default: 3000
-        options.put("kuromojiOtherPenaltyLength", "2"); // original default: 7
-        options.put("kuromojiOtherPenalty", "1000"); // original default: 1700
+        options.put("kuromojiOtherPenaltyLength", "1"); // original default: 7; alternate: 2
+        options.put("kuromojiOtherPenalty", "500"); // original default: 1700; alternate: 1000
 
     }
     public Options(File file)throws IOException

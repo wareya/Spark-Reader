@@ -71,5 +71,13 @@ public class Hacks
         {
             assertEquals(word.getText().equals("てよ"), false); // failed to split segment that wasn't in a dictionary
         }
+        
+        words = splitter.split("「な、なんでしょうかっ？」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("かっ"), false); // failed to split segment that wasn't in a dictionary
+        }
+        
+        
     }
 }

@@ -52,7 +52,7 @@ class HeavySegmenter extends Segmenter
     // unigram unknown tokens before adding them
     private void addWithUnigramCheck(ArrayList<Piece> r, Token t, boolean strong)
     {
-        if(t.isKnown() && !shouldForceUnigram(t.getSurface()))
+        if(t.isKnown() && !shouldForceUnigram(t.getSurface()) && !t.getSurface().endsWith("っ"))
             r.add(new Piece(t.getSurface(), strong));
         else for(char c : t.getSurface().toCharArray())
             r.add(new Piece(c+"", strong));

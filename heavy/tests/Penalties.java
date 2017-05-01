@@ -38,6 +38,13 @@ public class Penalties
         for(Token token : tokens)
             if(token.getSurface().equals("について")) foundRightToken = true;
         assertEquals(foundRightToken, true);
+        
+        tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("というわけで");
+        System.out.println(tokens);
+        foundRightToken = false;
+        for(Token token : tokens)
+            if(token.getSurface().equals("という")) foundRightToken = true;
+        assertEquals(foundRightToken, true);
 
         //words = splitter.split("それで、魔法について教わった？",  new HashSet<>());
         //for(FoundWord word : words)
