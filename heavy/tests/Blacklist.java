@@ -31,10 +31,6 @@ public class Blacklist
         Main.known = new Known(Main.options.getFile("knownWordsPath"));
         Main.prefDef = new PrefDef(Main.options.getFile("preferredDefsPath"));
         Main.blacklistDef = new BlacklistDef();
-        
-        Main.blacklistDef.debugForceBlacklist((long)1203350, "がいい");
-        Main.blacklistDef.debugForceBlacklist((long)1757620, "がいい");
-        Main.blacklistDef.debugForceBlacklist((long)1868030, "がいい");
 
         Main.options.setOption("splitterMode", "full");
         Main.options.setOption("deconMode", "recursive");
@@ -44,12 +40,18 @@ public class Blacklist
         WordSplitter splitter = new WordSplitter(dict);
 
         List<FoundWord> words;
+        
+        Main.blacklistDef.debugForceBlacklist((long)1203350, "がいい");
+        Main.blacklistDef.debugForceBlacklist((long)1757620, "がいい");
+        Main.blacklistDef.debugForceBlacklist((long)1868030, "がいい");
 
         words = splitter.split("次からはちゃんと姫様と話すがいいです",  new HashSet<>());
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("がいい"), false); // false split
         }
+        
+        // まだ疑問が残っている倉科さんの手を取ると
         
         // test かえって得体の知れないものを想像させる
     }

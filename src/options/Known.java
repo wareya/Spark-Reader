@@ -82,7 +82,7 @@ public class Known
     }
     private void addWord(String word)
     {
-        List<Definition> defs = Main.dict.find(word);
+        List<Definition> defs = Main.dict.findText(word);
         if(defs != null)//if this word isn't known, don't bother adding it as a known word
         {
             for(String match:defs.get(0).getSpellings())

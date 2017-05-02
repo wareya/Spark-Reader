@@ -17,6 +17,8 @@
 package language.dictionary;
 
 import fuku.eb4j.*;
+import language.deconjugator.ValidWord;
+import language.splitter.FoundWord;
 import main.Main;
 
 import java.io.*;
@@ -157,22 +159,26 @@ public class Dictionary
         List<Definition> meanings = lookup.computeIfAbsent(kanji, k -> new ArrayList<>());
         meanings.add(def);//add this definition for this spelling
     }
-    public List<Definition> find(String word)
+    public List<Definition> findWord(ValidWord word)
     {
         //System.out.println("looking up " + word);
-        if(lookup.get(word) == null) return null;
+        if(lookup.get(word.getWord()) == null) return null;
         // FIXME: this is a pile of crap and probably really slow
-        List<Definition> stored = new ArrayList<>(lookup.get(word));
+        List<Definition> stored = new ArrayList<>(lookup.get(word.getWord()));
         for(int i = 0; i < stored.size(); i++)
         {
             Definition def = stored.get(i);
-            if(Main.blacklistDef.isBlacklisted(def.getID(), word))
+            if(Main.blacklistDef.isBlacklisted(def.getID(), word.getOriginalWord()))
             {
                 stored.remove(i);
                 i--;
             }
         }
         return stored;
+    }
+    public List<Definition> findText(String word)
+    {
+        return lookup.get(word);
     }
     public boolean hasEpwingDef(String word)
     {

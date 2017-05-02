@@ -62,7 +62,7 @@ public class WordSplitter
         {
             String attempt = text + ending;
             //only check Edict here; Epwing does cannot handle conjugations
-            if(dict.find(attempt) != null)
+            if(dict.findText(attempt) != null)
                 goodMatch = true;
         }
         return goodMatch;
@@ -136,7 +136,7 @@ public class WordSplitter
                 {
                     String textHere = Segmenter.Unsegment(segments, start, end);
                     // only check the epwing dictionary if this is the first segment in the section (for speed reasons)
-                    if(dict.find(textHere) != null || (firstSection && dict.hasEpwingDef(textHere)) || mightBeDeconjugatable(textHere, firstSection))
+                    if(dict.findText(textHere) != null || (firstSection && dict.hasEpwingDef(textHere)) || mightBeDeconjugatable(textHere, firstSection))
                         break;
                     end--;
                 }
@@ -152,7 +152,7 @@ public class WordSplitter
                         while(position > 1)
                         {
                             String textHere = workingText.substring(0, position);
-                            if(dict.find(textHere) != null || (firstSection && dict.hasEpwingDef(textHere))  || mightBeDeconjugatable(textHere, firstSection))
+                            if(dict.findText(textHere) != null || (firstSection && dict.hasEpwingDef(textHere))  || mightBeDeconjugatable(textHere, firstSection))
                                 break;
                             position--;
                         }
@@ -221,7 +221,7 @@ public class WordSplitter
     {
         for(ValidWord match:conjugations.getMatches())//for each possible conjugation...
         {
-            List<Definition> defs = dict.find(match.getWord());
+            List<Definition> defs = dict.findWord(match);
             if(defs != null)for(Definition def:defs)//for each possible definition...
             {
                 //check if it meets the tag requirements of this conjugation
