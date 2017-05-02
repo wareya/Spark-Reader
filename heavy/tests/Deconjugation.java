@@ -41,6 +41,18 @@ public class Deconjugation
 
         List<FoundWord> words;
 
+        words = splitter.split("「これ……いいの？」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("いいの"), false); // incorrectly deconjugated ii as a noun
+        }
+
+        words = splitter.split("「これ……いいの？」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("いいの"), false); // incorrectly deconjugated ii as an adjective
+        }
+
         words = splitter.split("それじゃ最近してたことって何？",  new HashSet<>());
         for(FoundWord word : words)
         {

@@ -140,6 +140,12 @@ class HeavySegmenter extends Segmenter
                        && t.getPartOfSpeechLevel3().equals("一般")
                        && n.getPartOfSpeechLevel2().equals("格助詞")
                        && n.getPartOfSpeechLevel3().equals("一般"));
+                // はナシだって
+                strong = strong
+                      || (t.getPartOfSpeechLevel1().equals("助詞")
+                       && t.getPartOfSpeechLevel2().equals("係助詞")
+                       && n.getPartOfSpeechLevel1().equals("名詞")
+                       && n.getPartOfSpeechLevel2().equals("一般"));
                 
                 if(i+2 < tokens.size())
                 {
