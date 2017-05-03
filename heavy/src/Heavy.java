@@ -138,6 +138,7 @@ class HeavySegmenter extends Segmenter
                 strong = strong
                       || (t.getPartOfSpeechLevel2().equals("代名詞")
                        && t.getPartOfSpeechLevel3().equals("一般")
+                       && !t.getSurface().equals("なん")// なんで・なんでもない
                        && n.getPartOfSpeechLevel2().equals("格助詞")
                        && n.getPartOfSpeechLevel3().equals("一般"));
                 // はナシだって

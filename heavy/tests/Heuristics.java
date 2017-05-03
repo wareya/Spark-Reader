@@ -144,6 +144,11 @@ public class Heuristics
         {
             assertEquals(word.getText().equals("のです"), false); // misleading split
         }
+        words = splitter.split("いや、なんでもない。",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("なん"), false); // misleading split
+        }
 
         // TODO: Blacklist ものを somehow and test かえって得体の知れないものを想像させる
     }
