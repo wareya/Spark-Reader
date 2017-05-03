@@ -138,6 +138,12 @@ public class Heuristics
             assertEquals(word.getText().equals("ことし"), false);
         }
 
+        words = splitter.split("見納めにするかのように、",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("か"), false);
+        }
+        
         
         words = splitter.split("とても個人的なことで申し訳ないのですが",  new HashSet<>());
         for(FoundWord word : words)

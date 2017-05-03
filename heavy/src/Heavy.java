@@ -124,7 +124,7 @@ class HeavySegmenter extends Segmenter
                 strong = strong
                       || (t.getPartOfSpeechLevel2().contains("終助詞")
                        && n.getPartOfSpeechLevel1().contains("助詞")
-                       && !n.getPartOfSpeechLevel2().contains("終助詞"));
+                       && n.getPartOfSpeechLevel2().contains("格助詞"));
                 // ～さは (is the blacklist better for this?)
                 strong = strong
                       || (t.getPartOfSpeechLevel2().contains("接尾")
