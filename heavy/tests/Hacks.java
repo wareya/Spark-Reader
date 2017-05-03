@@ -91,5 +91,13 @@ public class Hacks
         {
             assertEquals(word.getText().equals("こ"), false);
         }
+        
+        
+        // hybrid test: both default penalties and deconjugation
+        words = splitter.split("噛みしめるようにして返事をした",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("噛"), false); // failed to deconjugate word that gets split from its kana segmentally in kuromoji mode with penalties
+        }
     }
 }

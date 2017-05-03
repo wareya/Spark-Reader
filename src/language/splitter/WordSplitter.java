@@ -204,9 +204,57 @@ public class WordSplitter
                 // We failed to match a word and only have one segment left
                 else if(end == start+1)
                 {
-                    words.add(matchedWord);
-                    start = end;
-                    break;
+                    // Hack: try it with substrings of the next segment (todo: make this encompass more failure cases without making it nasty)
+                    if(end < segments.size() && segments.get(end).txt.length() > 1)
+                    {
+                        String segment1 = segments.get(start).txt;
+                        String segment2 = segments.get(end).txt;
+                        int n;
+                        for (n = segment2.length(); n > 0; n--)
+                        {
+                            String tempString = segment1 + segment2.substring(0, n);
+                            
+                            System.out.println("wow");
+                            System.out.println(tempString);
+                            
+                            WordScanner tempWord = new WordScanner(tempString);//deconjugate
+                            FoundWord tempMatchedWord = new FoundWord(tempWord.getWord());//prototype definition
+                            attachDefinitions(tempMatchedWord, word);//add cached definitions
+                            if(tempMatchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(tempWord.getWord())) || !options.getOption("splitterMode").equals("full"))
+                            {
+                                words.add(tempMatchedWord);
+                                
+                                // rebuild segment list
+                                List<Piece> workingList;
+                                workingList = new ArrayList<>();
+                                workingList.add(instance.new Piece(segment2.substring(n-1, segment2.length()), false));
+                                for(int i = start+1; i < segments.size(); i++)
+                                    workingList.add(segments.get(i));
+                                segments = workingList;
+                                start = 0;
+                                
+                                System.out.println("Rebuilt segment list.");
+                                break;
+                            }
+                        }
+                        if(n != 0)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            System.out.println("Boo");
+                            words.add(matchedWord);
+                            start = end;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        words.add(matchedWord);
+                        start = end;
+                        break;
+                    }
                 }
                 else
                     end--;//try shorter word
