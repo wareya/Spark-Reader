@@ -227,8 +227,8 @@ public class WordSplitter
                                 // rebuild segment list
                                 List<Piece> workingList;
                                 workingList = new ArrayList<>();
-                                workingList.add(instance.new Piece(segment2.substring(n-1, segment2.length()), false));
-                                for(int i = start+1; i < segments.size(); i++)
+                                workingList.add(instance.new Piece(segment2.substring(n, segment2.length()), false));
+                                for(int i = end+1; i < segments.size(); i++)
                                     workingList.add(segments.get(i));
                                 segments = workingList;
                                 start = 0;

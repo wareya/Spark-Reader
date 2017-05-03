@@ -98,6 +98,7 @@ public class Hacks
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("噛"), false); // failed to deconjugate word that gets split from its kana segmentally in kuromoji mode with penalties
+            assertEquals(word.getText().equals("みし"), false); // failed to rebuild segment list correctly
         }
     }
 }
