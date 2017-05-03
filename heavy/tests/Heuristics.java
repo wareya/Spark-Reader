@@ -42,18 +42,18 @@ public class Heuristics
         //ArrayList<Piece> pieces = Segmenter.instance.Segment();
         List<FoundWord> words;
 
-        words = splitter.split("男を入れて三人しかいなかった",  new HashSet<>());
-        for(FoundWord word : words)
-        {
-            assertEquals(word.getText().equals("しかい"), false); // false split
-        }
-
-        words = splitter.split("それはそうね",  new HashSet<>());
+        words = splitter.split("俺はそう、一言だけつぶやいた。",  new HashSet<>());
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("はそう"), false); // false split
         }
 
+        words = splitter.split("男を入れて三人しかいなかった",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("しかい"), false); // false split
+        }
+        
         words = splitter.split("別段なにがいいってわけでもない",  new HashSet<>());
         for(FoundWord word : words)
         {
