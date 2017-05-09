@@ -164,6 +164,13 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel2().equals("助詞類接続")
                        && n.getPartOfSpeechLevel1().equals("動詞")
                        && n.getPartOfSpeechLevel2().equals("自立"));
+                // にいない
+                strong = strong
+                      || (t.getPartOfSpeechLevel1().equals("助詞")
+                       && t.getPartOfSpeechLevel2().equals("格助詞")
+                       && n.getPartOfSpeechLevel1().equals("動詞")
+                       && n.getPartOfSpeechLevel2().equals("自立")
+                       && !n.getSurface().equals("すっ")); // で|すっ, bad lexeme in kuromoji-ipadic
                 
                 if(i+2 < tokens.size())
                 {
