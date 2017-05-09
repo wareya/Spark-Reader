@@ -161,7 +161,12 @@ public class Heuristics
         {
             assertEquals(word.getText().equals("くんで"), false);
         }
-        
+
+        words = splitter.split("律くんでいいかい？",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("くんで"), false);
+        }
         
         
         
