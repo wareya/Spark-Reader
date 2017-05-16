@@ -19,12 +19,12 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test for the heuristics used to prevent the word splitter from inventing words
  */
-public class Blacklist
+public class Splitter
 {
     @Test
-    public void testBlacklist() throws IOException
+    public void testSplitter() throws IOException
     {
-        Segmenter.extended = true;
+        Segmenter.extended = false;
         Segmenter.instance = new HeavySegmenter();
         Main.options = new Options();
 
@@ -34,21 +34,17 @@ public class Blacklist
 
         Main.options.setOption("splitterMode", "full");
         Main.options.setOption("deconMode", "recursive");
-        Main.options.setOption("kuromojiSupportLevel", "heuristics");
+        Main.options.setOption("kuromojiSupportLevel", "disabled");
 
         Dictionary dict = new Dictionary(new File("../dictionaries"));
         WordSplitter splitter = new WordSplitter(dict);
 
         List<FoundWord> words;
         
-        Main.blacklistDef.debugForceBlacklist((long)1203350, "がいい");
-        Main.blacklistDef.debugForceBlacklist((long)1757620, "がいい");
-        Main.blacklistDef.debugForceBlacklist((long)1868030, "がいい");
-
-        words = splitter.split("次からはちゃんと姫様と話すがいいです",  new HashSet<>());
+        words = splitter.split("沙夜",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("がいい"), false); // false split
+            assertEquals(word.getText().equals("沙夜"), true);
         }
         
         // まだ疑問が残っている倉科さんの手を取ると

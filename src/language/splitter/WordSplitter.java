@@ -122,7 +122,7 @@ public class WordSplitter
                 else // If the segmenter is "smart" then each segment is larger than a single character and we should be more aggressive
                 {
                     int scratch_length = 0;
-                    for(Piece s : Segmenter.subList(segments, start, segments.size()-1))
+                    for(Piece s : Segmenter.subList(segments, start, segments.size()))
                     {
                         scratch_length += s.txt.length();
                         if(scratch_length >= 100) break;
