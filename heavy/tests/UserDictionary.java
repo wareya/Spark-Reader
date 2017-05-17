@@ -16,10 +16,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class Splitter
+/**
+ * Test to make sure user dictionary is understood by kuromoji
+ */
+public class UserDictionary
 {
     @Test
-    public void testSplitter() throws IOException
+    public void testUserDictionary() throws IOException
     {
         Segmenter.extended = false;
         Segmenter.instance = new HeavySegmenter();
@@ -31,7 +34,8 @@ public class Splitter
 
         Main.options.setOption("splitterMode", "full");
         Main.options.setOption("deconMode", "recursive");
-        Main.options.setOption("kuromojiSupportLevel", "disabled");
+        Main.options.setOption("kuromojiSupportLevel", "heuristics");
+        Main.options.setOption("kuromojiUserdictWeight", "20000");
 
         Dictionary dict = new Dictionary(new File("../dictionaries"));
         WordSplitter splitter = new WordSplitter(dict);
@@ -39,11 +43,13 @@ public class Splitter
         List<FoundWord> words;
         
         // make sure "initial segment" optimization works right
-        words = splitter.split("沙夜",  new HashSet<>());
+        words = splitter.split("沙夜の目",  new HashSet<>());
+        System.out.println("Words:");
+        System.out.println(words);
+        boolean foundRightWord = false;
         for(FoundWord word : words)
-        {
-            assertEquals(word.getText().equals("沙夜"), true);
-        }
+            if(word.getText().equals("沙夜")) foundRightWord = true;
+        assertEquals(foundRightWord, true);
         
         // まだ疑問が残っている倉科さんの手を取ると
         

@@ -1,10 +1,16 @@
 
 import com.atilika.kuromoji.TokenizerBase;
 import jdk.nashorn.internal.runtime.options.Options;
+import language.dictionary.DefSource;
+import language.dictionary.Definition;
+import language.dictionary.UserDefinition;
 import language.segmenter.BasicSegmenter;
 import main.Main;
 import language.segmenter.Segmenter;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,17 +24,51 @@ import static main.Main.options;
 class HeavySegmenter extends Segmenter
 {
     Tokenizer kuro;
+    String kuromojiUserdict;
 
     Segmenter basic = new BasicSegmenter();
 
     private void ensureInitialized()
     {
         if(kuro == null)
-            kuro = new Tokenizer.Builder()
+        {
+            kuromojiUserdict = "";
+            for(Definition definition : DefSource.getSource("Custom").getDefinitions())
+            {
+                UserDefinition def = (UserDefinition)definition;
+                //1 その他,間投,*,*,*,*,* (etc)
+                //酔,1285,1285,4879,名詞,一般,*,*,*,*,酔,ヨイ,ヨイ
+                //よ,1,1,6514,その他,間投,*,*,*,*,よ,ヨ,ヨ
+                String word = "";
+                if(def.getWord().length > 0)
+                    word = def.getWord()[0];
+                String reading = "*";
+                if(def.getReadings().length > 0)
+                    reading = def.getReadings()[0];
+                else
+                    reading = word;
+                
+                //kuromojiUserdict += String.format("%s,1,1,%d,その他,間投,*,*,*,*,%s,%s,%s\n",
+                //using the "others" category makes kuromoji basically refuse to use the term, proving that it cares about morphological category
+                // todo: map some word categories to the appropriate formats instead of loading everything as a noun
+                kuromojiUserdict += String.format("%s,1285,1285,%d,名詞,一般,*,*,*,*,%s,%s,%s\n",
+                    word, options.getOptionInt("kuromojiUserdictWeight"), word, reading, reading);
+                
+            }
+            System.out.println("Userdict string:");
+            System.out.println(kuromojiUserdict);
+            try
+            {
+                kuro = new Tokenizer.Builder()
                 .mode(TokenizerBase.Mode.SEARCH) // punish long terms
                 .kanjiPenalty(options.getOptionInt("kuromojiKanjiPenaltyLength"), options.getOptionInt("kuromojiKanjiPenalty"))
                 .otherPenalty(options.getOptionInt("kuromojiOtherPenaltyLength"), options.getOptionInt("kuromojiOtherPenalty"))
+                .userDictionary(new ByteArrayInputStream(kuromojiUserdict.getBytes("UTF-8")))
                 .build();
+            }
+            catch (IOException e)
+            { /* not thrown in our use case */ }
+        }
     }
 
     public List<Token> DebugSegment(String text)
