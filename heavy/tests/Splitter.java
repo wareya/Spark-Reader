@@ -44,6 +44,11 @@ public class Splitter
         {
             assertEquals(word.getText().equals("沙夜"), true);
         }
+        words = splitter.split("そんな事言うお兄ちゃん、きらい！",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("お"), false);
+        }
         
         // まだ疑問が残っている倉科さんの手を取ると
         
