@@ -82,6 +82,8 @@ class HeavySegmenter extends Segmenter
     static HashSet<String> badSegments = new HashSet<>(Arrays.asList(
         "すっ",
         "たろ",
+        "てん",
+        "てぇ",
         "てよ"
     ));
     private boolean shouldForceUnigram(String s)
@@ -144,8 +146,14 @@ class HeavySegmenter extends Segmenter
                 {
                     Token o = tokens.get(i-1);
                     
-                    // Hack: kuromoji-ipadic's internal weights for こ and として are bogus
+                    // Hack: kuromoji-unidic's internal weights for こ and として are bogus
                     if(o.getSurface().equals("こ") && t.getSurface().equals("として"))
+                    {
+                        addAsUnigram(r, t);
+                        continue;
+                    }
+                    // same but with でし たい
+                    if(o.getSurface().equals("でし") && t.getSurface().equals("たい"))
                     {
                         addAsUnigram(r, t);
                         continue;
