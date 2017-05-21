@@ -106,7 +106,7 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
         ruleList.add(new StdRule("いく", "", "teiku", DefTag.stem_te, DefTag.v5k_s));
         ruleList.add(new StdRule("くる", "", "tekuru", DefTag.stem_te, DefTag.vk));
         // Should form differently on adjectives than verbs
-        ruleList.add(new StdRule("ある", "", "tearu", DefTag.stem_te, DefTag.v5aru));
+        ruleList.add(new StdRule("ある", "", "tearu", DefTag.stem_te, DefTag.v5r_i));
 
         // たら, the generic conditional
         // verbs
@@ -179,13 +179,13 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
         ruleList.add(new OnlyFinalRule("ました", "", "past polite", DefTag.stem_ren, DefTag.uninflectable));
         ruleList.add(new OnlyFinalRule("まして", "", "te polite", DefTag.stem_ren, DefTag.uninflectable));
         ruleList.add(new OnlyFinalRule("ませんでした", "", "past negative polite", DefTag.stem_ren, DefTag.uninflectable));
-        ruleList.add(new OnlyFinalRule("ましょう", "", "polite volitional", DefTag.stem_ren, DefTag.uninflectable));
+        ruleList.add(new OnlyFinalRule("ましょう", "", "polite volitional", DefTag.stem_ren, DefTag.form_volition));
 
         // part-of-speech roles
         ruleList.add(new StdRule("に", "", "adverb", DefTag.adj_na));
         ruleList.add(new StdRule("な", "", "attributive", DefTag.adj_na));
         //ruleList.add(new StdRule("の", "", "attributive", DefTag.adj_no));
-        //ruleList.add(new StdRule("の", "", "attributive", DefTag.n));
+        // ruleList.add(new StdRule("の", "", "attributive", DefTag.n)); // One of these should be a thing but they cause unfixable parsing problems on certain strings of kana.
         ruleList.add(new StdRule("と", "", "adverb", DefTag.adv_to));
 
         // i-adjective stems
@@ -209,8 +209,15 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
                 return false;
             return true;
         }));
+        ruleList.add(new OnlyFinalRule("ん", "", "slurred negative", DefTag.stem_a, DefTag.uninflectable)); // causes problems with ichidan verbs
+        ruleList.add(new OnlyFinalRule("ん", "る", "slurred", DefTag.v1, DefTag.uninflectable));
+        ruleList.add(new OnlyFinalRule("ん", "る", "slurred", DefTag.v5r, DefTag.uninflectable));
+        ruleList.add(new OnlyFinalRule("ん", "る", "slurred", DefTag.v5aru, DefTag.uninflectable));
+        ruleList.add(new OnlyFinalRule("ん", "る", "slurred", DefTag.vk, DefTag.uninflectable));
+        
         ruleList.add(new OnlyFinalRule("ず", "", "adverbial negative", DefTag.stem_mizenkei, DefTag.uninflectable)); // archaically, not adverbiall, but in modern japanese, almost always adverbial
         ruleList.add(new OnlyFinalRule("ずに", "", "without doing so", DefTag.stem_mizenkei, DefTag.uninflectable)); // exactly the same meaning, despite the difference in label
+        
         // i-adjectives
         ruleList.add(new ContextRule("ない", "", "negative", DefTag.stem_ku, DefTag.adj_i, (rule, word) -> {
             if(word.getConjugationTags().size() < 2) return true;
@@ -356,7 +363,7 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
         ruleList.add(new NeverFinalRule("くれ", "くる", "(izenkei)", DefTag.vk, DefTag.stem_e));
         ruleList.add(new StdRule("こい", "くる", "imperative", DefTag.vk, DefTag.uninflectable));
 
-        ruleList.add(new ContextRule("来", "来る", "(infinitive)", DefTag.vk, DefTag.stem_ren, (rule, word) -> {
+        ruleList.add(new FuriContextRule("来", "き", "来る", "くる", "(infinitive)", DefTag.vk, DefTag.stem_ren, (rule, word) -> {
             if(word.getConjugationTags().size() < 2) return true;
             DefTag tagOfInterest = word.getConjugationTags().get(word.getConjugationTags().size()-2);
             //noinspection RedundantIfStatement
@@ -364,10 +371,10 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
                 return false;
             return true;
         }));
-        ruleList.add(new NeverFinalRule("来", "来る", "(unstressed infinitive)", DefTag.vk, DefTag.stem_ren_less));
-        ruleList.add(new NeverFinalRule("来", "来る", "(mizenkei)", DefTag.vk, DefTag.stem_mizenkei));
-        ruleList.add(new NeverFinalRule("来れ", "来る", "(izenkei)", DefTag.vk, DefTag.stem_e));
-        ruleList.add(new StdRule("来い", "来る", "imperative", DefTag.vk, DefTag.uninflectable));
+        ruleList.add(new FuriNeverFinalRule("来", "き", "来る", "くる", "(unstressed infinitive)", DefTag.vk, DefTag.stem_ren_less));
+        ruleList.add(new FuriNeverFinalRule("来", "こ", "来る", "くる", "(mizenkei)", DefTag.vk, DefTag.stem_mizenkei));
+        ruleList.add(new FuriNeverFinalRule("来れ", "くれ", "来る", "くる", "(izenkei)", DefTag.vk, DefTag.stem_e));
+        ruleList.add(new FuriStdRule("来い", "こい", "来る", "くる", "imperative", DefTag.vk, DefTag.uninflectable));
 
         ruleList.add(new NeverFinalRule("あり", "ある", "(infinitive)", DefTag.v5r_i, DefTag.stem_ren));
         ruleList.add(new StdRule("あっ", "ある", "(unstressed infinitive)", DefTag.v5r_i, DefTag.stem_ren_less));
@@ -381,6 +388,30 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
         // enable deconjugation of bound noun+suru dictionary entries that might have archaic equivalents, like 冠する
         // only has an effect on the kuromoji backend, on the normal one the archaic equivalent doesn't cause problems
         ruleList.add(new StdRule("する", "する", "", DefTag.vs_s, DefTag.vs_i));
+        
+        // archaic/fossilized/keigo stuff
+        
+        // https://ja.wikipedia.org/wiki/ラ行変格活用#.E5.8F.A3.E8.AA.9E.E3.81.AE.E3.83.A9.E8.A1.8C.E7.89.B9.E5.88.A5.E6.B4.BB.E7.94.A8.E5.8B.95.E8.A9.9E
+        // kudasaru etc
+        // source of "kudasai", "irasshai", etc
+        ruleList.add(new NeverFinalRule("れ", "る", "(izenkei)", DefTag.v5aru, DefTag.stem_e));
+        ruleList.add(new OnlyFinalRule("れ", "る", "imperative", DefTag.v5aru, DefTag.uninflectable));
+        ruleList.add(new NeverFinalRule("ら", "る", "('a' stem)", DefTag.v5aru, DefTag.stem_a));
+        ruleList.add(new NeverFinalRule("っ", "る", "(unstressed infinitive)", DefTag.v5aru, DefTag.stem_ren_less));
+        ruleList.add(new StdRule("い", "る", "(infinitive)", DefTag.v5aru, DefTag.stem_ren)); // this is the irregular part
+        ruleList.add(new StdRule("り", "る", "(infinitive)", DefTag.v5aru, DefTag.stem_ren));
+        ruleList.add(new StdRule("ろう", "る", "volitional", DefTag.v5aru, DefTag.form_volition));
+        // gozaru etc
+        // source of gozaimasu instead of gozarimasu
+        // unfortunately edict doesn't have an inflectional category for its ございます entry, which means we have to allow ございました to deconjugate to ござる instead.
+        ruleList.add(new NeverFinalRule("れ", "る", "(izenkei)", DefTag.v4r, DefTag.stem_e));
+        ruleList.add(new OnlyFinalRule("れ", "る", "imperative", DefTag.v4r, DefTag.uninflectable));
+        ruleList.add(new NeverFinalRule("ら", "る", "('a' stem)", DefTag.v4r, DefTag.stem_a));
+        ruleList.add(new NeverFinalRule("っ", "る", "(unstressed infinitive)", DefTag.v4r, DefTag.stem_ren_less));
+        ruleList.add(new StdRule("い", "る", "(infinitive)", DefTag.v4r, DefTag.stem_ren)); // this is the irregular part
+        ruleList.add(new StdRule("り", "る", "(infinitive)", DefTag.v4r, DefTag.stem_ren));
+        ruleList.add(new StdRule("ろう", "る", "volitional", DefTag.v4r, DefTag.form_volition));
+        
     }
     private int test_rules(int start)
     {

@@ -21,7 +21,7 @@ public class SwingMouseHandler extends MouseHandler implements MouseListener, Mo
     private Point dragReference;
     private long lastClickTime = 0;
 
-    private static final long MAX_CLICK_DELAY = 1000;
+    private static final long MAX_CLICK_DELAY = 100;
     private static final long MIN_DRAG_DIST = 100;
 
     public SwingMouseHandler(UI ui)
@@ -40,7 +40,7 @@ public class SwingMouseHandler extends MouseHandler implements MouseListener, Mo
     @Override
     public void mouseClicked(MouseEvent e)
     {
-        long clickTime = System.nanoTime();
+        long clickTime = System.currentTimeMillis();
         if(clickTime - lastClickTime < MAX_CLICK_DELAY)
         {
             System.out.println("stop double event");
@@ -144,45 +144,10 @@ public class SwingMouseHandler extends MouseHandler implements MouseListener, Mo
     }
 
 
-    private int mouseLine = -1;
-    private FoundWord mousedWord;
-    //TODO move this to MouseHandler
     @Override
     public void mouseMoved(MouseEvent e)
     {
-        mousePos = e.getPoint();
-        int pos = toCharPos(e.getX());
-        int lineIndex = ui.getLineIndex(e.getPoint());
-        if(lineIndex >= currPage.getLineCount() || lineIndex < 0)return;
-        if(lineIndex != mouseLine || (mousedWord!= null && !mousedWord.inBounds(pos)))
-        {
-            boolean reRender = false;
-            if(mousedWord != null)
-            {
-                mousedWord.setMouseover(false);
-                if(mousedWord.updateOnMouse())reRender = true;
-            }
-            mousedWord = null;//to recalculate
-            //toggle on selected line:
-            for (FoundWord word : currPage.getLine(lineIndex).getWords())
-            {
-                if (word.inBounds(pos))
-                {
-                    mousedWord = word;
-                    break;
-                }
-            }
-            mouseLine = lineIndex;
-
-            if(mousedWord != null)
-            {
-                //System.out.println("mouseover'd word changed to " + mousedWord.getText());
-                mousedWord.setMouseover(true);
-                if(mousedWord.updateOnMouse())reRender = true;
-            }
-
-            if(reRender)ui.render();
-        }
+        mouseMove(e.getPoint());
     }
 
     @Override

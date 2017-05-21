@@ -72,6 +72,20 @@ public class JapaneseTest
     {
         assertEquals("ａｅｓｔｈｅｔｉｃ", toFullWidth("aesthetic"));
         assertEquals("ＡＥＳＴＨＥＴＩＣ", toFullWidth("AESTHETIC"));
-        assertEquals("ａｂｃ.　あいう。ｘｙｚ.", toFullWidth("abc. あいう。xyz."));
+        assertEquals("１２３４５６７８９０", toFullWidth("1234567890"));
+        assertEquals("ａｂｃ.　あいう。ｘｙｚ.１２３漢字", toFullWidth("abc. あいう。xyz.123漢字"));
+    }
+
+    @Test
+    public void stripOkuriTest()
+    {
+        assertEquals("かんじ", stripOkurigana("漢字", "かんじ"));
+        assertEquals("", stripOkurigana("ひらがな", "ひらがな"));
+        assertEquals("あお", stripOkurigana("青い", "あおい"));
+        assertEquals("あまのがわ", stripOkurigana("天の川", "あまのがわ"));
+        assertEquals("にち", stripOkurigana("あ日い", "あにちい"));
+        assertEquals("にち", stripOkurigana("日", "にち"));
+        assertEquals("", stripOkurigana("", "にち"));
+        assertEquals("", stripOkurigana("日", ""));
     }
 }

@@ -82,6 +82,7 @@ public class Options
         options.put("windowWidth", "1280");
         options.put("maxHeight", "720");
         options.put("defWidth", "250");
+        options.put("useNativeUI", "false");
         
         options.put("splitLines", "true");
         options.put("reflowToFit", "false");
@@ -113,7 +114,10 @@ public class Options
 
         options.put("splitterMode", "full");
         options.put("deconMode", "recursive");
+        options.put("furiMode", "original");
+
         options.put("hookKeyboard", "false");
+        options.put("showDefID", "false");
 
         options.put("kuromojiSupportLevel", "basic");
 

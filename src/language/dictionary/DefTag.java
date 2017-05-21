@@ -24,7 +24,7 @@ public enum DefTag
     stem_ren(-1, "renyoukei (masu stem)"), // verb renyoukei; the masu stem infinitive
     stem_ren_less(-1, "reduced renyoukei (past stem)"), // phonologically reduced masu stem infinitive
     stem_ren_less_v(-1, "reduced renyoukei (past stem) (voiced)"), // voiced
-    form_volition(-1, "volitional form"), // verb renyoukei; the masu stem infinitive
+    form_volition(-1, "volitional form"), // based on the mizenkei
     // i-adj
     // i-adjectives have two renyoukei-like infinitives, but only this one is useful as a tag
     stem_ku(-1, "adjective ku form"), // e.g. nakute
@@ -157,7 +157,7 @@ public enum DefTag
     kyu(3, "Kyuushuu-ben"),
     rkb(3, "Ryuukyuu-ben"),
     
-    p(4, ""), P(4, "");//TODO what are these, actually?
+    p(4, ""), P(4, "");
     private int group;
     private String name;
     DefTag(int group, String name)

@@ -53,15 +53,16 @@ public class FoundDef implements Comparable<FoundDef>
         defText.addText(foundDef.getSource().getName(), options.getColor("defReadingCol"), options.getColor("defBackCol"));
 
         //output original form if processed
-        if(!foundForm.getProcessText().equals(""))
+        if(foundForm.getProcess().size() != 0)
         {
             defText.addText(foundForm.toString(), options.getColor("defReadingCol"), options.getColor("defBackCol"));
         }
 
         //output tags
         defText.addText(foundDef.getTagLine(), options.getColor("defTagCol"), options.getColor("defBackCol"));
-
-        defText.addText(String.valueOf(foundDef.getID()), options.getColor("defTagCol"), options.getColor("defBackCol"));
+        //output ID (debug)
+        if(options.getOptionBool("showDefID"))
+            defText.addText(String.valueOf(foundDef.getID()), options.getColor("defTagCol"), options.getColor("defBackCol"));
 
         String[] readings = foundDef.getSpellings();
         for(String reading:readings)
@@ -159,6 +160,8 @@ public class FoundDef implements Comparable<FoundDef>
         {
             if (tags.contains(DefTag.obs) || tags.contains(DefTag.obsc) || tags.contains(DefTag.rare) || tags.contains(DefTag.arch))
                 score -= 50;//obscure penalty
+            if(tags.contains(DefTag.p) || tags.contains(DefTag.P))
+                score += 50;//'common in newspapers etc.' bonus
 
             if (tags.contains(DefTag.uk) && !Japanese.hasKana(foundForm.getWord())) score -= 10;//usually kana without kana
             if (tags.contains(DefTag.uK) && Japanese.hasOnlyKana(foundForm.getWord())) score -= 10;//usually Kanji, only kana
@@ -169,10 +172,11 @@ public class FoundDef implements Comparable<FoundDef>
             if (tags.contains(DefTag.ctr)) score -= 10;
         }
         score -= foundDef.getSpellings().length;//-1 for every spelling; more likely it's coincidence
-        if (foundForm.getProcessText().equals("")) score += 5;//prefer words/phrases instead of deviations
+        if (foundForm.getNumConjugations() == 0) score += 5 + 50;//prefer words/phrases instead of deviations
+        //'common' words are often marked as such while a conjugated form of a common word would not.
+        //To avoid this, the above has an increased score (since word must be common enough to have it conjugated)
+        //FIXME if the above causes extra side effects.
 
-
-        //TODO: join numbers and counter words!
         //System.out.println("score for " + foundDef + " is " + score);
         return score;
     }

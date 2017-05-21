@@ -124,6 +124,34 @@ public class Japanese
         return output.toString();
     }
 
+    /**
+     * Removes kana before and after a word. Used for Furigana rendering.
+     * @param kanji the word in Kanji
+     * @param kana the word in Kana
+     * @return the kanji word, minus matching kana at the start and end.
+     */
+    public static String stripOkurigana(String kanji, String kana)
+    {
+        if(kanji == null)return null;
+        if(kana == null || kana.equals(""))return "";
+        int end = 0;
+        int start = 0;
+        try
+        {
+            while(kanji.substring(kanji.length() - end - 1, kanji.length())
+                    .equals(kana.substring(kana.length() - end - 1, kana.length())))
+                end++;
+            while(kanji.substring(0, start + 1)
+                    .equals(kana.substring(0, start + 1)))
+                start++;
+
+            return kana.substring(start, kana.length() - end);
+        }catch(StringIndexOutOfBoundsException ignored)
+        {
+            return "";
+        }
+    }
+
 
     /**
      * Converts latin characters to their full width equivalent. Other characters (Japanese etc.) are left as is.<br>
@@ -143,6 +171,9 @@ public class Japanese
             }else if(c >= 'A' && c <= 'Z')
             {
                 output.append((char)(c + ('Ａ' - 'A')));
+            }else if(c >= '0' && c <= '9')
+            {
+                output.append((char)(c + ('０' - '0')));
             }
             else if(c == ' ' || c == '\t')output.append('　');//full width space
             else if(c != '\r')output.append(c);

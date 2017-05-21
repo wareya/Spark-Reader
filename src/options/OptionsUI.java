@@ -28,6 +28,7 @@ import options.page.UserDefPage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -55,6 +56,7 @@ public class OptionsUI extends JFrame
     private final static String parserConfig ="full=Full;partial=Basic;none=Disable";
     private final static String deconConfig ="recursive=Recursive (better, slow);legacy=Legacy (faster, less accurate)";
     private final static String kuromojiConfig ="heuristics=Enabled with heuristics;basic=Enabled;disabled=Disabled (not recommended)";
+    private final static String furiConfig ="sameForm=Conjugated as in text;original=Dictionary form;stripKana=Kanji readings only";
 
     public OptionsUI() throws HeadlessException
     {
@@ -65,6 +67,7 @@ public class OptionsUI extends JFrame
 
         OptionPage display = new OptionPage("General");
             display.add(new OptionLabel("Window properties:", null));
+            display.add(new ToggleOption("useNativeUI", "Use System UI (requires restart)", "Themes the UI like the operating system. Looks a bit weird at the moment."));
             display.add(new NumberOption("windowWidth", "Window width (requires restart)", "I recommend setting this to the width of the window you plan to overlay this on."));
             display.add(new NumberOption("maxHeight", "Maximum height (requires restart)", "<html>Definitions will not be longer than this.<br>I recommend setting this to the height of the window you plan to overlay this on."));        root.add(display);
             display.add(new ToggleOption("takeFocus", "Take focus when clicked (requires restart)", "If the game under the overlay is still receiving clicks, try turning this on."));
@@ -77,8 +80,10 @@ public class OptionsUI extends JFrame
         PageGroup window = new PageGroup("Overlay", "Graphical settings related to the on-screen overlay window");
 
             OptionPage furigana = new OptionPage("Furigana");
-            furigana.add(new RadioOption("unknownFuriMode", mouseoverConfig, "Furigana mode (unknown words)", null));
-            furigana.add(new RadioOption("knownFuriMode", mouseoverConfig, "Furigana mode (known words)", null));//TODO add tips
+            furigana.add(new RadioOption("furiMode", furiConfig, "Furigana type", null));
+            furigana.add(new OptionLabel("Visibility:", null));
+            furigana.add(new RadioOption("unknownFuriMode", mouseoverConfig, "Furigana display mode (unknown words)", null));
+            furigana.add(new RadioOption("knownFuriMode", mouseoverConfig, "Furigana display mode (known words)", null));
             furigana.add(new OptionLabel("Theme:", null));
             furigana.add(new FontOption("furiFont", "Furigana font", "Also decides the size of the furigana bar."));
             furigana.add(new ColourOption("furiCol", "Main text colour", "The colour used for the furigana text."));
@@ -123,6 +128,7 @@ public class OptionsUI extends JFrame
             defWindow.add(new NumberOption("defWidth", "Definition popup width", "Determines how wide the definition popup window is."));
             defWindow.add(new ToggleOption("hideDefOnMouseLeave", "Hide definition when mouse leaves the screen", "If unticked, the definition popup will remain visible until you manually close it."));
             defWindow.add(new ToggleOption("showAllKanji", "Show all possible Kanji for a word", "If unticked, only kana readings are shown."));
+            defWindow.add(new ToggleOption("showDefID", "Show definition ID", "Shows the ID code of definitions. Mainly for debug purposes."));
             defWindow.add(new OptionLabel("Theme:", null));
             defWindow.add(new ColourOption("defBackCol", "Background colour", "Colour for overlay background."));
             defWindow.add(new FontOption("defFont", "Font", "Used for definition popup text."));
@@ -170,10 +176,11 @@ public class OptionsUI extends JFrame
         }
         menuScroll = new JScrollPane(leftMenu);
         rightOptions = new JPanel();
+        rightOptions.setBorder(new EmptyBorder(3, 3, 3, 3));
         optionScroll = new JScrollPane(rightOptions);
         lowerButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        optionScroll.getVerticalScrollBar().setUnitIncrement(8);
-        menuScroll.getVerticalScrollBar().setUnitIncrement(8);
+        optionScroll.getVerticalScrollBar().setUnitIncrement(12);
+        menuScroll.getVerticalScrollBar().setUnitIncrement(12);
 
         lowerButtons.add(new JButton(new AbstractAction("Revert changes")
         {
