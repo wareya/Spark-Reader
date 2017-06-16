@@ -4,7 +4,6 @@
     <root id="archive" name="Spark Reader Heavy.jar">
       <element id="module-output" name="Spark Reader Heavy" />
       <element id="module-output" name="Spark Reader Core" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kuromoji-ipadic-0.9.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/kuromoji-core-0.9.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/java libs/eb4j-1.0.5/lib/log4j-1.2.14.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/java libs/eb4j-1.0.5/lib/xml2eb-1.0.5.jar" path-in-jar="/" />
@@ -21,6 +20,7 @@
       <element id="extracted-dir" path="$USER_HOME$/java libs/JNA/jna-4.2.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/java libs/JNA/jna-platform-4.2.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/1stleg/jnativehook/2.1.0/jnativehook-2.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kuromoji-unidic-0.9.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

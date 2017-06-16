@@ -50,6 +50,14 @@ public class Splitter
             assertEquals(word.getText().equals("お"), false);
         }
         
+        Main.options.setOption("kuromojiSupportLevel", "basic");
+        
+        words = splitter.split("彼女とどのように知りあったのかも覚えていない。",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("知"), false);
+        }
+        
         // まだ疑問が残っている倉科さんの手を取ると
         
         // test かえって得体の知れないものを想像させる

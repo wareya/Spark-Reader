@@ -152,7 +152,13 @@ public class WordSplitter
                         while(position > 1)
                         {
                             String textHere = workingText.substring(0, position);
-                            if(dict.findText(textHere) != null || (firstSection && dict.hasEpwingDef(textHere))  || mightBeDeconjugatable(textHere, firstSection))
+                            
+                            // Annoying change: Using the dictionary isn't good enough and causes segmentation errors like 知りあっ|た -> 知|りあ|った. We have to deconjugate it.
+                            WordScanner word = new WordScanner(textHere);//deconjugate
+                            FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+                            attachDefinitions(matchedWord, word);//add cached definitions
+            
+                            if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())))
                                 break;
                             position--;
                         }

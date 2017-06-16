@@ -16,8 +16,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import com.atilika.kuromoji.ipadic.Token;
-import com.atilika.kuromoji.ipadic.Tokenizer;
+import com.atilika.kuromoji.unidic.Token;
+import com.atilika.kuromoji.unidic.Tokenizer;
 
 import static main.Main.options;
 
@@ -36,9 +36,8 @@ class HeavySegmenter extends Segmenter
             for(Definition definition : DefSource.getSource("Custom").getDefinitions())
             {
                 UserDefinition def = (UserDefinition)definition;
-                //1 その他,間投,*,*,*,*,* (etc)
-                //酔,1285,1285,4879,名詞,一般,*,*,*,*,酔,ヨイ,ヨイ
-                //よ,1,1,6514,その他,間投,*,*,*,*,よ,ヨ,ヨ
+                //けいどろ,5145,5145,8735,名詞,普通名詞,一般,*,*,*,ケイドロ,警泥,けいどろ,ケードロ,けいどろ,ケードロ,混,*,*,*,*
+                //A,5145,5145,C,名詞,普通名詞,一般,*,*,*,B,A,A,B,A,B,混,*,*,*,*
                 String word = "";
                 if(def.getWord().length > 0)
                     word = def.getWord()[0];
@@ -51,8 +50,8 @@ class HeavySegmenter extends Segmenter
                 //kuromojiUserdict += String.format("%s,1,1,%d,その他,間投,*,*,*,*,%s,%s,%s\n",
                 //using the "others" category makes kuromoji basically refuse to use the term, proving that it cares about morphological category
                 // todo: map some word categories to the appropriate formats instead of loading everything as a noun
-                kuromojiUserdict += String.format("%s,1285,1285,%d,名詞,一般,*,*,*,*,%s,%s,%s\n",
-                    word, options.getOptionInt("kuromojiUserdictWeight"), word, reading, reading);
+                kuromojiUserdict += String.format("%s,5145,5145,%d,名詞,普通名詞,一般,*,*,*,%s,%s,%s,%s,%s,%s,混,*,*,*,*\n",
+                    word, options.getOptionInt("kuromojiUserdictWeight"), reading, word, word, reading, word, reading);
                 
             }
             System.out.println("Userdict string:");
@@ -60,9 +59,10 @@ class HeavySegmenter extends Segmenter
             try
             {
                 kuro = new Tokenizer.Builder()
-                .mode(TokenizerBase.Mode.SEARCH) // punish long terms
-                .kanjiPenalty(options.getOptionInt("kuromojiKanjiPenaltyLength"), options.getOptionInt("kuromojiKanjiPenalty"))
-                .otherPenalty(options.getOptionInt("kuromojiOtherPenaltyLength"), options.getOptionInt("kuromojiOtherPenalty"))
+                // kuromoji-unidic doesn't support this, unfortunately.
+                //.mode(TokenizerBase.Mode.SEARCH) // punish long terms
+                //.kanjiPenalty(options.getOptionInt("kuromojiKanjiPenaltyLength"), options.getOptionInt("kuromojiKanjiPenalty"))
+                //.otherPenalty(options.getOptionInt("kuromojiOtherPenaltyLength"), options.getOptionInt("kuromojiOtherPenalty"))
                 .userDictionary(new ByteArrayInputStream(kuromojiUserdict.getBytes("UTF-8")))
                 .build();
             }
@@ -142,32 +142,14 @@ class HeavySegmenter extends Segmenter
             {
                 Token n = tokens.get(i+1);
                 
-                if(i-1 > 0)
-                {
-                    Token o = tokens.get(i-1);
-                    
-                    // Hack: kuromoji-unidic's internal weights for こ and として are bogus
-                    if(o.getSurface().equals("こ") && t.getSurface().equals("として"))
-                    {
-                        addAsUnigram(r, t);
-                        continue;
-                    }
-                    // same but with でし たい
-                    if(o.getSurface().equals("でし") && t.getSurface().equals("たい"))
-                    {
-                        addAsUnigram(r, t);
-                        continue;
-                    }
-                }
-
                 // "Strong" means that a segment forces the word splitter to make a segment after it IF it is the first segment in the current attempt at finding a word.
                 
                 boolean strong = false;
                 // しかいなかった
                 strong = strong
-                      || (t.getPartOfSpeechLevel2().contains("係助詞")
+                      || (t.getPartOfSpeechLevel2().contains("副助詞")
                        && n.getPartOfSpeechLevel1().contains("動詞")
-                       && n.getPartOfSpeechLevel2().contains("自立"));
+                       && n.getPartOfSpeechLevel2().contains("非自立可能"));
                 // ～かと思う
                 strong = strong
                       || (t.getPartOfSpeechLevel2().contains("終助詞")
@@ -175,12 +157,12 @@ class HeavySegmenter extends Segmenter
                        && n.getPartOfSpeechLevel2().contains("格助詞"));
                 // ～さは (is the blacklist better for this?)
                 strong = strong
-                      || (t.getPartOfSpeechLevel2().contains("接尾")
+                      || (t.getPartOfSpeechLevel1().contains("接尾辞")
                        && n.getPartOfSpeechLevel2().contains("係助詞"));
                 // になると
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("動詞")
-                       && t.getConjugationForm().equals("基本形")
+                       && t.getConjugationForm().equals("終止形-一般")
                        && n.getPartOfSpeechLevel1().equals("助詞"));
                 // これですっ！
                 strong = strong
@@ -194,14 +176,14 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && t.getPartOfSpeechLevel2().equals("係助詞")
                        && n.getPartOfSpeechLevel1().equals("名詞")
-                       && n.getPartOfSpeechLevel2().equals("一般"));
+                       && n.getPartOfSpeechLevel2().equals("普通名詞"));
                 // ことしたら
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("名詞")
-                       && t.getPartOfSpeechLevel2().equals("非自立")
-                       // && t.getPartOfSpeechLevel3().equals("一般")
+                       && t.getPartOfSpeechLevel2().equals("普通名詞")
+                       && t.getPartOfSpeechLevel3().equals("一般")
                        && n.getPartOfSpeechLevel1().equals("動詞")
-                       && n.getPartOfSpeechLevel2().equals("自立"));
+                       && n.getPartOfSpeechLevel2().equals("非自立可能"));
                 // はそう
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("助詞")
@@ -209,27 +191,27 @@ class HeavySegmenter extends Segmenter
                        && n.getPartOfSpeechLevel1().equals("副詞"));
                 // どうしました
                 strong = strong
-                      || (t.getPartOfSpeechLevel2().equals("助詞類接続")
+                      || (t.getPartOfSpeechLevel1().equals("副詞")
                        && n.getPartOfSpeechLevel1().equals("動詞")
-                       && n.getPartOfSpeechLevel2().equals("自立"));
+                       && n.getPartOfSpeechLevel2().equals("非自立可能"));
                 // にいない
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && t.getPartOfSpeechLevel2().equals("格助詞")
                        && n.getPartOfSpeechLevel1().equals("動詞")
                        && n.getPartOfSpeechLevel2().equals("自立")
-                       && !n.getSurface().equals("すっ")); // で|すっ, bad lexeme in kuromoji-ipadic
-                // ～くんで (kuromoji interpreting で one way)
+                       && !n.getSurface().equals("すっ"));
+                // ～くんで
                 strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("名詞")
-                       && t.getPartOfSpeechLevel2().equals("接尾")
+                      || (t.getPartOfSpeechLevel1().equals("接尾辞")
+                       && t.getPartOfSpeechLevel2().equals("名詞的")
                        && n.getPartOfSpeechLevel1().equals("助詞")
                        && n.getPartOfSpeechLevel2().equals("格助詞"));
-                // ～くんで (kuromoji interpreting で another)
+                // ここでしたい
                 strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("名詞")
-                       && t.getPartOfSpeechLevel2().equals("接尾")
-                       && n.getPartOfSpeechLevel1().equals("助動詞"));
+                      || (t.getPartOfSpeechLevel1().equals("助詞")
+                       && t.getPartOfSpeechLevel2().equals("格助詞")
+                       && n.getPartOfSpeechLevel1().equals("動詞"));
                 
                 if(i+2 < tokens.size())
                 {

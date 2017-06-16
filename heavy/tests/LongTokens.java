@@ -1,4 +1,4 @@
-import com.atilika.kuromoji.ipadic.Token;
+import com.atilika.kuromoji.unidic.Token;
 import language.segmenter.Segmenter;
 import language.splitter.FoundWord;
 import main.Main;
@@ -14,10 +14,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by wareya on 2017/03/25.
  */
-public class Penalties
+public class LongTokens
 {
     @Test
-    public void testPenalties() throws IOException
+    public void testLongTokens() throws IOException
     {
         Segmenter.extended = true;
         Segmenter.instance = new HeavySegmenter();
@@ -25,19 +25,21 @@ public class Penalties
 
         List<Token> tokens;
         
-        tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("それで、魔法について教わった？");
-        System.out.println(tokens);
-        boolean foundRightToken = false;
-        for(Token token : tokens)
-            if(token.getSurface().equals("について")) foundRightToken = true;
-        assertEquals(foundRightToken, true);
+        boolean foundRightToken = false; 
         
-        tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("というわけで");
-        System.out.println(tokens);
-        foundRightToken = false;
-        for(Token token : tokens)
-            if(token.getSurface().equals("という")) foundRightToken = true;
-        assertEquals(foundRightToken, true);
+        //tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("それで、魔法について教わった？");
+        //System.out.println(tokens);
+        //foundRightToken = false;
+        //for(Token token : tokens)
+        //    if(token.getSurface().equals("について")) foundRightToken = true;
+        //assertEquals(foundRightToken, true);
+        
+        //tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("というわけで");
+        //System.out.println(tokens);
+        //foundRightToken = false;
+        //for(Token token : tokens)
+        //    if(token.getSurface().equals("という")) foundRightToken = true;
+        //assertEquals(foundRightToken, true);
         
         tokens = ((HeavySegmenter)(Segmenter.instance)).DebugSegment("謙遜なんかしないでください。");
         System.out.println(tokens);

@@ -168,13 +168,19 @@ public class Heuristics
             assertEquals(word.getText().equals("くんで"), false);
         }
         
-        
-        
-        words = splitter.split("とても個人的なことで申し訳ないのですが",  new HashSet<>());
+        words = splitter.split("あたしはここでしたいの！",  new HashSet<>());
         for(FoundWord word : words)
         {
-            assertEquals(word.getText().equals("のです"), false); // misleading split
+            assertEquals(word.getText().equals("でし"), false);
         }
+        
+        
+        
+        //words = splitter.split("とても個人的なことで申し訳ないのですが",  new HashSet<>());
+        //for(FoundWord word : words)
+        //{
+        //    assertEquals(word.getText().equals("のです"), false); // misleading split
+        //}
         words = splitter.split("いや、なんでもない。",  new HashSet<>());
         for(FoundWord word : words)
         {
