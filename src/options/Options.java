@@ -123,6 +123,7 @@ public class Options
 
         options.put("hookKeyboard", "false");
         options.put("showDefID", "false");
+        options.put("defConstrainPosition", "false");
 
         options.put("kuromojiSupportLevel", "basic");
 

@@ -158,6 +158,7 @@ public class FoundWord
     }
     public void renderBackground(Graphics2D g, int xStart, int xOff, int yOff)
     {
+        g.setClip(0, 0, options.getOptionInt("windowWidth"), options.getOptionInt("maxHeight"));//render only over window
         int startPos = xStart + xOff;
         int bgEnd = startPos + getAdvancementWidth(g);
         
@@ -220,6 +221,7 @@ public class FoundWord
     
     public void render(Graphics2D g, int xStart, int xOff, int yOff)
     {
+        g.setClip(0, 0, options.getOptionInt("windowWidth"), options.getOptionInt("maxHeight"));//render only over window
         int startPos = xStart + xOff;
         
         boolean known = isKnown();
@@ -280,7 +282,11 @@ public class FoundWord
             g.setClip(null);//render this anywhere
             options.getFont(g, "defFont");
             int y = UI.defStartY + g.getFontMetrics().getAscent();
-            definitions.get(currentDef).render(g, startPos, Math.max(width, options.getOptionInt("defWidth")), y);
+            int defPosition = startPos;
+            if(options.getOptionBool("defConstrainPosition"))
+                defPosition = Math.min(startPos, options.getOptionInt("windowWidth")-options.getOptionInt("defWidth"));
+            
+            definitions.get(currentDef).render(g, defPosition, Math.max(width, options.getOptionInt("defWidth")), y);
         }
         
         return;
