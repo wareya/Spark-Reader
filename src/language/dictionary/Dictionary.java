@@ -38,6 +38,8 @@ public class Dictionary
 
 
     private static int loadedWordCount = 0;
+    
+    public static String userdictFilename = "dictionaries/customDict.txt";
 
     public Dictionary()throws IOException
     {
@@ -77,9 +79,9 @@ public class Dictionary
             else if(file.getName().endsWith(".txt"))
             {
                 //UTF-8 dictionary
+                userdictFilename = file.getAbsolutePath();
                 loadUserDict(file, DefSource.getSource("Custom"));
             }
-
         }
     }
     public boolean loadEpwing(File file)
