@@ -170,16 +170,16 @@ public class Heuristics
             assertEquals(word.getText().equals("くんで"), false);
         }
         
-        words = splitter.split("あたしはここでしたいの！",  new HashSet<>());
-        for(FoundWord word : words)
-        {
-            assertEquals(word.getText().equals("でし"), false);
-        }
-        
         words = splitter.split("「俺がちゃんと作りますから」",  new HashSet<>());
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("がちゃんと"), false);
+        }
+        
+        words = splitter.split("「二冊目もお亡くなりに！？」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("もお"), false);
         }
         
         // weakness
@@ -188,6 +188,19 @@ public class Heuristics
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("た"), false);
+        }
+        
+        words = splitter.split("どうしたほうがいいのかなお兄ちゃんっ",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("どうし"), false); 
+            assertEquals(word.getText().equals("なお"), false);
+        }
+        
+        words = splitter.split("あたしはここでしたいの！",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("でし"), false);
         }
         
         

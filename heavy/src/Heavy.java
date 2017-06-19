@@ -194,11 +194,6 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && t.getPartOfSpeechLevel2().equals("係助詞")
                        && n.getPartOfSpeechLevel1().equals("副詞"));
-                // どうしました
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("副詞")
-                       && n.getPartOfSpeechLevel1().equals("動詞")
-                       && n.getPartOfSpeechLevel2().equals("非自立可能"));
                 // にいない
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("助詞")
@@ -217,10 +212,15 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && t.getPartOfSpeechLevel2().equals("格助詞")
                        && n.getPartOfSpeechLevel1().equals("動詞"));
-                // ここでしたい
+                // 俺がちゃんと作りますから
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && n.getPartOfSpeechLevel1().equals("副詞"));
+                // 二冊目もお亡くなりに
+                strong = strong
+                      || (t.getPartOfSpeechLevel1().equals("助詞")
+                       && n.getPartOfSpeechLevel1().equals("接頭辞")
+                       && n.getSurface().equals("お"));
                 
                 if(i+2 < tokens.size())
                 {
@@ -233,6 +233,7 @@ class HeavySegmenter extends Segmenter
                          && n.getPartOfSpeechLevel1().equals("助動詞"));
                 }
                 
+                // どう説明したものか
                 weak = weak
                     || (t.getPartOfSpeechLevel1().equals("動詞")
                      && t.getSurface().equals("し")
