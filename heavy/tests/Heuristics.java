@@ -182,6 +182,30 @@ public class Heuristics
             assertEquals(word.getText().equals("もお"), false);
         }
         
+        words = splitter.split("都会に暮らしていた頃となんら変わらぬ環境！？",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("となんら"), false);
+        }
+        
+        words = splitter.split("「なんだよそれ……」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("よそれ"), false);
+        }
+        
+        words = splitter.split("「いいから顔洗って千波も食べろ。それとも今日はいらないのか？」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はいらない"), false);
+        }
+        
+        words = splitter.split("僕はといえば特に星が好きということはなかったものの。",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はと"), false);
+        }
+        
         // weakness
         
         words = splitter.split("どう説明したものか。",  new HashSet<>());
@@ -201,6 +225,24 @@ public class Heuristics
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("でし"), false);
+        }
+        
+        words = splitter.split("「今度は花札にしますか？」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("にし"), false);
+        }
+        
+        words = splitter.split("詰め込みすぎなんだよ",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("んだ"), false);
+        }
+        
+        words = splitter.split("なのに彼女のその身にまとう衣装は奇抜であり。",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("あり"), false);
         }
         
         

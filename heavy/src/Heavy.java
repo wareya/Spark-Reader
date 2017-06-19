@@ -221,6 +221,20 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && n.getPartOfSpeechLevel1().equals("接頭辞")
                        && n.getSurface().equals("お"));
+                // 都会に暮らしていた頃となんら変わらぬ環境
+                strong = strong
+                      || (t.getPartOfSpeechLevel2().equals("格助詞")
+                       && n.getPartOfSpeechLevel1().equals("代名詞"));
+                // なんだよそれ
+                strong = strong
+                      || (t.getPartOfSpeechLevel2().equals("終助詞")
+                       && n.getPartOfSpeechLevel1().equals("代名詞"));
+                // 僕はといえば
+                strong = strong
+                      || (t.getSurface().equals("は")
+                       && t.getPartOfSpeechLevel2().equals("係助詞")
+                       && n.getSurface().equals("と")
+                       && n.getPartOfSpeechLevel2().equals("格助詞"));
                 
                 if(i+2 < tokens.size())
                 {
@@ -238,6 +252,19 @@ class HeavySegmenter extends Segmenter
                     || (t.getPartOfSpeechLevel1().equals("動詞")
                      && t.getSurface().equals("し")
                      && n.getPartOfSpeechLevel1().equals("助動詞"));
+                
+                // 詰め込みすぎなんだよ
+                weak = weak
+                    || (t.getSurface().equals("な")
+                     && t.getPartOfSpeechLevel1().equals("助動詞")
+                     && n.getPartOfSpeechLevel1().equals("助詞")
+                     && n.getLemma().equals("の"));
+                
+                // なのに彼女のその身にまとう衣装は奇抜であり。
+                weak = weak
+                    || (t.getSurface().equals("で")
+                     && t.getConjugationType().equals("助動詞-ダ")
+                     && n.getLemma().equals("有る"));
                 
                 if(weak)
                 {
