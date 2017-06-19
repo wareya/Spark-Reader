@@ -16,6 +16,8 @@ import java.util.List;
 import com.atilika.kuromoji.unidic.Token;
 import com.atilika.kuromoji.unidic.Tokenizer;
 
+import javax.swing.*;
+
 import static main.Main.options;
 
 class HeavySegmenter extends Segmenter
@@ -123,8 +125,16 @@ class HeavySegmenter extends Segmenter
             return basic.Segment(text);
 
         ensureInitialized();
-
-        List<Token> tokens = kuro.tokenize(text);
+        List<Token> tokens;
+        try
+        {
+            tokens = kuro.tokenize(text);
+        }
+        catch(StringIndexOutOfBoundsException e)
+        {
+            JOptionPane.showMessageDialog(null, "Kuromoji threw an exception interally.\nThis probably means the user dictionary is formatted funny, like containing a definition for \"？\".\nSpark Reader has not crashed.");
+            return basic.Segment(text);
+        }
         ArrayList<Piece> r = new ArrayList<>();
         
         System.out.println("Kuromoji output:");
