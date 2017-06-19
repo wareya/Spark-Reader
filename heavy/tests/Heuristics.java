@@ -41,6 +41,8 @@ public class Heuristics
 
         //ArrayList<Piece> pieces = Segmenter.instance.Segment();
         List<FoundWord> words;
+        
+        // strength
 
         words = splitter.split("俺はそう、一言だけつぶやいた。",  new HashSet<>());
         for(FoundWord word : words)
@@ -172,6 +174,20 @@ public class Heuristics
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("でし"), false);
+        }
+        
+        words = splitter.split("「俺がちゃんと作りますから」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("がちゃんと"), false);
+        }
+        
+        // weakness
+        
+        words = splitter.split("どう説明したものか。",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("た"), false);
         }
         
         

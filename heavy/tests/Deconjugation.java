@@ -65,5 +65,11 @@ public class Deconjugation
             assertEquals(word.getText().equals("ました"), false); // failed to handle gozaimasu
         }
         
+        words = splitter.split("「さっさと終わらせよ……」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("終"), false); // failed to do the よ imperative
+        }
+        
     }
 }

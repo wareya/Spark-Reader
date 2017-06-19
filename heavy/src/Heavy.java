@@ -1,6 +1,4 @@
 
-import com.atilika.kuromoji.TokenizerBase;
-import jdk.nashorn.internal.runtime.options.Options;
 import language.dictionary.DefSource;
 import language.dictionary.Definition;
 import language.dictionary.UserDefinition;
@@ -10,7 +8,6 @@ import language.segmenter.Segmenter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -91,26 +88,33 @@ class HeavySegmenter extends Segmenter
         return (badSegments.contains(s));
     }
     
-    private void addAsUnigram(ArrayList<Piece> r, Token t)
+    private void addAsUnigram(ArrayList<Piece> r, String s)
     {
-        for(char c : t.getSurface().toCharArray())
+        for(char c : s.toCharArray())
             r.add(new Piece(c+"", false));
     }
 
     // unigram unknown tokens before adding them
     private void addWithUnigramCheck(ArrayList<Piece> r, Token t, boolean strong)
     {
-        if(!t.isKnown() || shouldForceUnigram(t.getSurface()))
+        if(!t.isKnown())
+            addAsUnigram(r, t.getSurface());
+        else
+            addWithUnigramCheck(r, new Piece(t.getSurface(), strong));
+    }
+    private void addWithUnigramCheck(ArrayList<Piece> r, Piece p)
+    {
+        if(shouldForceUnigram(p.txt))
         {
-            addAsUnigram(r, t);
+            addAsUnigram(r, p.txt);
         }
-        else if(t.getSurface().endsWith("っ") && t.getSurface().length() > 1)
+        else if(p.txt.endsWith("っ") && p.txt.length() > 1)
         {
-            r.add(new Piece(t.getSurface().substring(0, t.getSurface().length()-1), false));
+            addWithUnigramCheck(r, new Piece(p.txt.substring(0, p.txt.length()-1), false));
             r.add(new Piece("っ", false));
         }
         else
-            r.add(new Piece(t.getSurface(), strong));
+            r.add(p);
     }
 
     public List<Piece> Segment(String text)
@@ -142,9 +146,10 @@ class HeavySegmenter extends Segmenter
             {
                 Token n = tokens.get(i+1);
                 
-                // "Strong" means that a segment forces the word splitter to make a segment after it IF it is the first segment in the current attempt at finding a word.
-                
+                // "Strong" means that a segment forces the word splitter to make a segment after it iff it is the first segment in the current attempt at finding a word.
                 boolean strong = false;
+                // "Weak" means that a segment is forced to merge with the next one, with higher priority than strongness
+                boolean weak = false;
                 // しかいなかった
                 strong = strong
                       || (t.getPartOfSpeechLevel2().contains("副助詞")
@@ -212,6 +217,10 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && t.getPartOfSpeechLevel2().equals("格助詞")
                        && n.getPartOfSpeechLevel1().equals("動詞"));
+                // ここでしたい
+                strong = strong
+                      || (t.getPartOfSpeechLevel1().equals("助詞")
+                       && n.getPartOfSpeechLevel1().equals("副詞"));
                 
                 if(i+2 < tokens.size())
                 {
@@ -224,10 +233,12 @@ class HeavySegmenter extends Segmenter
                          && n.getPartOfSpeechLevel1().equals("助動詞"));
                 }
                 
-                // Force non-split on one-character-surface independent verbs followed by auxiliaries
-                // TODO: Figure out what this was needed for and add a test for it.
-                if(false)//t.getSurface().length() == 1 && t.getPartOfSpeechLevel2().equals("自立") && n.getPartOfSpeechLevel1().contains("助動")
-                //    && t.isKnown() && n.isKnown())
+                weak = weak
+                    || (t.getPartOfSpeechLevel1().equals("動詞")
+                     && t.getSurface().equals("し")
+                     && n.getPartOfSpeechLevel1().equals("助動詞"));
+                
+                if(weak)
                 {
                     r.add(new Piece(t.getSurface()+n.getSurface(), false));
                     i++;

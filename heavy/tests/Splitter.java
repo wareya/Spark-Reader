@@ -58,6 +58,12 @@ public class Splitter
             assertEquals(word.getText().equals("知"), false);
         }
         
+        words = splitter.split("「なんで腹黒いんだよっ、ちゃっかりさんって言ってよっ」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("言"), false);
+        }
+        
         // まだ疑問が残っている倉科さんの手を取ると
         
         // test かえって得体の知れないものを想像させる
