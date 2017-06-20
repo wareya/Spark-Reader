@@ -206,6 +206,30 @@ public class Heuristics
             assertEquals(word.getText().equals("はと"), false);
         }
         
+        words = splitter.split("安定はしている",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はし"), false);
+        }
+        
+        words = splitter.split("聞くチャンスはあったはずだ。",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はあっ"), false);
+        }
+        
+        words = splitter.split("といってもどんなものか",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はあっ"), false);
+        }
+        
+        words = splitter.split("「手伝いはいらないから。気持ちだけで充分だから」",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はいらない"), false);
+        }
+        
         // weakness
         
         words = splitter.split("どう説明したものか。",  new HashSet<>());

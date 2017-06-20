@@ -89,6 +89,7 @@ class HeavySegmenter extends Segmenter
         "たろ",
         "てん",
         "てぇ",
+        "たー",
         "てよ"
     ));
     private boolean shouldForceUnigram(String s)
@@ -96,15 +97,22 @@ class HeavySegmenter extends Segmenter
         return (badSegments.contains(s));
     }
     
+    private void add(ArrayList<Piece> r, Piece piece)
+    {
+        r.add(piece);
+        System.out.println(piece.txt + (piece.strong?" (strong)":""));
+    }
+    
     private void addAsUnigram(ArrayList<Piece> r, String s)
     {
         for(char c : s.toCharArray())
-            r.add(new Piece(c+"", false));
+            add(r, new Piece(c+"", false));
     }
 
     // unigram unknown tokens before adding them
     private void addWithUnigramCheck(ArrayList<Piece> r, Token t, boolean strong)
     {
+        System.out.println("Strong " + strong);
         if(!t.isKnown())
             addAsUnigram(r, t.getSurface());
         else
@@ -119,10 +127,10 @@ class HeavySegmenter extends Segmenter
         else if(p.txt.endsWith("っ") && p.txt.length() > 1)
         {
             addWithUnigramCheck(r, new Piece(p.txt.substring(0, p.txt.length()-1), false));
-            r.add(new Piece("っ", false));
+            add(r, new Piece("っ", false));
         }
         else
-            r.add(p);
+            add(r, p);
     }
 
     public List<Piece> Segment(String text)
@@ -138,7 +146,7 @@ class HeavySegmenter extends Segmenter
         }
         catch(StringIndexOutOfBoundsException e)
         {
-            JOptionPane.showMessageDialog(null, "Kuromoji threw an exception interally.\nThis probably means the user dictionary is formatted funny, like containing a #.\nSpark Reader has not crashed.");
+            JOptionPane.showMessageDialog(null, "Kuromoji threw an exception interally.\nThis probably means the user dictionary is formatted funny.\nSpark Reader has not crashed.");
             kuro = null;
             
             return basic.Segment(text);
@@ -212,13 +220,6 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && t.getPartOfSpeechLevel2().equals("係助詞")
                        && n.getPartOfSpeechLevel1().equals("副詞"));
-                // にいない
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("助詞")
-                       && t.getPartOfSpeechLevel2().equals("格助詞")
-                       && n.getPartOfSpeechLevel1().equals("動詞")
-                       && n.getPartOfSpeechLevel2().equals("自立")
-                       && !n.getSurface().equals("すっ"));
                 // ～くんで
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("接尾辞")
@@ -226,9 +227,11 @@ class HeavySegmenter extends Segmenter
                        && n.getPartOfSpeechLevel1().equals("助詞")
                        && n.getPartOfSpeechLevel2().equals("格助詞"));
                 // ここでしたい
+                // にいない
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && t.getPartOfSpeechLevel2().equals("格助詞")
+                       && (t.getSurface().equals("で") || t.getSurface().equals("に"))
                        && n.getPartOfSpeechLevel1().equals("動詞"));
                 // 俺がちゃんと作りますから
                 strong = strong
@@ -253,6 +256,24 @@ class HeavySegmenter extends Segmenter
                        && t.getPartOfSpeechLevel2().equals("係助詞")
                        && n.getSurface().equals("と")
                        && n.getPartOfSpeechLevel2().equals("格助詞"));
+                // 安定はしている
+                strong = strong
+                      || (t.getSurface().equals("は")
+                       && t.getPartOfSpeechLevel2().equals("係助詞")
+                       && n.getSurface().equals("し")
+                       && n.getPartOfSpeechLevel1().equals("動詞"));
+                // はあった
+                strong = strong
+                      || (t.getSurface().equals("は")
+                       && t.getPartOfSpeechLevel2().equals("係助詞")
+                       && n.getSurface().equals("あっ")
+                       && n.getPartOfSpeechLevel1().equals("動詞"));
+               // はいらない
+                strong = strong
+                      || (t.getSurface().equals("は")
+                       && t.getPartOfSpeechLevel2().equals("係助詞")
+                       && n.getSurface().equals("いら")
+                       && n.getPartOfSpeechLevel1().equals("動詞"));
                 
                 if(i+2 < tokens.size())
                 {
@@ -286,7 +307,7 @@ class HeavySegmenter extends Segmenter
                 
                 if(weak)
                 {
-                    r.add(new Piece(t.getSurface()+n.getSurface(), false));
+                    addWithUnigramCheck(r, new Piece(t.getSurface()+n.getSurface(), false));
                     i++;
                 }
                 else

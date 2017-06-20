@@ -102,7 +102,10 @@ public class WordSplitter
             if(options.getOption("splitterMode").equals("full"))
             {
                 if(segments.get(start).strong)
+                {
+                    System.out.println("constraining range because of strength");
                     end = start+1;
+                }
             }
             int limit = end;
 
@@ -135,18 +138,23 @@ public class WordSplitter
                 while(end > start)
                 {
                     String textHere = Segmenter.Unsegment(segments, start, end);
+                    System.out.println(textHere);
                     // only check the epwing dictionary if this is the first segment in the section (for speed reasons)
                     if(dict.findText(textHere) != null || (firstSection && dict.hasEpwingDef(textHere)) || mightBeDeconjugatable(textHere, firstSection))
+                    {
                         break;
+                    }
                     end--;
                 }
                 // Fell through: no good, try splitting the first segment (uncommon, performance impact isn't big even though we rewrite the segment list)
                 if(end <= start)
                 {
+                    System.out.println("Fell through");
                     // only bother for weak non-unigrams or long things
                     //if((segments.get(start).txt.length() > 1 && !segments.get(start).strong) || segments.get(start).txt.length() >= 3)
                     if(segments.get(start).txt.length() > 1)
                     {
+                        System.out.println("Rebuilding segment list");
                         String workingText = segments.get(start).txt;
                         int position = workingText.length();
                         while(position > 1)
@@ -177,12 +185,16 @@ public class WordSplitter
                     end = start+1; // only pick up exactly one segment
                 }
 
-                // extend it to include any contiguous segments that might be conjugation text
+                // extend it to include any contiguous segments that might be conjugation text or aren't kana when the previous was kana
+                String lastSegment = "";
                 while(end < limit)
                 {
                     String nextSegment = segments.get(end).txt;
-                    if(mightBeConjugation(nextSegment))
+                    if(mightBeConjugation(nextSegment) || !(Japanese.hasKanji(nextSegment) && !Japanese.hasOnlyKana(lastSegment)))
+                    {
                         end++;
+                        lastSegment = nextSegment;
+                    }
                     else
                         break;
                 }
@@ -194,12 +206,12 @@ public class WordSplitter
             while(end > start)
             {
                 String str = Segmenter.Unsegment(segments, start, end);
+                System.out.println(str);
 
                 WordScanner word = new WordScanner(str);//deconjugate
                 FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
                 attachDefinitions(matchedWord, word);//add cached definitions
 
-                System.out.println(matchedWord.getText());
                 // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
                 if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())) || !options.getOption("splitterMode").equals("full"))
                 {

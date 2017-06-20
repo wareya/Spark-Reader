@@ -64,6 +64,12 @@ public class Splitter
             assertEquals(word.getText().equals("言"), false);
         }
         
+        words = splitter.split("「浄水器の押し売りとか新聞の勧誘とかと間違われてるのかな？」。",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("間"), false);
+        }
+        
         // まだ疑問が残っている倉科さんの手を取ると
         
         // test かえって得体の知れないものを想像させる
