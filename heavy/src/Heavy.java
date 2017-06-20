@@ -1,6 +1,7 @@
 
 import language.dictionary.DefSource;
 import language.dictionary.Definition;
+import language.dictionary.Japanese;
 import language.dictionary.UserDefinition;
 import language.segmenter.BasicSegmenter;
 import main.Main;
@@ -23,7 +24,7 @@ import static main.Main.options;
 class HeavySegmenter extends Segmenter
 {
     Tokenizer kuro;
-    String kuromojiUserdict;
+    String kuromojiUserdict = null;
 
     Segmenter basic = new BasicSegmenter();
 
@@ -31,27 +32,32 @@ class HeavySegmenter extends Segmenter
     {
         if(kuro == null)
         {
-            kuromojiUserdict = "";
-            for(Definition definition : DefSource.getSource("Custom").getDefinitions())
+            if(kuromojiUserdict == null)
             {
-                UserDefinition def = (UserDefinition)definition;
-                //けいどろ,5145,5145,8735,名詞,普通名詞,一般,*,*,*,ケイドロ,警泥,けいどろ,ケードロ,けいどろ,ケードロ,混,*,*,*,*
-                //A,5145,5145,C,名詞,普通名詞,一般,*,*,*,B,A,A,B,A,B,混,*,*,*,*
-                String word = "";
-                if(def.getWord().length > 0)
-                    word = def.getWord()[0];
-                String reading = "*";
-                if(def.getReadings().length > 0)
-                    reading = def.getReadings()[0];
-                else
-                    reading = word;
-                
-                //kuromojiUserdict += String.format("%s,1,1,%d,その他,間投,*,*,*,*,%s,%s,%s\n",
-                //using the "others" category makes kuromoji basically refuse to use the term, proving that it cares about morphological category
-                // todo: map some word categories to the appropriate formats instead of loading everything as a noun
-                kuromojiUserdict += String.format("%s,5145,5145,%d,名詞,普通名詞,一般,*,*,*,%s,%s,%s,%s,%s,%s,混,*,*,*,*\n",
-                    word, options.getOptionInt("kuromojiUserdictWeight"), reading, word, word, reading, word, reading);
-                
+                kuromojiUserdict = "";
+                for(Definition definition : DefSource.getSource("Custom").getDefinitions())
+                {
+                    UserDefinition def = (UserDefinition)definition;
+                    String word = "";
+                    if(def.getWord().length > 0)
+                        word = def.getWord()[0];
+                    String reading = "";
+                    if(def.getReadings().length > 0)
+                        reading = Japanese.toKatakana(def.getReadings()[0], true);
+                    
+                    /*
+                    // Incorrect user dictionary format
+                    //警泥,5145,5145,7380,名詞,普通名詞,一般,*,*,*,ケイドロ,警泥,警泥,ケードロ,警泥,ケードロ,混,*,*,*,*
+                    //A,   5145,5145,C,   名詞,普通名詞,一般,*,*,*,B,       A,   A,   B        ,A,  B,混,*,*,*,*
+                    kuromojiUserdict += String.format("%s,5145,5145,%d,名詞,普通名詞,一般,*,*,*,%s,%s,%s,%s,%s,%s,混,*,*,*,*\n",
+                        word, options.getOptionInt("kuromojiUserdictWeight"), reading, word, word, reading, word, reading); 
+                     */
+                    // Real one. Note that kuromoji 1.0 is going to add support for better custom dictionary stuff 
+                    // 東京スカイツリー,東京 スカイツリー,トウキョウ スカイツリー,カスタム名詞
+                    // A,A,B,カスタム名詞
+                    kuromojiUserdict += String.format("%s,%s,%s,カスタム名詞\n",
+                        word, word, reading);
+                }
             }
             System.out.println("Userdict string:");
             System.out.println(kuromojiUserdict);
@@ -132,7 +138,9 @@ class HeavySegmenter extends Segmenter
         }
         catch(StringIndexOutOfBoundsException e)
         {
-            JOptionPane.showMessageDialog(null, "Kuromoji threw an exception interally.\nThis probably means the user dictionary is formatted funny, like containing a definition for \"？\".\nSpark Reader has not crashed.");
+            JOptionPane.showMessageDialog(null, "Kuromoji threw an exception interally.\nThis probably means the user dictionary is formatted funny, like containing a #.\nSpark Reader has not crashed.");
+            kuro = null;
+            
             return basic.Segment(text);
         }
         ArrayList<Piece> r = new ArrayList<>();
