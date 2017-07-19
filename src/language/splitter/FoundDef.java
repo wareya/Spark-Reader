@@ -63,11 +63,19 @@ public class FoundDef implements Comparable<FoundDef>
         //output ID (debug)
         if(options.getOptionBool("showDefID"))
             defText.addText(String.valueOf(foundDef.getID()), options.getColor("defTagCol"), options.getColor("defBackCol"));
-
-        String[] readings = foundDef.getSpellings();
+        //frequency data
+        FrequencySink.FreqData freqdata = FrequencySink.get(foundForm.getWord(), foundDef.getFurigana());
+        if(freqdata != null)
+            defText.addText(freqdata.toString(), options.getColor("defTagCol"), options.getColor("defBackCol"));
+        
+        String[] readings;
+        if(foundDef instanceof EDICTDefinition)
+            readings = ((EDICTDefinition)foundDef).getSpellings(foundForm.getWord());
+        else
+            readings = foundDef.getSpellings();
         for(String reading:readings)
         {
-            if(Japanese.hasKanji(reading) && !options.getOptionBool("showAllKanji"))continue;
+            if(Japanese.hasKanji(reading) && !options.getOptionBool("showAllKanji"))continue; // note: showAllKanji currently broken
             //output readings if not in this form already
             if(!reading.equals(foundForm.getWord()))
             {
@@ -136,7 +144,10 @@ public class FoundDef implements Comparable<FoundDef>
     }
     public String getFurigana()
     {
-        return foundDef.getFurigana();
+        if(foundDef instanceof EDICTDefinition)
+            return ((EDICTDefinition)foundDef).getFurigana(foundForm.getWord());
+        else
+            return foundDef.getFurigana();
     }
     public String getDictForm()
     {
