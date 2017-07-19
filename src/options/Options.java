@@ -135,6 +135,8 @@ public class Options
         
         options.put("kuromojiUserdictWeight", "20000"); // weight 
 
+        options.put("ankiExportEdictID", "false");
+        options.put("ankiExportFreqData", "false");
     }
     public Options(File file)throws IOException
     {
