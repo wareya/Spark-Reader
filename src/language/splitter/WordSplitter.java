@@ -222,15 +222,16 @@ public class WordSplitter
                 // We failed to match a word and only have one segment left
                 else if(end == start+1)
                 {
-                    // Hack: try it with substrings of the next segment (todo: make this encompass more failure cases without making it nasty)
-                    if(end < segments.size() && segments.get(end).txt.length() > 1)
+                    System.out.printf("Problem! %d %d\n", end, segments.size());
+                    // Hack: try it with substrings of this segment plus the next segment segment (to catch certain edge cases)
+                    if(end < segments.size() && segments.get(start).txt.length()+segments.get(end).txt.length() > 2)
                     {
-                        String segment1 = segments.get(start).txt;
-                        String segment2 = segments.get(end).txt;
+                        System.out.println("Condition triggered");
+                        String virtualSegment = segments.get(start).txt + segments.get(end).txt;
                         int n;
-                        for (n = segment2.length(); n > 0; n--)
+                        for (n = virtualSegment.length(); n > 0; n--)
                         {
-                            String tempString = segment1 + segment2.substring(0, n);
+                            String tempString = virtualSegment.substring(0, n);
                             
                             System.out.println("wow");
                             System.out.println(tempString);
@@ -245,7 +246,7 @@ public class WordSplitter
                                 // rebuild segment list
                                 List<Piece> workingList;
                                 workingList = new ArrayList<>();
-                                workingList.add(instance.new Piece(segment2.substring(n, segment2.length()), false));
+                                workingList.add(instance.new Piece(virtualSegment.substring(n, virtualSegment.length()), false));
                                 for(int i = end+1; i < segments.size(); i++)
                                     workingList.add(segments.get(i));
                                 segments = workingList;

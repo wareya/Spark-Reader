@@ -50,6 +50,13 @@ public class Blacklist
         {
             assertEquals(word.getText().equals("がいい"), false); // false split
         }
+
+        Main.blacklistDef.debugForceBlacklist((long)1367880	, "他人事");
+        words = splitter.split("他人事だからって言ってくれるわ。",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("他人事"), false); // false split
+        }
         
         // まだ疑問が残っている倉科さんの手を取ると
         
