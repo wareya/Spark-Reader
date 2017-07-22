@@ -1,3 +1,0 @@
-- Add rules that only allow specific edict entries (どう -> どうだ etc)
-
-- Restructure new optimizations/fixes to obey OoP modularization
