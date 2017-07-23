@@ -13,6 +13,7 @@ import options.BlacklistDef;
 import options.Known;
 import options.Options;
 import options.PrefDef;
+import options.WantToLearn;
 import ui.Page;
 import ui.UI;
 
@@ -30,6 +31,9 @@ import java.io.IOException;
 public class Main
 {
     public static final String VERSION = "Beta 0.8";
+    public static final String ABOUT = "Spark Reader " + VERSION + "\n\n" +
+            "Lead developer: Laurens Weyn\n" +
+            "Contributions: Alexander Nadeau\n\n";//TODO mention EDICT, libraries, links
 
     public static UI ui;
     /**
@@ -51,6 +55,7 @@ public class Main
     public static Hook hook;
     public static Dictionary dict;
     public static Known known;
+    public static WantToLearn wantToLearn;
     public static PrefDef prefDef;
     public static BlacklistDef blacklistDef;
     /**
@@ -75,7 +80,8 @@ public class Main
         {
             //load in configuration
             options = new Options(Options.SETTINGS_FILE);
-            known = new Known(options.getFile("knownWordsPath"));
+            known = new Known(options.getOptionBool("enableKnown")? options.getFile("knownWordsPath"):null);
+            wantToLearn = new WantToLearn(known);
             prefDef = new PrefDef(options.getFile("preferredDefsPath"));
             blacklistDef = new BlacklistDef(options.getFile("blacklistDefsPath"));
 
