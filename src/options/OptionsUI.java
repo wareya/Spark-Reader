@@ -70,7 +70,7 @@ public class OptionsUI extends JFrame
             display.add(new OptionLabel("Window properties:", null));
             display.add(new ToggleOption("useNativeUI", "Use System UI (requires restart)", "Themes the UI like the operating system. Looks a bit weird at the moment."));
             display.add(new NumberOption("windowWidth", "Window width (requires restart)", "I recommend setting this to the width of the window you plan to overlay this on."));
-            display.add(new NumberOption("maxHeight", "Maximum height (requires restart)", "<html>Definitions will not be longer than this.<br>I recommend setting this to the height of the window you plan to overlay this on."));        root.add(display);
+            display.add(new NumberOption("maxHeight", "Maximum height (requires restart)", "<html>Definitions will not be longer than this.<br>I recommend setting this to the height of the window you plan to overlay this on."));
             display.add(new ToggleOption("takeFocus", "Take focus when clicked (requires restart)", "If the game under the overlay is still receiving clicks, try turning this on."));
             display.add(new ToggleOption("showOnNewLine", "Restore window on new Japanese text", "If on, the window will automatically reappear if new Japanese text is detected."));
             display.add(new ToggleOption("hideOnOtherText", "Minimise window on new non-Japanese text", "If on, the window will automatically minimise if non-Japanese text is put into the clipboard."));
@@ -78,6 +78,7 @@ public class OptionsUI extends JFrame
             display.add(new OptionLabel("Other:", null));
             display.add(new ToggleOption("reduceSave", "Reduce file I/O", "<html>If ticked, writing to files is avoided until the program is closed or a lot of changes have been made.<br>Turning this on will improve performance, but if the program crashes some progress may be lost."));
             display.add(new ToggleOption("hookKeyboard", "Enable keyboard controls", "<html>If enabled, Spark Reader uses a tool to listen for keystrokes while the window is unfocused.<br>Requires restart."));
+        root.add(display);
         PageGroup window = new PageGroup("Overlay", "Graphical settings related to the on-screen overlay window");
 
             OptionPage furigana = new OptionPage("Furigana");
@@ -108,10 +109,10 @@ public class OptionsUI extends JFrame
 
             OptionPage backs = new OptionPage("Background colours");
 
-            backs.add(new OptionLabel("Text:", null));
-            
             backs.add(new RadioOption("textBackMode", textBackConfig, "Text background mode", null));
             backs.add(new NumberOption("textBackVariable", "Dropshadow/outline distance/thickness", "", NumberOption.NumberPreset.posOnly));
+
+            backs.add(new OptionLabel("Text:", null));
             backs.add(new ColourOption("textBackCol", "Main text background colour", "The colour used for normal words."));
             backs.add(new ColourOption("knownTextBackCol", "Known text background colour", "Colour used for words marked as known."));
             
