@@ -124,21 +124,23 @@ public class WordSplitter
                 }
                 else // If the segmenter is "smart" then each segment is larger than a single character and we should be more aggressive
                 {
-                    int scratch_length = 0;
+                    int char_length = 0;
+                    int segment_length = 0;
                     for(Piece s : Segmenter.subList(segments, start, segments.size()))
                     {
-                        scratch_length += s.txt.length();
-                        if(scratch_length >= 100) break;
+                        char_length += s.txt.length();
+                        segment_length += 1;
+                        if(char_length >= 100) break;
                     }
-                    if(end-start > scratch_length)
-                        end = start+scratch_length;
+                    if(end-start > segment_length)
+                        end = start+segment_length;
                 }
                 
                 // look for the longest section covered as-is in the dictionary
                 while(end > start)
                 {
                     String textHere = Segmenter.Unsegment(segments, start, end);
-                    System.out.println(textHere);
+                    //System.out.println(textHere);
                     // only check the epwing dictionary if this is the first segment in the section (for speed reasons)
                     if(dict.findText(textHere) != null || (firstSection && dict.hasEpwingDef(textHere)) || mightBeDeconjugatable(textHere, firstSection))
                     {
@@ -161,7 +163,8 @@ public class WordSplitter
                         {
                             String textHere = workingText.substring(0, position);
                             
-                            // Annoying change: Using the dictionary isn't good enough and causes segmentation errors like 知りあっ|た -> 知|りあ|った. We have to deconjugate it.
+                            // Annoying change: Using the dictionary alone isn't good enough and causes segmentation errors like 知りあっ|た -> 知|りあ|った. We have to deconjugate it.
+                            // Again, rebuilds are uncommon, and this isn't redundant. We just failed to find the shortest possible word, 
                             WordScanner word = new WordScanner(textHere);//deconjugate
                             FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
                             attachDefinitions(matchedWord, word);//add cached definitions
@@ -182,7 +185,7 @@ public class WordSplitter
                         limit = segments.size();
                         start = 0;
                     }
-                    end = start+1; // only pick up exactly one segment
+                    end = start+1; // only pick up exactly one segment because we built that segment out of a known word just above
                 }
 
                 // extend it to include any contiguous segments that might be conjugation text or aren't kana when the previous was kana
@@ -190,7 +193,7 @@ public class WordSplitter
                 while(end < limit)
                 {
                     String nextSegment = segments.get(end).txt;
-                    if(mightBeConjugation(nextSegment) || !(Japanese.hasKanji(nextSegment) && !Japanese.hasOnlyKana(lastSegment)))
+                    if(Japanese.isJapaneseWriting(nextSegment) && (mightBeConjugation(nextSegment) || !(Japanese.hasKanji(nextSegment) && !Japanese.hasOnlyKana(lastSegment))))
                     {
                         end++;
                         lastSegment = nextSegment;
@@ -280,8 +283,10 @@ public class WordSplitter
             }
             firstSection = false;
         }
+            
+        System.out.println("Done splitting");
+        
         return words;
-
     }
 
     private void attachDefinitions(FoundWord word, WordScanner conjugations)
