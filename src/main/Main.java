@@ -80,12 +80,19 @@ public class Main
             Segmenter.instance = new language.segmenter.BasicSegmenter();
         }
         System.out.println(VERSION);
+        options = new Options(Options.SETTINGS_FILE);
+        persist = Persist.load(options.getFile("persistPath"));
+        try
+        {
+            if(options.getOptionBool("useNativeUI"))javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+        }catch(Exception e)
+        {
+            //fall back to default if this fails
+        }
         initLoadingScreen();
         //try
         {
             //load in configuration
-            options = new Options(Options.SETTINGS_FILE);
-            persist = Persist.load(options.getFile("persistPath"));
             known = new Known(options.getOptionBool("enableKnown")? options.getFile("knownWordsPath"):null);
             wantToLearn = new WantToLearn(known);
             prefDef = new PrefDef(options.getFile("preferredDefsPath"));
@@ -113,6 +120,7 @@ public class Main
 
         dict = new Dictionary(new File(Main.options.getOption("dictionaryPath")));
         System.out.println("loaded " + Dictionary.getLoadedWordCount() + " in total");
+        persist.lastDictSize = Dictionary.getLoadedWordCount();//keep this in mind for next startup estimate
         WordScanner.init();
     }
 
@@ -164,7 +172,7 @@ public class Main
     private static void initLoadingScreen()throws IOException
     {
         loadScreen = new JDialog((JFrame) null, "Starting Spark Reader");
-        loadProgress = new JProgressBar(0, 377089);//TODO don't hardcode this value, use last boot as estimate
+        loadProgress = new JProgressBar(0, persist.lastDictSize);
         loadStatus = new JLabel("Loading dictionaries...");
         JPanel mainPanel = new JPanel(new BorderLayout());
         loadScreen.setContentPane(mainPanel);
