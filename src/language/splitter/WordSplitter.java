@@ -16,6 +16,7 @@
  */
 package language.splitter;
 
+import language.segmenter.BasicSegmenter;
 import language.segmenter.Segmenter;
 import language.segmenter.Segmenter.*;
 import language.deconjugator.ValidWord;
@@ -55,12 +56,12 @@ public class WordSplitter
     }
 
     // not in dictionary, see if adding possible deconjugation match endings to it gives us a dictionary entry (fixes 振り返ります etc)
-    private boolean mightBeDeconjugatable(String text, boolean firstSection)
+    private boolean mightBeDeconjugatable(String text)
     {
         boolean goodMatch = false;
         for(String ending:WordScanner.possibleEndings())
         {
-            String attempt = text + ending;
+            String attempt = text + ending; // "ending" is the deconjugated ending which the conjugation replaces 
             //only check Edict here; Epwing does cannot handle conjugations
             if(dict.findText(attempt) != null)
                 goodMatch = true;
@@ -81,209 +82,205 @@ public class WordSplitter
         }
         return goodMatch;
     }
-
+    
     private List<FoundWord> splitSection(String text, boolean firstSection)
     {
-        List<Piece> segments = instance.Segment(text);
+        if(options.getOption("splitterMode").equals("none"))
+        {
+            WordScanner word = new WordScanner(text);//deconjugate
+            FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+            attachDefinitions(matchedWord, word);//add cached definitions
+            ArrayList<FoundWord> list = new ArrayList<>();
+            list.add(matchedWord);
+            return list;
+        }
+        else
+            return splitSectionInternal(instance.Segment(text), firstSection);
+    }
+    
+    private FoundWord splitSectionSingleWord(List<Piece> segments, boolean firstSection, boolean isExtended)
+    {
+
+        // Concepts:
+        // - Segment: A string of text at least one character long which can be marked as "strong".
+        // - Word: A string of text that has associated dictionary entries.
+        // - Deconjugation: Taking a string of text and finding the desired "head word" or "lemma" with which we can find its definitions in a dictionary.
+        // - Full Lookup: Full deconjugation and dictionary checking for a piece of text.
+        // - Trivial Lookup: A lookup that needed no deconjugation. Refers to the result, not the process.
+        // - Strong segments: Can only be the first segment of the word if they are the only segment of the word.
+        // The strength of the following segments does not matter and the only number restriction is "not exactly one", and the rule does not apply if the strong segment is not the first segment.
+        
+        // - Deconjugation works by finding plausible original words based on recursive pattern replacement.
+        // These plausible original words are then all looked up in the dictionaries.
+        
+        // - Long words are preferred to short words, otherwise parsing would be very hard.
+        // Because of this, word splitting tries treating long sections of text as words before it tries treating short sections of text as words.
+        // This would be extremely slow on long lines if it were not limited, but real words are relatively short, conjugated or otherwise.
+        // As such, we limit the starting length to 100 characters.
+        
+        // - Because rule-based recursive deconjugation has relatively high computational complexity, 100 characters is still too long if you end up with 50 words in that 100 character string.
+        // Because of this, we sort of want to avoid deconjugating long text. However, conjugations can be arbitrarily long, theoretically, so there's no limit.
+        // The easiest way to deal with this is to find the longest string that consists of a dictionary word plus *possible* *single* conjugations, and use this as our "real" baseline for where we're starting.
+        // However, segmentation can disagree with the deconjugator as to where conujgation segments start and end, so we have to do this in text, not segments.
+        // This necessarily only covers a single step of recursive deconjugation, but is sufficient for turning strings into dictionary words with no care for accuracy.
+        
+        // - Sometimes segmentation makes it so that finding the right word is impossible. This means that we may need to do the process a second time, ignoring segments, to make sure it's not responsible.
+        // We have to do this regardless of whether the single first segment gives dictionary results, to fix things like 知りあった being 知|りあった instead of 知り|あった (edict does not have the spelling 知りあう)
+        // We only need to do this if it's possible that there is a word longer than one segment. Otherwise it would not find a new word.
+        
+        // - Sometimes the only available word is shorter than a single segment. In this case we need to split the segment up into single pieces and search words on that.  
+        
+        // Algorithm overview:
+        // - Start with an insane length (100 characters)
+        // - Shrink it down to the shortest *possible* word, based on partial deconjugation of text
+        // - Start doing Full Lookups starting here, shrinking by segments each time; Full Lookups are constrained to segments
+        // - Check strength rules when doing Full Lookups if the Full Lookup is also a Trivial Lookup
+        // 
+        int end = segments.size();
+        int limit = end;
+        // Parsing is faster if we start with a relatively short segment instead of the entire string.
+        // Otherwise, deconjugation can be unnecessarily expensive, since it'll be passing around tons of memory unnecessarily
+        // Luckily, even for words that can be deconjugated, we can make a pretty good guess at the longest string that could possibly be valid
+        boolean mayBeLong = false;
+        
+        // We only need to start with a length as the longest dictionary term, because it can be extended to pick up conjugation characters
+        // 100 is a good conservative "no way there's a dictionary term this long" limit, and prevents long text from taking several seconds to parse
+        int char_length = 0;
+        int segment_length = 0;
+        for(Piece s : Segmenter.subList(segments, 0, segments.size()))
+        {
+            char_length += s.txt.length();
+            segment_length += 1;
+            if(char_length >= 100) break;
+        }
+        if(end > segment_length)
+            end = segment_length;
+        
+        // look for the longest section covered as-is in the dictionary
+        while(end > 1)
+        {
+            String textHere = Segmenter.Unsegment(segments, 0, end);
+            //System.out.println(textHere);
+            // only check the epwing dictionary if this is the first segment in the section (for speed reasons)
+            if(dict.findText(textHere) != null || (firstSection && dict.hasEpwingDef(textHere)) || mightBeDeconjugatable(textHere))
+            {
+                if(end > 1) mayBeLong = true;
+                break;
+            }
+            end--;
+        }
+
+        // extend it to include any contiguous segments that might be conjugation text or aren't kana when the previous was kana
+        String lastSegment = "";
+        while(end < limit)
+        {
+            String nextSegment = segments.get(end).txt;
+            if(Japanese.isJapaneseWriting(nextSegment) && (mightBeConjugation(nextSegment) || !(Japanese.hasKanji(nextSegment) && !Japanese.hasOnlyKana(lastSegment))))
+            {
+                end++;
+                lastSegment = nextSegment;
+            }
+            else
+                break;
+        }
+        
+        // Now check if our string is a word, conjugated or not. If it isn't, shorten the string and try again until we only have one segment left.
+        // suppress bogus java compiler complaint when otherwise using while(end > 0)
+        assert(end > 0);
+        while(true)
+        {
+            if(end > 1 && !segments.get(0).strong)
+            {
+                String str = Segmenter.Unsegment(segments, 0, end);
+                System.out.println(str);
+    
+                WordScanner word = new WordScanner(str);//deconjugate
+                FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+                attachDefinitions(matchedWord, word);//add cached definitions
+    
+                // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
+                if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())) || !options.getOption("splitterMode").equals("full"))
+                {
+                    System.out.println("Match type 1");
+                    System.out.println("Strength: " + segments.get(0).strong);
+                    System.out.println("End: " + end);
+                    System.out.println("Extended: " + isExtended);
+                    for(int i = 0; i < end; i++)
+                        segments.remove(0);
+                    return matchedWord;
+                }
+            }
+            else if(end == 1)
+            {
+                // If we went all the way down to the first segment without matching anything yet, but it might be because of segment positions, retry with characters as segments instead of substrings as segments
+                if(mayBeLong && isExtended && !segments.get(0).strong)
+                {
+                    FoundWord word = splitSectionSingleWord(Segmenter.basicInstance.Segment(Segmenter.Unsegment(segments, 0, segments.size())), firstSection, false);
+                    int targetLen = word.getText().length();
+                    
+                    // Need to rebuild the portion of the segments list that word consumed
+                    int removedLen = 0;
+                    while(removedLen < targetLen)
+                    {
+                        int segmentLen = segments.get(0).txt.length();
+                        if(removedLen + segmentLen <= targetLen)
+                        {
+                            segments.remove(0);
+                            removedLen += segmentLen;
+                        }
+                        else
+                        {
+                            segments.get(0).txt = segments.get(0).txt.substring(targetLen-removedLen);
+                            segments.get(0).strong = false;
+                            removedLen = targetLen;
+                        }
+                    }
+                    System.out.println("Match type 2");
+                    return word;
+                }
+                if(segments.get(0).txt.length() > 1 && isExtended)
+                {
+                    FoundWord word = splitSectionSingleWord(Segmenter.basicInstance.Segment(Segmenter.Unsegment(segments, 0, 1)), firstSection, false);
+                    segments.remove(0);
+                    System.out.println("Match type 3");
+                    return word;
+                }
+                else
+                {
+                    String str = Segmenter.Unsegment(segments, 0, end);
+                    System.out.println(str);
+        
+                    WordScanner word = new WordScanner(str);//deconjugate
+                    FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+                    attachDefinitions(matchedWord, word);//add cached definitions
+        
+                    // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
+                    for(int i = 0; i < end; i++)
+                        segments.remove(0);
+                    System.out.println("Match type 4");
+                    return matchedWord;
+                }
+            }
+            end--;
+        }
+    }
+    
+    private List<FoundWord> splitSectionInternal(List<Piece> segments, boolean firstSection)
+    {
         List<FoundWord> words = new ArrayList<>();
         
         System.out.println("Splitter output:");
         for(Piece p : segments)
             System.out.println(p.txt);
-
-        //until we've covered all words
-        int start = 0;
-        while(segments.size()-start > 0)
+        
+        Integer start = 0;
+        while(segments.size() > 0)
         {
-            // select the initial "overly long and certainly bogus" segment list to test for validity
-            int end = segments.size();
-
-            // if the first segment is strong, use it in isolation
-            if(options.getOption("splitterMode").equals("full"))
-            {
-                if(segments.get(start).strong)
-                {
-                    System.out.println("constraining range because of strength");
-                    end = start+1;
-                }
-            }
-            int limit = end;
-
-            // Parsing is faster if we start with a relatively short segment instead of the entire string.
-            // Otherwise, deconjugation can be unnecessarily expensive, since it'll be passing around tons of memory unnecessarily
-            // Luckily, even for words that can be deconjugated, we can make a pretty good guess at the longest string that could possibly be valid
-            if(!options.getOption("splitterMode").equals("none"))
-            {
-                // We only need to start with a length as the longest dictionary term, because it can be extended to pick up conjugation characters
-                // 100 is a good conservative "no way there's a dictionary term this long" limit, and prevents long text from taking several seconds to parse
-                // todo: make this be an option?
-                if(!Segmenter.extended)
-                {
-                    if(end-start > 100)
-                        end = start+100;
-                }
-                else // If the segmenter is "smart" then each segment is larger than a single character and we should be more aggressive
-                {
-                    int char_length = 0;
-                    int segment_length = 0;
-                    for(Piece s : Segmenter.subList(segments, start, segments.size()))
-                    {
-                        char_length += s.txt.length();
-                        segment_length += 1;
-                        if(char_length >= 100) break;
-                    }
-                    if(end-start > segment_length)
-                        end = start+segment_length;
-                }
-                
-                // look for the longest section covered as-is in the dictionary
-                while(end > start)
-                {
-                    String textHere = Segmenter.Unsegment(segments, start, end);
-                    //System.out.println(textHere);
-                    // only check the epwing dictionary if this is the first segment in the section (for speed reasons)
-                    if(dict.findText(textHere) != null || (firstSection && dict.hasEpwingDef(textHere)) || mightBeDeconjugatable(textHere, firstSection))
-                    {
-                        break;
-                    }
-                    end--;
-                }
-                // Fell through: no good, try splitting the first segment (uncommon, performance impact isn't big even though we rewrite the segment list)
-                if(end <= start)
-                {
-                    System.out.println("Fell through");
-                    // only bother for weak non-unigrams or long things
-                    //if((segments.get(start).txt.length() > 1 && !segments.get(start).strong) || segments.get(start).txt.length() >= 3)
-                    if(segments.get(start).txt.length() > 1)
-                    {
-                        System.out.println("Rebuilding segment list");
-                        String workingText = segments.get(start).txt;
-                        int position = workingText.length();
-                        while(position > 1)
-                        {
-                            String textHere = workingText.substring(0, position);
-                            
-                            // Annoying change: Using the dictionary alone isn't good enough and causes segmentation errors like 知りあっ|た -> 知|りあ|った. We have to deconjugate it.
-                            // Again, rebuilds are uncommon, and this isn't redundant. We just failed to find the shortest possible word, 
-                            WordScanner word = new WordScanner(textHere);//deconjugate
-                            FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
-                            attachDefinitions(matchedWord, word);//add cached definitions
-            
-                            if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())))
-                                break;
-                            position--;
-                        }
-
-                        List<Piece> workingList;
-                        workingList = new ArrayList<>();
-                        workingList.add(instance.new Piece(workingText.substring(0, position), false));
-                        workingList.add(instance.new Piece(workingText.substring(position, workingText.length()), false));
-                        for(int i = start+1; i < segments.size(); i++)
-                            workingList.add(segments.get(i));
-
-                        segments = workingList;
-                        limit = segments.size();
-                        start = 0;
-                    }
-                    end = start+1; // only pick up exactly one segment because we built that segment out of a known word just above
-                }
-
-                // extend it to include any contiguous segments that might be conjugation text or aren't kana when the previous was kana
-                String lastSegment = "";
-                while(end < limit)
-                {
-                    String nextSegment = segments.get(end).txt;
-                    if(Japanese.isJapaneseWriting(nextSegment) && (mightBeConjugation(nextSegment) || !(Japanese.hasKanji(nextSegment) && !Japanese.hasOnlyKana(lastSegment))))
-                    {
-                        end++;
-                        lastSegment = nextSegment;
-                    }
-                    else
-                        break;
-                }
-            }
-            
-            int safe_end = end;
-
-            // Now check if our string is a word, conjugated or not. If it isn't, shorten the string and try again until we only have one segment left.
-            while(end > start)
-            {
-                String str = Segmenter.Unsegment(segments, start, end);
-                System.out.println(str);
-
-                WordScanner word = new WordScanner(str);//deconjugate
-                FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
-                attachDefinitions(matchedWord, word);//add cached definitions
-
-                // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
-                if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())) || !options.getOption("splitterMode").equals("full"))
-                {
-                    words.add(matchedWord);
-                    start = end;
-                    break;
-                }
-                // We failed to match a word and only have one segment left
-                else if(end == start+1)
-                {
-                    System.out.printf("Problem! %d %d\n", end, segments.size());
-                    // Hack: try it with substrings of this segment plus the next segment segment (to catch certain edge cases)
-                    if(end < segments.size() && segments.get(start).txt.length()+segments.get(end).txt.length() > 2)
-                    {
-                        System.out.println("Condition triggered");
-                        String virtualSegment = segments.get(start).txt + segments.get(end).txt;
-                        int n;
-                        for (n = virtualSegment.length(); n > 0; n--)
-                        {
-                            String tempString = virtualSegment.substring(0, n);
-                            
-                            System.out.println("wow");
-                            System.out.println(tempString);
-                            
-                            WordScanner tempWord = new WordScanner(tempString);//deconjugate
-                            FoundWord tempMatchedWord = new FoundWord(tempWord.getWord());//prototype definition
-                            attachDefinitions(tempMatchedWord, word);//add cached definitions
-                            if(tempMatchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(tempWord.getWord())) || !options.getOption("splitterMode").equals("full"))
-                            {
-                                words.add(tempMatchedWord);
-                                
-                                // rebuild segment list
-                                List<Piece> workingList;
-                                workingList = new ArrayList<>();
-                                workingList.add(instance.new Piece(virtualSegment.substring(n, virtualSegment.length()), false));
-                                for(int i = end+1; i < segments.size(); i++)
-                                    workingList.add(segments.get(i));
-                                segments = workingList;
-                                start = 0;
-                                
-                                System.out.println("Rebuilt segment list.");
-                                break;
-                            }
-                        }
-                        if(n != 0)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            System.out.println("Boo");
-                            words.add(matchedWord);
-                            start = end;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        words.add(matchedWord);
-                        start = end;
-                        break;
-                    }
-                }
-                else
-                    end--;//try shorter word
-            }
+            words.add(splitSectionSingleWord(segments, firstSection, Segmenter.extended));
             firstSection = false;
+            System.out.println("Full word cycle");
         }
-            
+        
         System.out.println("Done splitting");
         
         return words;

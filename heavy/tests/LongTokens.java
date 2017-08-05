@@ -1,4 +1,5 @@
 import com.atilika.kuromoji.unidic.Token;
+import language.segmenter.BasicSegmenter;
 import language.segmenter.Segmenter;
 import language.splitter.FoundWord;
 import main.Main;
@@ -21,6 +22,7 @@ public class LongTokens
     {
         Segmenter.extended = true;
         Segmenter.instance = new HeavySegmenter();
+        Segmenter.basicInstance = new BasicSegmenter();
         Main.options = new Options();
 
         List<Token> tokens;

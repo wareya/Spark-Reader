@@ -1,7 +1,5 @@
 package language.segmenter;
 
-import main.Main;
-
 import java.util.ArrayList;
 
 public class BasicSegmenter extends Segmenter

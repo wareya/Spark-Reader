@@ -1,4 +1,5 @@
 import language.dictionary.Dictionary;
+import language.segmenter.BasicSegmenter;
 import language.segmenter.Segmenter;
 import language.splitter.FoundWord;
 import language.splitter.WordSplitter;
@@ -26,6 +27,7 @@ public class Deconjugation
     {
         Segmenter.extended = true;
         Segmenter.instance = new HeavySegmenter();
+        Segmenter.basicInstance = new BasicSegmenter();
         Main.options = new Options();
 
         Main.known = new Known(Main.options.getFile("knownWordsPath"));

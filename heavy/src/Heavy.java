@@ -26,8 +26,6 @@ class HeavySegmenter extends Segmenter
     Tokenizer kuro;
     String kuromojiUserdict = null;
 
-    Segmenter basic = new BasicSegmenter();
-
     private void ensureInitialized()
     {
         if(kuro == null)
@@ -136,7 +134,7 @@ class HeavySegmenter extends Segmenter
     public List<Piece> Segment(String text)
     {
         if(options.getOption("kuromojiSupportLevel").equals("disabled"))
-            return basic.Segment(text);
+            return Segmenter.basicInstance.Segment(text);
 
         ensureInitialized();
         List<Token> tokens;
@@ -149,7 +147,7 @@ class HeavySegmenter extends Segmenter
             JOptionPane.showMessageDialog(null, "Kuromoji threw an exception interally.\nThis probably means the user dictionary is formatted funny.\nSpark Reader has not crashed.");
             kuro = null;
             
-            return basic.Segment(text);
+            return Segmenter.basicInstance.Segment(text);
         }
         ArrayList<Piece> r = new ArrayList<>();
         
@@ -329,6 +327,7 @@ public class Heavy
     {
         Segmenter.extended = true;
         Segmenter.instance = new HeavySegmenter();
+        Segmenter.basicInstance = new BasicSegmenter();
         Main.main(args);
     }
 }

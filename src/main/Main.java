@@ -78,6 +78,7 @@ public class Main
         {
             Segmenter.extended = false;
             Segmenter.instance = new language.segmenter.BasicSegmenter();
+            Segmenter.basicInstance = Segmenter.instance;
         }
         System.out.println(VERSION);
         options = new Options(Options.SETTINGS_FILE);

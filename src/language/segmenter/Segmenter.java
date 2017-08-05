@@ -6,6 +6,7 @@ import java.util.ArrayList;
 abstract public class Segmenter
 {
     static public Segmenter instance;
+    static public Segmenter basicInstance;
     static public boolean extended = false;
     public class Piece
     {
