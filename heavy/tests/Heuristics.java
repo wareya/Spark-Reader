@@ -232,6 +232,14 @@ public class Heuristics
             assertEquals(word.getText().equals("はいらない"), false);
         }
         
+        words = splitter.split("あの目覚ましが壊れてるのがいけないんだもん！",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("がい"), false);
+        }
+        
+        
+        
         // weakness
         
         words = splitter.split("どう説明したものか。",  new HashSet<>());

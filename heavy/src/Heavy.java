@@ -266,12 +266,17 @@ class HeavySegmenter extends Segmenter
                        && t.getPartOfSpeechLevel2().equals("係助詞")
                        && n.getSurface().equals("あっ")
                        && n.getPartOfSpeechLevel1().equals("動詞"));
-               // はいらない
+                // はいらない
                 strong = strong
                       || (t.getSurface().equals("は")
                        && t.getPartOfSpeechLevel2().equals("係助詞")
                        && n.getSurface().equals("いら")
                        && n.getPartOfSpeechLevel1().equals("動詞"));
+                // がい
+                strong = strong
+                      || (t.getSurface().equals("が")
+                       && t.getPartOfSpeechLevel2().equals("格助詞")
+                       && n.getSurface().startsWith("い"));
                 
                 if(i+2 < tokens.size())
                 {
