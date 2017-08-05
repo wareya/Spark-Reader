@@ -87,11 +87,72 @@ public class WordSplitter
     {
         if(options.getOption("splitterMode").equals("none"))
         {
+            ArrayList<FoundWord> list = new ArrayList<>();
             WordScanner word = new WordScanner(text);//deconjugate
             FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
             attachDefinitions(matchedWord, word);//add cached definitions
-            ArrayList<FoundWord> list = new ArrayList<>();
             list.add(matchedWord);
+            return list;
+        }
+        else if(!options.getOption("splitterMode").equals("full"))
+        {
+            ArrayList<FoundWord> list = new ArrayList<>();
+            if(Segmenter.extended)
+            {
+                String scratch = "";
+                boolean wasAllKanji = false;
+                for(Piece s : Segmenter.instance.Segment(text))
+                {
+                    boolean isAllKana = Japanese.hasOnlyKana(s.txt);
+                    boolean isAllKanji = Japanese.hasKanji(s.txt) && !Japanese.hasKana(s.txt);
+                    
+                    if(!isAllKana && !wasAllKanji && !scratch.equals(""))
+                    {
+                        WordScanner word = new WordScanner(scratch);//deconjugate
+                        FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+                        attachDefinitions(matchedWord, word);//add cached definitions
+                        list.add(matchedWord);
+                        scratch = "";
+                    }
+                    scratch += s.txt;
+                    
+                    wasAllKanji = isAllKanji;
+                }
+                if(!scratch.equals(""))
+                {
+                    WordScanner word = new WordScanner(scratch);//deconjugate
+                    FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+                    attachDefinitions(matchedWord, word);//add cached definitions
+                    list.add(matchedWord);
+                }
+            }
+            else
+            {
+                String scratch = "";
+                boolean wasKana = false;
+                for(char s : text.toCharArray())
+                {
+                    boolean isKanji = Japanese.isKanji(s);
+                    
+                    if(isKanji && wasKana && !scratch.equals(""))
+                    {
+                        WordScanner word = new WordScanner(scratch);//deconjugate
+                        FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+                        attachDefinitions(matchedWord, word);//add cached definitions
+                        list.add(matchedWord);
+                        scratch = "";
+                    }
+                    
+                    wasKana = Japanese.isKana(s);
+                }
+                if(!scratch.equals(""))
+                {
+                    WordScanner word = new WordScanner(scratch);//deconjugate
+                    FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
+                    attachDefinitions(matchedWord, word);//add cached definitions
+                    list.add(matchedWord);
+                }
+            }
             return list;
         }
         else
@@ -199,7 +260,7 @@ public class WordSplitter
                 attachDefinitions(matchedWord, word);//add cached definitions
     
                 // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
-                if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())) || !options.getOption("splitterMode").equals("full"))
+                if(matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord())))
                 {
                     System.out.println("Match type 1");
                     System.out.println("Strength: " + segments.get(0).strong);
@@ -238,13 +299,6 @@ public class WordSplitter
                     System.out.println("Match type 2");
                     return word;
                 }
-                if(segments.get(0).txt.length() > 1 && isExtended)
-                {
-                    FoundWord word = splitSectionSingleWord(Segmenter.basicInstance.Segment(Segmenter.Unsegment(segments, 0, 1)), firstSection, false);
-                    segments.remove(0);
-                    System.out.println("Match type 3");
-                    return word;
-                }
                 else
                 {
                     String str = Segmenter.Unsegment(segments, 0, end);
@@ -253,6 +307,16 @@ public class WordSplitter
                     WordScanner word = new WordScanner(str);//deconjugate
                     FoundWord matchedWord = new FoundWord(word.getWord());//prototype definition
                     attachDefinitions(matchedWord, word);//add cached definitions
+                    
+                    boolean defined = matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord()));
+                    
+                    if(!defined && (segments.get(0).txt.length() > 1 && isExtended))
+                    {
+                        FoundWord foundword = splitSectionSingleWord(Segmenter.basicInstance.Segment(Segmenter.Unsegment(segments, 0, 1)), firstSection, false);
+                        segments.remove(0);
+                        System.out.println("Match type 3");
+                        return foundword;
+                    }
         
                     // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
                     for(int i = 0; i < end; i++)
