@@ -313,16 +313,20 @@ public class WordSplitter
                     if(!defined && (segments.get(0).txt.length() > 1 && isExtended))
                     {
                         FoundWord foundword = splitSectionSingleWord(Segmenter.basicInstance.Segment(Segmenter.Unsegment(segments, 0, 1)), firstSection, false);
-                        segments.remove(0);
+                        segments.get(0).txt = segments.get(0).txt.substring(foundword.getText().length());
+                        segments.get(0).strong = false;
+                        assert(segments.get(0).txt.length() > 0);
                         System.out.println("Match type 3");
                         return foundword;
                     }
-        
-                    // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
-                    for(int i = 0; i < end; i++)
-                        segments.remove(0);
-                    System.out.println("Match type 4");
-                    return matchedWord;
+                    else
+                    {
+                        // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
+                        for(int i = 0; i < end; i++)
+                            segments.remove(0);
+                        System.out.println("Match type 4");
+                        return matchedWord;
+                    }
                 }
             }
             end--;
