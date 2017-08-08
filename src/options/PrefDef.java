@@ -17,6 +17,7 @@
 package options;
 
 import language.dictionary.Definition;
+import language.dictionary.JMDict.Spelling;
 import language.splitter.FoundDef;
 import main.Main;
 import main.Utils;
@@ -110,11 +111,14 @@ public class PrefDef
         }
     }
 
-    public boolean isPreferred(String spelling, Definition def)
+    public boolean isPreferred(Definition def)
     {
-        if(table.containsKey(spelling) && table.get(spelling) == def.getID())
+        for(Spelling spelling:def.getSpellings())
         {
-            return true;
+            if(table.containsKey(spelling.getText()) && table.get(spelling.getText()) == def.getID())
+            {
+                return true;
+            }
         }
         return false;
     }

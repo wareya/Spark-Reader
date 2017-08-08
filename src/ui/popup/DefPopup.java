@@ -172,7 +172,7 @@ public class DefPopup extends JPopupMenu
             String definition = def.getDefinition().getMeaningLine();
 
             StringBuilder tagList = new StringBuilder();
-            Set<DefTag> tags = def.getDefinition().getTags();
+            Set<DefTag> tags = def.getDefinition().getTags(def.getFoundForm());
             if(tags != null)for(DefTag tag:tags)
             {
                 tagList.append(tag.name()).append(" ");
@@ -213,7 +213,7 @@ public class DefPopup extends JPopupMenu
                         
             fr.append(kanji)
               .append("\t").append(reading)
-              .append("\t").append(definition)
+              .append("\t").append(definition.replace("\n", "<br>"))
               .append("\t").append(tagList.toString())
               .append("\t").append(Main.currPage.getText().replace("\n", "<br>"))
               .append("\t").append(kanjiDetails.toString())
@@ -221,7 +221,6 @@ public class DefPopup extends JPopupMenu
             
             if(Main.options.getOptionBool("ankiExportFreqData"))
             {
-                // TODO: make FrequencySink.get take a FoundDef or something so it can check all possible furigana/spelling
                 FrequencySink.FreqData freqdata = FrequencySink.get(word.getCurrentDef());
                 if(freqdata != null)
                     fr.append(String.format("\t%d\t%.2f", freqdata.rank, freqdata.ppm));

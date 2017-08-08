@@ -18,10 +18,14 @@ package language.splitter;
 
 import language.deconjugator.ValidWord;
 import language.dictionary.*;
+import language.dictionary.JMDict.JMDictDefinition;
+import language.dictionary.JMDict.Sense;
+import language.dictionary.JMDict.Spelling;
 import main.Main;
 import ui.TextBlockRenderer;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Set;
 
 import static main.Main.options;
@@ -59,30 +63,46 @@ public class FoundDef implements Comparable<FoundDef>
         }
 
         //output tags
-        defText.addText(foundDef.getTagLine(), options.getColor("defTagCol"), options.getColor("defBackCol"));
+        if(options.getOptionBool("showAllTags") || !(foundDef instanceof JMDictDefinition))
+            defText.addText(foundDef.getTagLine(), options.getColor("defTagCol"), options.getColor("defBackCol"));
         //output ID (debug)
         if(options.getOptionBool("showDefID"))
             defText.addText(String.valueOf(foundDef.getID()), options.getColor("defTagCol"), options.getColor("defBackCol"));
-        //frequency data
-        // TODO: make FrequencySink.get take a FoundDef or something so it can check all possible furigana/spelling
+        //output frequency data
         FrequencySink.FreqData freqdata = FrequencySink.get(this);
         if(freqdata != null)
             defText.addText(freqdata.toString(), options.getColor("defTagCol"), options.getColor("defBackCol"));
-        
-        String[] readings;
-        if(foundDef instanceof EDICTDefinition)
-            readings = ((EDICTDefinition)foundDef).getSpellings(foundForm.getWord());
-        else
-            readings = foundDef.getSpellings();
-        for(String reading:readings)
+
+        //output readings
+        for(Spelling reading:foundDef.getSpellings(foundForm))
         {
-            if(Japanese.hasKanji(reading) && !options.getOptionBool("showAllKanji"))continue; // note: showAllKanji currently broken
+            if(reading.isKanji() && !options.getOptionBool("showAllKanji"))continue; // note: showAllKanji currently broken
             //output readings if not in this form already
-            if(!reading.equals(foundForm.getWord()))
+            if(!reading.getText().equals(foundForm.getWord()))
             {
-                defText.addText(reading, options.getColor("defReadingCol"), options.getColor("defBackCol"));
+                StringBuilder extraData = new StringBuilder("");
+                //add frequency
+                if(options.getOptionBool("showReadingFreqs"))
+                {
+                    FrequencySink.FreqData specificFreqdata = FrequencySink.get(this, reading.getText());
+                    if(specificFreqdata != null)
+                        extraData.append(' ').append(specificFreqdata);
+                }
+                //add tags
+                boolean firstTag = true;
+                if(options.getOptionBool("showTagsOnReading") && reading.getTags() != null)
+                {
+                    for(DefTag tag:reading.getTags())
+                    {
+                        extraData.append(firstTag?" ":", ").append(tag);
+                        firstTag = false;
+                    }
+                }
+                defText.addText(reading.getText() + extraData, options.getColor("defReadingCol"), options.getColor("defBackCol"));
             }
         }
+
+        //output kanji
         if(!(foundDef instanceof KanjiDefinition))
         {
             for (int i = 0; i < foundForm.getWord().length(); i++)
@@ -96,12 +116,36 @@ public class FoundDef implements Comparable<FoundDef>
                 }
             }
         }
-        for(String def:foundDef.getMeaning())
+
+        //output definition text
+        List<Sense> defs = foundDef.getMeanings(foundForm);
+        for(int i = 0; i < defs.size(); i++)
         {
-            //output non-empty definitions
-            if(!def.equals("") && !def.equals("(P)"))
+
+            String startText = "";
+            if(defs.size() > 1)startText = (i + 1) + ") ";//number definitions
+            if(options.getOptionBool("showTagsOnDef") && defs.get(i).getTags() != null)
             {
-                defText.addText(def, options.getColor("defCol"), options.getColor("defBackCol"));
+                StringBuilder tags = new StringBuilder();
+                for(DefTag tag:defs.get(i).getTags())
+                {
+                    if(tags.length() > 0)tags.append(", ");
+                    tags.append(tag);
+                }
+                defText.addText(startText + tags, options.getColor("defTagCol"), options.getColor("defBackCol"));
+                startText = "";
+            }
+            if(foundDef instanceof JMDictDefinition && !options.getOptionBool("splitDefLines"))
+            {
+                defText.addText(startText + defs.get(i).getMeaningAsLine(), options.getColor("defCol"), options.getColor("defBackCol"));
+            }
+            else
+            {
+                for(String defLine : defs.get(i).getMeaningLines())
+                {
+                    defText.addText(startText + defLine, options.getColor("defCol"), options.getColor("defBackCol"));
+                    startText = "";
+                }
             }
         }
         resetScroll();
@@ -145,12 +189,7 @@ public class FoundDef implements Comparable<FoundDef>
     }
     public String getFurigana()
     {
-        if(foundDef instanceof EDICTDefinition)
-        {
-            return ((EDICTDefinition)foundDef).getFurigana(foundForm.getWord());
-        }
-        else
-            return foundDef.getFurigana();
+        return foundDef.getFurigana(foundForm);
     }
     public String getDictForm()
     {
@@ -167,15 +206,15 @@ public class FoundDef implements Comparable<FoundDef>
         int score = 0;
 
         score += foundDef.getSource().getPriority() * 100;
-        if (Main.prefDef.isPreferred(foundForm.getOriginalWord(), foundDef)) score += 1000;//HIGHLY favour definitions the user preferred
+        if (Main.prefDef.isPreferred(foundDef)) score += 1000;//HIGHLY favour definitions the user preferred
 
-        Set<DefTag> tags = foundDef.getTags();
+        Set<DefTag> tags = foundDef.getTags(foundForm);
         if (tags != null)
         {
             if (tags.contains(DefTag.obs) || tags.contains(DefTag.obsc) || tags.contains(DefTag.rare) || tags.contains(DefTag.arch))
                 score -= 50;//obscure penalty
             if(tags.contains(DefTag.p) || tags.contains(DefTag.P))
-                score += 50;//'common in newspapers etc.' bonus
+                score += 50;//'common in newspapers etc.' bonus (deprecated for JMDict)
 
             if (tags.contains(DefTag.uk) && !Japanese.hasKana(foundForm.getWord())) score -= 10;//usually kana without kana
             if (tags.contains(DefTag.uK) && Japanese.hasOnlyKana(foundForm.getWord())) score -= 10;//usually Kanji, only kana
@@ -186,10 +225,17 @@ public class FoundDef implements Comparable<FoundDef>
             if (tags.contains(DefTag.ctr)) score -= 10;
         }
         score -= foundDef.getSpellings().length;//-1 for every spelling; more likely it's coincidence
+        int maxSpellingScore = 0;
+        int thisSpellingScore = 0;
+        for(Spelling spelling:foundDef.getSpellings())
+        {
+            if(spelling.getText().equals(foundForm.getWord()))
+                thisSpellingScore = spelling.getCommonScore();
+            maxSpellingScore = Math.max(maxSpellingScore, spelling.getCommonScore());
+        }
+        score += maxSpellingScore / 2;
+        score += thisSpellingScore / 2;
         if (foundForm.getNumConjugations() == 0) score += 5 + 50;//prefer words/phrases instead of deviations
-        //'common' words are often marked as such while a conjugated form of a common word would not.
-        //To avoid this, the above has an increased score (since word must be common enough to have it conjugated)
-        //FIXME if the above causes extra side effects.
 
         //System.out.println("score for " + foundDef + " is " + score);
         return score;
