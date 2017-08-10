@@ -72,12 +72,10 @@ public class DefPopup extends JPopupMenu
             public void actionPerformed(ActionEvent e)
             {
                 Main.blacklistDef.toggleBlacklist(def);
-                //word.resortDefs();
-                //word.resetScroll();
                 ui.render();
             }
         });
-        setBlacklist.setSelected(Main.blacklistDef.isBlacklisted(word.getCurrentDef().getDefinition().getID(), word.getCurrentDef().getDictForm()));
+        setBlacklist.setSelected(Main.blacklistDef.isBlacklisted(def.getDefinition().getID(), def.getFoundForm().getOriginalWord()));
 
         anki = new JMenuItem(new AbstractAction("Add as flashcard")
         {
