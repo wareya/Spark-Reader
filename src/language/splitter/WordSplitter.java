@@ -247,9 +247,9 @@ public class WordSplitter
         
         // Now check if our string is a word, conjugated or not. If it isn't, shorten the string and try again until we only have one segment left.
         // suppress bogus java compiler complaint when otherwise using while(end > 0)
-        assert(end > 0);
         while(true)
         {
+            assert(end > 0);
             if(end > 1 && !segments.get(0).strong)
             {
                 String str = Segmenter.Unsegment(segments, 0, end);
