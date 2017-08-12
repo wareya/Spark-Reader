@@ -46,6 +46,12 @@ public class Heuristics
         
         // strength
 
+        words = splitter.split("俺はいつから歩いているんだろう？",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はい"), false);
+        }
+        
         words = splitter.split("俺はそう、一言だけつぶやいた。",  new HashSet<>());
         for(FoundWord word : words)
         {

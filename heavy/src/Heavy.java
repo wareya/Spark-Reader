@@ -110,7 +110,6 @@ class HeavySegmenter extends Segmenter
     // unigram unknown tokens before adding them
     private void addWithUnigramCheck(ArrayList<Piece> r, Token t, boolean strong)
     {
-        System.out.println("Strong " + strong);
         if(!t.isKnown())
             addAsUnigram(r, t.getSurface());
         else
@@ -218,6 +217,11 @@ class HeavySegmenter extends Segmenter
                       || (t.getPartOfSpeechLevel1().equals("助詞")
                        && t.getPartOfSpeechLevel2().equals("係助詞")
                        && n.getPartOfSpeechLevel1().equals("副詞"));
+                // はいつ
+                strong = strong
+                      || (t.getPartOfSpeechLevel1().equals("助詞")
+                       && t.getPartOfSpeechLevel2().equals("係助詞")
+                       && n.getPartOfSpeechLevel1().equals("代名詞"));
                 // ～くんで
                 strong = strong
                       || (t.getPartOfSpeechLevel1().equals("接尾辞")

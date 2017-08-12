@@ -273,7 +273,8 @@ public class WordSplitter
             }
             else if(end == 1)
             {
-                // If we went all the way down to the first segment without matching anything yet, but it might be because of segment positions, retry with characters as segments instead of substrings as segments
+                // If we went all the way down to the first segment without matching anything yet
+                // but it might be because of segment positions, retry with characters as segments instead of substrings as segments
                 if(mayBeLong && isExtended && !segments.get(0).strong)
                 {
                     FoundWord word = splitSectionSingleWord(Segmenter.basicInstance.Segment(Segmenter.Unsegment(segments, 0, segments.size())), firstSection, false);
@@ -342,7 +343,7 @@ public class WordSplitter
         
         System.out.println("Splitter output:");
         for(Piece p : segments)
-            System.out.println(p.txt);
+            System.out.println(p.txt + " " + (p.strong?"true":"false"));
         
         Integer start = 0;
         while(segments.size() > 0)
@@ -382,18 +383,10 @@ public class WordSplitter
         int start = 0;
         breaks.add(0);
 
-        boolean wasJapanese;
-        boolean isJapanese = true;//Japanese.isJapaneseWriting(text.charAt(0));
         while(pos < text.length())
         {
-            wasJapanese = isJapanese;
-            isJapanese = true;//Japanese.isJapaneseWriting(text.charAt(pos));
-            if(breaks.contains(pos) || isJapanese != wasJapanese)
+            if(breaks.contains(pos))
             {
-                // cause wasJapanese to be equal to isJapanese on the next iteration
-                if(breaks.contains(pos) && pos+1 < text.length())
-                    isJapanese = Japanese.isJapaneseWriting(text.charAt(pos+1));
-
                 String section = text.substring(start, pos);
                 words.addAll(splitSection(section, breaks.contains(start)));
                 start = pos;
