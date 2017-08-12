@@ -23,6 +23,7 @@ import language.dictionary.JMDict.JMParser;
 import language.dictionary.JMDict.Spelling;
 import main.Main;
 import main.Utils;
+import options.BlacklistDef;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -241,6 +242,7 @@ public class Dictionary
     }
     public List<Definition> findWord(ValidWord word)
     {
+        if(Main.blacklistDef == null) Main.blacklistDef = new BlacklistDef(); // last chance init to keep basic tests simple
         //System.out.println("looking up " + word);
         if(lookup.get(word.getWord()) == null) return null;
         List<Definition> stored = new ArrayList<>(findText(word.getWord())); // must copy; we're modifying our copy

@@ -33,7 +33,6 @@ public class JMDictTest extends DictionaryTest
     @Test
     public void testAshitaFurigana()
     {
-        Main.blacklistDef = new BlacklistDef();
         ValidWord word = new ValidWord("明日");
         List<Definition> defs = dict.findWord(word);
         assertEquals(1, defs.size());
