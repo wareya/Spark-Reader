@@ -310,7 +310,7 @@ public class WordSplitter
                     
                     boolean defined = matchedWord.getDefinitionCount() > 0 || (firstSection && dict.hasEpwingDef(word.getWord()));
                     
-                    if(!defined && (segments.get(0).txt.length() > 1 && isExtended))
+                    if(!defined && (segments.get(0).txt.length() > 1))
                     {
                         FoundWord foundword = splitSectionSingleWord(Segmenter.basicInstance.Segment(Segmenter.Unsegment(segments, 0, 1)), firstSection, false);
                         segments.get(0).txt = segments.get(0).txt.substring(foundword.getText().length());
@@ -321,10 +321,13 @@ public class WordSplitter
                     }
                     else
                     {
-                        // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one segment long
+                        // Use current string if it's a good word or if we do not have full parsing enabled or if it's only one character long
+                        System.out.println("Match type 4");
+                        System.out.println(defined);
+                        System.out.println(matchedWord.getDefinitionCount());
+                        System.out.println(segments.get(0).txt.length());
                         for(int i = 0; i < end; i++)
                             segments.remove(0);
-                        System.out.println("Match type 4");
                         return matchedWord;
                     }
                 }

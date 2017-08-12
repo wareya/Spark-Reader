@@ -35,12 +35,13 @@ import java.util.*;
 public class Dictionary
 {
     //text -> definition
-    private HashMap<String, List<Definition>> lookup;
+    private HashMap<String, Object> lookup;
     //can query for words
     private List<SubBook> books;
 
     private static int loadedWordCount = 0;
     
+    //TODO move this to the UserDict DefSource
     public static String userdictFilename = "dictionaries/customDict.txt";
 
     public Dictionary()throws IOException
@@ -156,11 +157,37 @@ public class Dictionary
      */
     public void insertDefinition(Definition def)
     {
-        for(Spelling spelling:def.getSpellings())//for each possible spelling...
+        insertDefinition(def.getSpellings(), def);
+    }
+
+    /**
+     * Inserts a definition only for specific spellings
+     * @param spellings the spellings of the definition to insert
+     * @param def the definition to insert
+     */
+    @SuppressWarnings("unchecked")
+    public void insertDefinition(Spelling[] spellings, Definition def)
+    {
+        for(Spelling spelling:spellings)
         {
-            //create if it doesn't exist
-            List<Definition> meanings = lookup.computeIfAbsent(spelling.getText(), k -> new LinkedList<>());
-            meanings.add(def);//add this definition for this spelling
+            String key = spelling.getText();
+            Object result = lookup.get(key);
+            if(result == null)//not yet in lookup
+            {
+                lookup.put(key, def);//put single instance
+            }
+            else if(result instanceof Definition)//already in lookup - not yet list
+            {
+                LinkedList multi = new LinkedList<>();
+                multi.add(result);//add original entry
+                multi.add(def);//add new entry
+                lookup.put(key, multi);
+            }
+            else//already in lookup as list
+            {
+                LinkedList multi = (LinkedList) result;
+                multi.add(def);//add to existing list
+            }
             loadedWordCount++;
         }
     }
@@ -171,13 +198,38 @@ public class Dictionary
      */
     public void removeDefinition(Definition def)
     {
-        for(Spelling spelling:def.getSpellings())//for each possible spelling...
+        removeDefinition(def.getSpellings(), def);
+    }
+    /**
+     * Removes a definition only for specific spellings
+     * @param spellings the spellings of the definition to remove
+     * @param def the definition to remove
+     */
+    public void removeDefinition(Spelling[] spellings, Definition def)
+    {
+        for(Spelling spelling:spellings)
         {
-            List<Definition> meanings = lookup.get(spelling.getText());
-            if(meanings == null)continue;
-            meanings.remove(def);
+            String key = spelling.getText();
+            Object result = lookup.get(key);
+            if(result == null)continue;//not in lookup
+            else if(result instanceof Definition)//in lookup - alone
+            {
+                lookup.remove(key);
+            }
+            else//in lookup as list
+            {
+                LinkedList multi = (LinkedList) result;
+                multi.remove(def);//remove from list
+                if(multi.size() <= 1)//LinkedList no longer needed
+                {
+                    lookup.remove(key);
+                }
+                if(multi.size() == 1)//1 entry still needed in structure
+                {
+                    lookup.put(key, multi.get(0));
+                }
+            }
             loadedWordCount--;
-            if(meanings.isEmpty())lookup.remove(spelling.getText());
         }
     }
 
@@ -185,15 +237,13 @@ public class Dictionary
     {
         String kanji = def.getSpellings()[0].getText().charAt(0) + "";
         //create if it doesn't exist
-        List<Definition> meanings = lookup.computeIfAbsent(kanji, k -> new ArrayList<>());
-        meanings.add(def);//add this definition for this spelling
+        insertDefinition(new Spelling[]{new Spelling(kanji)}, def);
     }
     public List<Definition> findWord(ValidWord word)
     {
         //System.out.println("looking up " + word);
         if(lookup.get(word.getWord()) == null) return null;
-        // FIXME: this is a pile of crap and probably really slow
-        List<Definition> stored = new ArrayList<>(lookup.get(word.getWord()));
+        List<Definition> stored = new ArrayList<>(findText(word.getWord())); // must copy; we're modifying our copy
         for(int i = 0; i < stored.size(); i++)
         {
             Definition def = stored.get(i);
@@ -207,7 +257,10 @@ public class Dictionary
     }
     public List<Definition> findText(String word)
     {
-        return lookup.get(word);
+        Object found = lookup.get(word);
+        if(found == null)return null;
+        if(found instanceof List)return (List)found;
+        else return Collections.singletonList((Definition)found);
     }
     public boolean hasEpwingDef(String word)
     {
@@ -251,5 +304,15 @@ public class Dictionary
     public int getHashSize()
     {
         return lookup.size();
+    }
+
+    /**
+     * Access the internal data structure of the Dictionary.
+     * Don't use this method unless you really need to as the structure may change.
+     * @return the HashMap holding all loaded definitions
+     */
+    public HashMap<String, Object> getInternalLookup()
+    {
+        return lookup;
     }
 }
