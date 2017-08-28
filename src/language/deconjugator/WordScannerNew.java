@@ -111,8 +111,15 @@ public class WordScannerNew extends WordScanner implements WordScanner.SubScanne
                 return false;
             return true;
         }));
+        
         // Not sure if these should be restricted to verbs but probably
+        ruleList.add(new StdRule("とく", "て", "as preparation", DefTag.stem_te, DefTag.v5k));
+        ruleList.add(new StdRule("どく", "で", "as preparation", DefTag.stem_te, DefTag.v5k));
+        ruleList.add(new StdRule("おく", "", "as preparation", DefTag.stem_te, DefTag.v5k));
+        
         ruleList.add(new StdRule("いく", "", "teiku", DefTag.stem_te, DefTag.v5k_s));
+        ruleList.add(new StdRule("く", "", "teiku (slurred)", DefTag.stem_te, DefTag.v5k_s));
+        
         ruleList.add(new StdRule("くる", "", "tekuru", DefTag.stem_te, DefTag.vk));
         // Should form differently on adjectives than verbs
         ruleList.add(new StdRule("ある", "", "tearu", DefTag.stem_te, DefTag.v5r_i));
