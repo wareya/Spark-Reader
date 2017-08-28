@@ -206,7 +206,8 @@ public class FoundDef implements Comparable<FoundDef>
         int score = 0;
 
         score += foundDef.getSource().getPriority() * 100;
-        if (Main.prefDef.isPreferred(foundDef)) score += 1000;//HIGHLY favour definitions the user preferred
+        // must use dictionary form or else e.g. 俺 having a preferred definition will override 己 being preferred to be おのれ
+        if (Main.prefDef.isPreferred(getDictForm(), foundDef)) score += 1000;//HIGHLY favour definitions the user preferred
 
         Set<DefTag> tags = foundDef.getTags(foundForm);
         if (tags != null)

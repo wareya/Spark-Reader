@@ -111,14 +111,12 @@ public class PrefDef
         }
     }
 
-    public boolean isPreferred(Definition def)
+    public boolean isPreferred(String spelling, Definition def)
     {
-        for(Spelling spelling:def.getSpellings())
+        if(table.containsKey(spelling) && table.get(spelling) == def.getID())
         {
-            if(table.containsKey(spelling.getText()) && table.get(spelling.getText()) == def.getID())
-            {
-                return true;
-            }
+            System.out.println(spelling + " matches " + def.getID());
+            return true;
         }
         return false;
     }
