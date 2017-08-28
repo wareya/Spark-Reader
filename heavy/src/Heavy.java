@@ -88,7 +88,8 @@ class HeavySegmenter extends Segmenter
         "てん",
         "てぇ",
         "たー",
-        "てよ"
+        "てよ",
+        "たぁ"
     ));
     private boolean shouldForceUnigram(String s)
     {
@@ -281,6 +282,12 @@ class HeavySegmenter extends Segmenter
                       || (t.getSurface().equals("が")
                        && t.getPartOfSpeechLevel2().equals("格助詞")
                        && n.getSurface().startsWith("い"));
+                       
+                // はいけません
+                strong = strong
+                      || (t.getSurface().equals("は")
+                       && t.getPartOfSpeechLevel2().equals("係助詞")
+                       && n.getSurface().startsWith("い"));
                 
                 if(i+2 < tokens.size())
                 {
@@ -312,7 +319,17 @@ class HeavySegmenter extends Segmenter
                      && t.getConjugationType().equals("助動詞-ダ")
                      && n.getLemma().equals("有る"));
                 
-                if(weak)
+                // hardcoded heuristic because this one is complicated 
+                // 強盗とかしてたのかな
+                if (t.getSurface().equals("と")
+                    && t.getPartOfSpeechLevel2().equals("格助詞")
+                    && n.getLemma().equals("か")
+                    && n.getPartOfSpeechLevel2().equals("副助詞"))
+                {
+                    addWithUnigramCheck(r, new Piece(t.getSurface()+n.getSurface(), true));
+                    i++;
+                }
+                else if(weak)
                 {
                     addWithUnigramCheck(r, new Piece(t.getSurface()+n.getSurface(), false));
                     i++;
@@ -321,6 +338,7 @@ class HeavySegmenter extends Segmenter
                 {
                     addWithUnigramCheck(r, t, strong);
                 }
+                
             }
         }
         return r;

@@ -107,6 +107,16 @@ public class Hacks
         }
         assertEquals(foundWantedWord, true);
         
+        foundWantedWord = false;
+        words = splitter.split("すりーぱーほーるど決まったぁーーッ！",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            if(word.getText().equals("決まった")) foundWantedWord = true;
+        }
+        assertEquals(foundWantedWord, true);
+        
+        
+        
         
         // hybrid test: both default penalties and deconjugation
         words = splitter.split("噛みしめるようにして返事をした",  new HashSet<>());

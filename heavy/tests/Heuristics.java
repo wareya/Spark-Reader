@@ -244,6 +244,13 @@ public class Heuristics
             assertEquals(word.getText().equals("がい"), false);
         }
         
+        words = splitter.split("全部買うだなんて嘘はいけません", new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("はい"), false);
+            assertEquals(word.getText().equals("はいけ"), false);
+        }
+        
         
         
         // weakness
@@ -296,6 +303,14 @@ public class Heuristics
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("なん"), false); // misleading split
+        }
+        
+        
+        
+        words = splitter.split("強盗とかしてたのかな",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("とかしてた"), false); // misleading split
         }
     }
 }
