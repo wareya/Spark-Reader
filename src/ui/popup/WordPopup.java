@@ -138,8 +138,8 @@ public class WordPopup extends JPopupMenu
         
         add(addBreak);
         add(exportLine);
-        add(fixupOCR);
         if(Main.options.getOptionBool("enableKnown"))add(markKnown);
+        add(fixupOCR);
         add(makeDefinition);
         add(new Separator());
         add(copy);
