@@ -223,11 +223,22 @@ public class WordPopup extends JPopupMenu
         addRelations("ボポ");
         
         addRelations("きさ");
+        addRelations("ちら");
+        addRelations("りリ");
+        addRelations("しレL");
+        
         addRelations("ト卜");
+        addRelations("ミ三彡");
+        addRelations("ニ二こ");
+        addRelations("カ力");
+        addRelations("タ夕");
+        addRelations("チ千");
+        addRelations("ロ口");
+        addRelations("ハ八");
         
         addRelations("ー―一|]-");
         
-        addRelations("間聞問閤");
+        addRelations("間聞問閤"); // example
         
         addRelations("  "); // two ascii spaces, dummy, special logic used
     } 
