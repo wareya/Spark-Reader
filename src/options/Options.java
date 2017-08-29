@@ -148,6 +148,7 @@ public class Options
         options.put("menubarOptionSpacing", "7");
 
         options.put("showReadingFreqs", "false");
+        options.put("rikaiEmulation", "0");
     }
     public Options(File file)throws IOException
     {
