@@ -36,7 +36,10 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
+import java.util.List;
+
+import static main.Main.splitter;
 
 /**
  *
@@ -48,6 +51,7 @@ public class WordPopup extends JPopupMenu
     
     JMenuItem addBreak;
     JMenuItem exportLine;
+    JMenuItem fixupOCR;
     JMenuItem makeDefinition;
     JMenuItem copy;
     JMenuItem append;
@@ -66,6 +70,15 @@ public class WordPopup extends JPopupMenu
             {
                 setVisible(false);//ensure this menu's already gone for the screenshot
                 exportLine();
+            }
+        });
+        fixupOCR = new JMenuItem(new AbstractAction("Fix up OCR")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                fixupOCR(line);
+                ui.render(); // refresh
             }
         });
         makeDefinition = new JMenuItem(new AbstractAction("Create new userdict entry")
@@ -125,6 +138,7 @@ public class WordPopup extends JPopupMenu
         
         add(addBreak);
         add(exportLine);
+        add(fixupOCR);
         if(Main.options.getOptionBool("enableKnown"))add(markKnown);
         add(makeDefinition);
         add(new Separator());
@@ -154,7 +168,127 @@ public class WordPopup extends JPopupMenu
 
         return exportedBeforeSession + exportedThisSession;
     }
+    
+    private static final Map<Character, Character> fixupRelations;
+    static
+    {
+        fixupRelations = new HashMap<>();
+        fixupRelations.put('や', 'ゃ');
+        fixupRelations.put('ゆ', 'ゅ');
+        fixupRelations.put('よ', 'ょ');
+        fixupRelations.put('つ', 'っ');
+        fixupRelations.put('ゃ', 'や');
+        fixupRelations.put('ゅ', 'ゆ');
+        fixupRelations.put('ょ', 'よ');
+        fixupRelations.put('っ', 'つ');
+        fixupRelations.put('へ', 'ヘ');
+        fixupRelations.put('ヘ', 'へ');
+        fixupRelations.put('―', '一');
+        fixupRelations.put('―', 'ー');
+        fixupRelations.put('-', 'ー');
+        fixupRelations.put('-', '一');
+        fixupRelations.put('|', 'ー');
+        fixupRelations.put(']', 'ー');
+        fixupRelations.put('一', 'ー');
+        fixupRelations.put('ー', '一');
+        fixupRelations.put('ば', 'ぱ');
+        fixupRelations.put('ぱ', 'ば');
+        fixupRelations.put('ぴ', 'び');
+        fixupRelations.put('び', 'ぴ');
+        fixupRelations.put('ぷ', 'ぶ');
+        fixupRelations.put('ぶ', 'ぷ');
+        fixupRelations.put('ぺ', 'べ');
+        fixupRelations.put('べ', 'ぺ');
+        fixupRelations.put('ぽ', 'ぼ');
+        fixupRelations.put('ぼ', 'ぽ');
+        fixupRelations.put('間', '聞');
+        fixupRelations.put('問', '聞');
+        fixupRelations.put('聞', '間');
+        fixupRelations.put('問', '間');
+        fixupRelations.put('間', '問');
+        fixupRelations.put('聞', '問');
+    } 
+    
+    public static void fixupOCR(Line line)
+    {
+        int currline = -1;
+        
+        for(int i = 0; i < Main.currPage.getLineCount(); i++)
+        {
+            if(line == Main.currPage.getLine(i))
+            {
+                currline = i;
+                break;
+            }
+        }
 
+        int length = 0;
+        for(FoundWord word : line.getWords())
+        {
+            // pretend undefined segments are two words long so that we can just use a "length" check to see if test strings are better
+            if(word.getDefinitionCount() == 0)
+                length += 2;
+            else
+                length += 1;
+        }
+        
+        System.out.println("length " + length);
+        
+        // FIXME: move the actual algorithm to src/language/ somewhere?
+        
+        String text = new String(line.toString());
+        for(int i = 0; i < text.length(); i++)
+        {
+            String newstring = null;
+            List<FoundWord> listB = null;
+            Boolean shorten = false;
+            if(fixupRelations.containsKey(text.charAt(i)))
+            {
+                char[] newtext = new String(text).toCharArray();
+                newtext[i] = fixupRelations.get(text.charAt(i));
+                newstring = new String(newtext);
+                listB = splitter.split(newstring, line.getMarkers());
+            }
+            if(text.charAt(i) == ' ')
+            {
+                newstring = text.substring(0, i);
+                if(i+1 < text.length())
+                    newstring += text.substring(i+1, text.length());
+                listB = splitter.split(newstring, line.getMarkers());
+                shorten = true;
+            }
+            if(newstring != null && listB != null)
+            {
+                int newlength = 0;
+                for(FoundWord word : listB)
+                {
+                    if(word.getDefinitionCount() == 0)
+                        newlength += 2;
+                    else
+                        newlength += 1;
+                }
+                System.out.println("test length " + newlength);
+                if(newlength < length)
+                {
+                    length = newlength;
+                    text = newstring;
+                    if(shorten) i--;
+                }
+            }
+        }
+        
+        String finaltext = "";
+        
+        for(int i = 0; i < currline && i < Main.currPage.getLineCount(); i++)
+            finaltext += Main.currPage.getLine(i).toString() + "\n";
+        
+        finaltext += text + "\n";
+        
+        for(int i = currline+1; i < Main.currPage.getLineCount(); i++)
+            finaltext += Main.currPage.getLine(i).toString() + (i+1 == Main.currPage.getLineCount()?"":"\n");
+        
+        Main.currPage.setText(finaltext);
+    }
     public static void exportLine()
     {
         JFrame frame = Main.ui.disp.getFrame();
