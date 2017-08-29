@@ -241,6 +241,7 @@ public class WordPopup extends JPopupMenu
         {
             String newstring = null;
             List<FoundWord> listB = null;
+            Boolean shorten = false;
             if(fixupRelations.containsKey(text.charAt(i)))
             {
                 char[] newtext = new String(text).toCharArray();
@@ -254,6 +255,7 @@ public class WordPopup extends JPopupMenu
                 if(i+1 < text.length())
                     newstring += text.substring(i+1, text.length());
                 listB = splitter.split(newstring, line.getMarkers());
+                shorten = true;
             }
             if(newstring != null && listB != null)
             {
@@ -270,6 +272,7 @@ public class WordPopup extends JPopupMenu
                 {
                     length = newlength;
                     text = newstring;
+                    if(shorten) i--;
                 }
             }
         }
