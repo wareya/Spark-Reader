@@ -225,7 +225,7 @@ public class WordPopup extends JPopupMenu
         addRelations("きさ");
         addRelations("ちら");
         addRelations("りリ");
-        addRelations("しレL");
+        addRelations("しL");
         
         addRelations("ト卜");
         addRelations("ミ三彡");
