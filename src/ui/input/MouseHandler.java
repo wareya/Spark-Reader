@@ -49,24 +49,9 @@ public abstract class MouseHandler
     {
         if(mousePos != null)middleClick(mousePos);
     }
-
-    public void leftClick(Point pos)
+    
+    private void setSelectedWord(Point pos, boolean toggle, boolean unknownonly)
     {
-        //minimise button
-        if(pos.y < textStartY && pos.x > minimiseStartX)
-        {
-            ui.minimise();
-            return;
-        }
-
-        if(UI.showMenubar)//on menubar
-        {
-            //TODO avoid triggering this when the user intends to move the window, not click a Menubar item
-            ui.menubar.processClick(pos);
-            return;
-        }
-
-
         if(pos.y >= textStartY && pos.y <= textEndY)
         {
             //int charIndex = toCharPos(pos.x);
@@ -87,7 +72,10 @@ public abstract class MouseHandler
             {
                 if(word2 == word)
                 {
-                    word.toggleWindow();
+                    if(toggle)
+                        word.toggleWindow();
+                    else if(!word.isShowingDef() && !(unknownonly && word.isKnown()))
+                        word.toggleWindow();
                     if(word.isShowingDef())ui.selectedWord = word;
                 }
                 else
@@ -96,6 +84,26 @@ public abstract class MouseHandler
             
             ui.render();
         }
+    
+    }
+
+    public void leftClick(Point pos)
+    {
+        //minimise button
+        if(pos.y < textStartY && pos.x > minimiseStartX)
+        {
+            ui.minimise();
+            return;
+        }
+
+        if(UI.showMenubar)//on menubar
+        {
+            //TODO avoid triggering this when the user intends to move the window, not click a Menubar item
+            ui.menubar.processClick(pos);
+            return;
+        }
+        
+        setSelectedWord(pos, true, false);
     }
     public void rightClick(Point pos)
     {
@@ -204,6 +212,9 @@ public abstract class MouseHandler
 
                 if(reRender)ui.render();
             }
+            
+            if(options.getOptionInt("rikaiEmulation") > 0)
+                setSelectedWord(pos, false, options.getOptionInt("rikaiEmulation") > 1);
         }
         //TODO could be more efficient, revisit when width is consistent
         boolean newResizeState = pos.getY() >= UI.textStartY && pos.getX() >= options.getOptionInt("windowWidth") - resizeEdgeSize;
