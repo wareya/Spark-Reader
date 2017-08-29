@@ -271,6 +271,9 @@ public class UI
                 stickToWindow = WindowHook.hook.getCoord();
                 ui.disp.getFrame().setLocation(stickToWindow.get(0), stickToWindow.get(1));
             }
+            
+            ui.mouseHandler.think();
+            
             //check clipboard
             String clip = hook.check();
             if(clip != null)
