@@ -9,6 +9,7 @@ import ui.popup.DefPopup;
 import ui.popup.WordPopup;
 
 import java.awt.*;
+import java.util.Date;
 import java.util.Set;
 
 import static main.Main.*;
@@ -30,6 +31,8 @@ public abstract class MouseHandler
     protected int resizeEdgeSize = 5;
     protected boolean resizeState = false;//true if cursor is <-> icon
 
+    protected double stopTime = 0;
+    protected Point stopPoint = null;
 
     public MouseHandler(UI ui)
     {
@@ -219,7 +222,10 @@ public abstract class MouseHandler
             }
             
             if(options.getOptionInt("rikaiEmulation") > 0 && moved)
-                setSelectedWord(pos, false, options.getOptionInt("rikaiEmulation") > 1);
+            {
+                stopPoint = pos;
+                stopTime = new Date().getTime();
+            }
         }
         //TODO could be more efficient, revisit when width is consistent
         boolean newResizeState = pos.getY() >= UI.textStartY && pos.getX() >= options.getOptionInt("windowWidth") - resizeEdgeSize;
@@ -239,6 +245,13 @@ public abstract class MouseHandler
             }
         }
         if(reRender)ui.render();
+    }
+    
+    public void think()
+    {
+        double currtime = new Date().getTime();
+        if(options.getOptionInt("rikaiEmulation") > 0 && currtime-stopTime > 200 && mousePos == stopPoint && stopPoint != null)
+            setSelectedWord(stopPoint, false, options.getOptionInt("rikaiEmulation") > 1);
     }
 
     public void mouseExit()
