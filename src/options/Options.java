@@ -160,6 +160,7 @@ public class Options
 
         options.put("showReadingFreqs", "false");
         options.put("rikaiEmulation", "0");
+        options.put("enableCopyBack", "true");
     }
     public Options(File file)throws IOException
     {

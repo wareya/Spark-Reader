@@ -29,6 +29,7 @@ import ui.WordEditUI;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -54,6 +55,7 @@ public class WordPopup extends JPopupMenu
     JMenuItem fixupOCR;
     JMenuItem makeDefinition;
     JMenuItem copy;
+    JMenuItem copyBack;
     JMenuItem append;
     JCheckBoxMenuItem markKnown;
     int x, y;
@@ -70,15 +72,6 @@ public class WordPopup extends JPopupMenu
             {
                 setVisible(false);//ensure this menu's already gone for the screenshot
                 exportLine();
-            }
-        });
-        fixupOCR = new JMenuItem(new AbstractAction("Fix up OCR")
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                fixupOCR(line);
-                ui.render(); // refresh
             }
         });
         makeDefinition = new JMenuItem(new AbstractAction("Create new userdict entry")
@@ -133,6 +126,25 @@ public class WordPopup extends JPopupMenu
             }
         });
         markKnown.setSelected(Main.known.isKnown(word));
+        
+        fixupOCR = new JMenuItem(new AbstractAction("Fix up OCR")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                fixupOCR(line);
+                ui.render(); // refresh
+            }
+        });
+        
+        copyBack = new JMenuItem(new AbstractAction("Copy back")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                copyPage();
+            }
+        });
 
         exportLine.setText("Export whole line (" + getExportedCount() + ")");
         
@@ -140,6 +152,7 @@ public class WordPopup extends JPopupMenu
         add(exportLine);
         if(Main.options.getOptionBool("enableKnown"))add(markKnown);
         add(fixupOCR);
+        if(Main.options.getOptionBool("enableCopyBack"))add(copyBack);
         add(makeDefinition);
         add(new Separator());
         add(copy);
@@ -332,6 +345,14 @@ public class WordPopup extends JPopupMenu
             finaltext += Main.currPage.getLine(i).toString() + (i+1 == Main.currPage.getLineCount()?"":"\n");
         
         Main.currPage.setText(finaltext);
+    }
+    public static void copyPage()
+    {
+        String textback = "";
+        for(int i = 0; i < Main.currPage.getLineCount(); i++)
+            textback += Main.currPage.getLine(i).toString() + "\n";
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(textback), null);
+        
     }
     public static void exportLine()
     {
