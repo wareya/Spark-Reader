@@ -169,44 +169,65 @@ public class WordPopup extends JPopupMenu
         return exportedBeforeSession + exportedThisSession;
     }
     
-    private static final Map<Character, Character> fixupRelations;
+    private static final Map<Character, List<Character>> fixupRelations;
+    private static void addRelations(String dump)
+    {
+        for(int i = 0; i < dump.length(); i++)
+        {
+            List<Character> tochars = new ArrayList<>();
+            for(int j = 0; j < dump.length(); j++)
+            {
+                if(j == i) continue;
+                tochars.add(dump.charAt(j));
+            }
+            fixupRelations.put(dump.charAt(i), tochars);
+        }
+    }
+    // TODO: Generate from a set of lists of confusable characters?
     static
     {
         fixupRelations = new HashMap<>();
-        fixupRelations.put('や', 'ゃ');
-        fixupRelations.put('ゆ', 'ゅ');
-        fixupRelations.put('よ', 'ょ');
-        fixupRelations.put('つ', 'っ');
-        fixupRelations.put('ゃ', 'や');
-        fixupRelations.put('ゅ', 'ゆ');
-        fixupRelations.put('ょ', 'よ');
-        fixupRelations.put('っ', 'つ');
-        fixupRelations.put('へ', 'ヘ');
-        fixupRelations.put('ヘ', 'へ');
-        fixupRelations.put('―', '一');
-        fixupRelations.put('―', 'ー');
-        fixupRelations.put('-', 'ー');
-        fixupRelations.put('-', '一');
-        fixupRelations.put('|', 'ー');
-        fixupRelations.put(']', 'ー');
-        fixupRelations.put('一', 'ー');
-        fixupRelations.put('ー', '一');
-        fixupRelations.put('ば', 'ぱ');
-        fixupRelations.put('ぱ', 'ば');
-        fixupRelations.put('ぴ', 'び');
-        fixupRelations.put('び', 'ぴ');
-        fixupRelations.put('ぷ', 'ぶ');
-        fixupRelations.put('ぶ', 'ぷ');
-        fixupRelations.put('ぺ', 'べ');
-        fixupRelations.put('べ', 'ぺ');
-        fixupRelations.put('ぽ', 'ぼ');
-        fixupRelations.put('ぼ', 'ぽ');
-        fixupRelations.put('間', '聞');
-        fixupRelations.put('問', '聞');
-        fixupRelations.put('聞', '間');
-        fixupRelations.put('問', '間');
-        fixupRelations.put('間', '問');
-        fixupRelations.put('聞', '問');
+        addRelations("やゃ");
+        addRelations("ゆゅ");
+        addRelations("よょ");
+        addRelations("つっ");
+        
+        addRelations("あぁ");
+        addRelations("いぃ");
+        addRelations("うぅ");
+        addRelations("えぇ");
+        addRelations("おぉ");
+        
+        addRelations("ヤャ");
+        addRelations("ユュ");
+        addRelations("ヨョ");
+        addRelations("ツッ");
+        
+        addRelations("アァ");
+        addRelations("イィ");
+        addRelations("ウゥ");
+        addRelations("工エェ");
+        addRelations("オォ");
+        
+        addRelations("へヘ");
+        
+        addRelations("ばぱ");
+        addRelations("びぴ");
+        addRelations("ぶぷ");
+        addRelations("べぺ");
+        addRelations("ぼぽ");
+        
+        addRelations("バパ");
+        addRelations("ビピ");
+        addRelations("ブプ");
+        addRelations("ベペ");
+        addRelations("ボポ");
+        
+        addRelations("ー―一|]-");
+        
+        addRelations("間聞問閤");
+        
+        addRelations("  "); // two ascii spaces, dummy, special logic used
     } 
     
     public static void fixupOCR(Line line)
@@ -245,34 +266,44 @@ public class WordPopup extends JPopupMenu
             if(fixupRelations.containsKey(text.charAt(i)))
             {
                 char[] newtext = new String(text).toCharArray();
-                newtext[i] = fixupRelations.get(text.charAt(i));
-                newstring = new String(newtext);
-                listB = splitter.split(newstring, line.getMarkers());
-            }
-            if(text.charAt(i) == ' ')
-            {
-                newstring = text.substring(0, i);
-                if(i+1 < text.length())
-                    newstring += text.substring(i+1, text.length());
-                listB = splitter.split(newstring, line.getMarkers());
-                shorten = true;
-            }
-            if(newstring != null && listB != null)
-            {
-                int newlength = 0;
-                for(FoundWord word : listB)
+                List<Character> replacements = fixupRelations.get(text.charAt(i));
+                
+                for(Character rep : replacements)
                 {
-                    if(word.getDefinitionCount() == 0)
-                        newlength += 2;
+                    if(rep != ' ')
+                    {
+                        newtext[i] = rep;
+                        newstring = new String(newtext);
+                    }
                     else
-                        newlength += 1;
-                }
-                System.out.println("test length " + newlength);
-                if(newlength < length)
-                {
-                    length = newlength;
-                    text = newstring;
-                    if(shorten) i--;
+                    {
+                        newstring = text.substring(0, i);
+                        if(i+1 < text.length())
+                            newstring += text.substring(i+1, text.length());
+                        shorten = true;
+                    }
+                    
+                    listB = splitter.split(newstring, line.getMarkers());
+                    
+                    if(newstring != null && listB != null)
+                    {
+                        int newlength = 0;
+                        for(FoundWord word : listB)
+                        {
+                            if(word.getDefinitionCount() == 0)
+                                newlength += 2;
+                            else
+                                newlength += 1;
+                        }
+                        System.out.println("test string " + newstring);
+                        System.out.println("test length " + newlength);
+                        if(newlength < length)
+                        {
+                            length = newlength;
+                            text = newstring;
+                            if(shorten) i--;
+                        }
+                    }
                 }
             }
         }
