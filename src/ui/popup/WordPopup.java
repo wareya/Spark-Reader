@@ -183,7 +183,6 @@ public class WordPopup extends JPopupMenu
             fixupRelations.put(dump.charAt(i), tochars);
         }
     }
-    // TODO: Generate from a set of lists of confusable characters?
     static
     {
         fixupRelations = new HashMap<>();
@@ -222,6 +221,8 @@ public class WordPopup extends JPopupMenu
         addRelations("ブプ");
         addRelations("ベペ");
         addRelations("ボポ");
+        
+        addRelations("きさ");
         
         addRelations("ー―一|]-");
         
