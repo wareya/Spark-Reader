@@ -23,6 +23,7 @@ public abstract class MouseHandler
 {
     protected UI ui;
     protected Point mousePos;
+    protected boolean mouseClear = false;
     protected int mouseLine = -1;
     protected FoundWord mousedWord;
 
@@ -76,7 +77,7 @@ public abstract class MouseHandler
                         word.toggleWindow();
                     else if(!word.isShowingDef() && !(unknownonly && word.isKnown()))
                         word.toggleWindow();
-                    if(word.isShowingDef())ui.selectedWord = word;
+                    if(word.isShowingDef() && word.getDefinitionCount() > 0)ui.selectedWord = word;
                 }
                 else
                     word2.showDef(false);
@@ -159,6 +160,9 @@ public abstract class MouseHandler
     public void mouseMove(Point pos)
     {
         if(pos == null) return;
+        boolean moved = false;
+        if(mousePos != null)
+            moved = !mousePos.equals(pos);
         mousePos = pos;//keep track of where the mouse is
         boolean reRender = false;//true if re-render needed
 
@@ -191,6 +195,7 @@ public abstract class MouseHandler
         else
         {
             FoundWord word = currPage.getLine(lineIndex).getWordAt(mousePos.x);
+            if(word != null) mouseClear = false;
             if(lineIndex != mouseLine || (mousedWord != null && mousedWord != word))
             {
                 if(mousedWord != null)
@@ -213,7 +218,7 @@ public abstract class MouseHandler
                 if(reRender)ui.render();
             }
             
-            if(options.getOptionInt("rikaiEmulation") > 0)
+            if(options.getOptionInt("rikaiEmulation") > 0 && moved)
                 setSelectedWord(pos, false, options.getOptionInt("rikaiEmulation") > 1);
         }
         //TODO could be more efficient, revisit when width is consistent
@@ -273,6 +278,7 @@ public abstract class MouseHandler
         if((options.getOptionBool("defsShowUpwards") ? (pos.y < defStartY):
                 (pos.y > defStartY)) && ui.selectedWord != null)
         {
+            if(mouseClear) return;
             if(scrollDir > 0)ui.selectedWord.getCurrentDef().scrollDown();
             if(scrollDir < 0)ui.selectedWord.getCurrentDef().scrollUp();
             ui.render();
@@ -281,6 +287,8 @@ public abstract class MouseHandler
         //scroll through definitions
         else if(onTextRange && ui.selectedWord != null)
         {
+            System.out.println("Trying to scroll through definitions");
+            if(mouseClear) return;
             if(ui.selectedWord == currPage.getLine(ui.getLineIndex(pos)).getWordAt(pos.x))
             {
                 if(scrollDir > 0)ui.selectedWord.scrollDown();
@@ -332,7 +340,8 @@ public abstract class MouseHandler
             if(rerender)ui.render();
         }
         mouseLine = -1;
-        mousePos = null;
+        //mousePos = null;
+        mouseClear = true;
         return rerender;
     }
     protected int toCharPos(int x)
