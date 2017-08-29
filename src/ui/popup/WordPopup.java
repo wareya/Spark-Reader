@@ -223,6 +223,7 @@ public class WordPopup extends JPopupMenu
         addRelations("ボポ");
         
         addRelations("きさ");
+        addRelations("ト卜");
         
         addRelations("ー―一|]-");
         
