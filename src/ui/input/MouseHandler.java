@@ -159,6 +159,9 @@ public abstract class MouseHandler
     public void mouseMove(Point pos)
     {
         if(pos == null) return;
+        boolean moved = false;
+        if(mousePos != null)
+            moved = !mousePos.equals(pos);
         mousePos = pos;//keep track of where the mouse is
         boolean reRender = false;//true if re-render needed
 
@@ -213,7 +216,7 @@ public abstract class MouseHandler
                 if(reRender)ui.render();
             }
             
-            if(options.getOptionInt("rikaiEmulation") > 0)
+            if(options.getOptionInt("rikaiEmulation") > 0 && moved)
                 setSelectedWord(pos, false, options.getOptionInt("rikaiEmulation") > 1);
         }
         //TODO could be more efficient, revisit when width is consistent
