@@ -8,11 +8,7 @@ import language.dictionary.Dictionary;
 import language.dictionary.Epwing.EPWINGDefinition;
 import language.splitter.WordSplitter;
 import network.MPController;
-import options.BlacklistDef;
-import options.Known;
-import options.Options;
-import options.PrefDef;
-import options.WantToLearn;
+import options.*;
 import ui.Page;
 import ui.UI;
 
@@ -92,6 +88,8 @@ public class Main
             wantToLearn = new WantToLearn(known);
             prefDef = new PrefDef(options.getFile("preferredDefsPath"));
             blacklistDef = new BlacklistDef(options.getFile("blacklistDefsPath"));
+            
+            Underlay.load(options.getFile("underlayPath"));
 
             hook = new ClipboardHook();//default hook
             log = new Log(50);//new log

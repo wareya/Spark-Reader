@@ -84,6 +84,7 @@ public class Options
         options.put("knownWordsPath", "preferences/knownWords");
         options.put("preferredDefsPath", "preferences/preferredDefs");
         options.put("blacklistDefsPath", "preferences/blacklistDefs");
+        options.put("underlayPath", "preferences/underlay");
         
         options.put("persistPath", "preferences/persist.dat");
 
