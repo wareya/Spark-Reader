@@ -32,7 +32,7 @@ public class WordScanner
     protected String word;
 
     protected static ArrayList<DeconRule> ruleList;
-
+    
     static private SubScanner subscanner = null;
     static boolean parserIsNew = false;
     public static void init()
