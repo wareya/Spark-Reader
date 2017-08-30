@@ -94,6 +94,7 @@ public abstract class MouseHandler
 
     public void leftClick(Point pos)
     {
+        stopWord = null;
         //minimise button
         if(pos.y < textStartY && pos.x > minimiseStartX)
         {
@@ -112,6 +113,7 @@ public abstract class MouseHandler
     }
     public void rightClick(Point pos)
     {
+        stopWord = null;
         //settings button
         /*if(pos.y > furiganaStartY && pos.y < textStartY)
         {
@@ -141,6 +143,7 @@ public abstract class MouseHandler
     }
     public void middleClick(Point pos)
     {
+        stopWord = null;
         if(pos.y > textStartY && pos.y < textEndY)//place marker
         {
             //int point = toCharPos(pos.x + mainFontSize/2);
@@ -258,6 +261,7 @@ public abstract class MouseHandler
 
     public void mouseExit()
     {
+        stopWord = null;
         boolean rerender = false;
         if(UI.showMenubar && !UI.tempIgnoreMouseExit)
         {
@@ -281,6 +285,7 @@ public abstract class MouseHandler
 
     public void mouseScroll(int scrollDir)
     {
+        stopWord = null;
         if(mousePos == null)return;
         mouseScroll(scrollDir, mousePos);
     }
