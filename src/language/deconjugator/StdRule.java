@@ -11,7 +11,7 @@ import java.util.LinkedList;
  */
 public class StdRule implements DeconRule
 {
-    protected String ending, replace, change;
+    public String ending, replace, change;
     protected DefTag neededTag, impliedTag;
     public StdRule(String ending, String replace, String change, DefTag neededTag)
     {

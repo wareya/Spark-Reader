@@ -63,8 +63,6 @@ public class FixupOCR
         
         System.out.println("length " + length);
         
-        // FIXME: move the actual algorithm to src/language/ somewhere?
-        
         String text = new String(line.toString());
         for(int i = 0; i < text.length(); i++)
         {
