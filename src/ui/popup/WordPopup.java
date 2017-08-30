@@ -18,8 +18,10 @@ package ui.popup;
 
 import hooker.ClipboardHook;
 import language.splitter.FoundWord;
+import language.FixupOCR;
 import main.Main;
 import main.Utils;
+import options.Underlay;
 import ui.Line;
 import ui.UI;
 import language.dictionary.DefSource;
@@ -132,7 +134,7 @@ public class WordPopup extends JPopupMenu
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                fixupOCR(line);
+                FixupOCR.fixupOCR(line);
                 ui.render(); // refresh
             }
         });
@@ -180,171 +182,6 @@ public class WordPopup extends JPopupMenu
         else exportedBeforeSession = 0;
 
         return exportedBeforeSession + exportedThisSession;
-    }
-    
-    private static final Map<Character, List<Character>> fixupRelations;
-    private static void addRelations(String dump)
-    {
-        for(int i = 0; i < dump.length(); i++)
-        {
-            List<Character> tochars = new ArrayList<>();
-            for(int j = 0; j < dump.length(); j++)
-            {
-                if(j == i) continue;
-                tochars.add(dump.charAt(j));
-            }
-            fixupRelations.put(dump.charAt(i), tochars);
-        }
-    }
-    static
-    {
-        fixupRelations = new HashMap<>();
-        addRelations("やゃ");
-        addRelations("ゆゅ");
-        addRelations("よょ");
-        addRelations("つっ");
-        
-        addRelations("あぁ");
-        addRelations("いぃ");
-        addRelations("うぅ");
-        addRelations("えぇ");
-        addRelations("おぉ");
-        
-        addRelations("ヤャ");
-        addRelations("ユュ");
-        addRelations("ヨョ");
-        addRelations("ツッ");
-        
-        addRelations("アァ");
-        addRelations("イィ");
-        addRelations("ウゥ");
-        addRelations("工エェ");
-        addRelations("オォ");
-        
-        addRelations("へヘ");
-        
-        addRelations("ばぱ");
-        addRelations("びぴ");
-        addRelations("ぶぷ");
-        addRelations("べぺ");
-        addRelations("ぼぽ");
-        
-        addRelations("バパ");
-        addRelations("ビピ");
-        addRelations("ブプ");
-        addRelations("ベペ");
-        addRelations("ボポ");
-        
-        addRelations("きさ");
-        addRelations("ちら");
-        addRelations("りリ");
-        addRelations("しL");
-        
-        addRelations("ト卜");
-        addRelations("ミ三彡");
-        addRelations("ニ二こ");
-        addRelations("カ力");
-        addRelations("タ夕");
-        addRelations("チ千");
-        addRelations("ロ口");
-        addRelations("ハ八");
-        
-        addRelations("ー―一|]-");
-        
-        addRelations("間聞問閤"); // example
-        
-        addRelations("  "); // two ascii spaces, dummy, special logic used
-    } 
-    
-    public static void fixupOCR(Line line)
-    {
-        int currline = -1;
-        
-        for(int i = 0; i < Main.currPage.getLineCount(); i++)
-        {
-            if(line == Main.currPage.getLine(i))
-            {
-                currline = i;
-                break;
-            }
-        }
-
-        int length = 0;
-        for(FoundWord word : line.getWords())
-        {
-            // pretend undefined segments are two words long so that we can just use a "length" check to see if test strings are better
-            if(word.getDefinitionCount() == 0)
-                length += 2;
-            else
-                length += 1;
-        }
-        
-        System.out.println("length " + length);
-        
-        // FIXME: move the actual algorithm to src/language/ somewhere?
-        
-        String text = new String(line.toString());
-        for(int i = 0; i < text.length(); i++)
-        {
-            String newstring = null;
-            List<FoundWord> listB = null;
-            Boolean shorten = false;
-            if(fixupRelations.containsKey(text.charAt(i)))
-            {
-                char[] newtext = new String(text).toCharArray();
-                List<Character> replacements = fixupRelations.get(text.charAt(i));
-                
-                for(Character rep : replacements)
-                {
-                    if(rep != ' ')
-                    {
-                        newtext[i] = rep;
-                        newstring = new String(newtext);
-                    }
-                    else
-                    {
-                        newstring = text.substring(0, i);
-                        if(i+1 < text.length())
-                            newstring += text.substring(i+1, text.length());
-                        shorten = true;
-                    }
-                    
-                    listB = splitter.split(newstring, line.getMarkers());
-                    
-                    if(newstring != null && listB != null)
-                    {
-                        int newlength = 0;
-                        for(FoundWord word : listB)
-                        {
-                            if(word.getDefinitionCount() == 0)
-                                newlength += 2;
-                            else
-                                newlength += 1;
-                        }
-                        System.out.println("test string " + newstring);
-                        System.out.println("test length " + newlength);
-                        if(newlength < length)
-                        {
-                            length = newlength;
-                            text = newstring;
-                            if(shorten) i--;
-                        }
-                    }
-                }
-            }
-        }
-        
-        String finaltext = "";
-        
-        for(int i = 0; i < currline && i < Main.currPage.getLineCount(); i++)
-            finaltext += Main.currPage.getLine(i).toString() + "\n";
-        
-        finaltext += text + "\n";
-        
-        for(int i = currline+1; i < Main.currPage.getLineCount(); i++)
-            finaltext += Main.currPage.getLine(i).toString() + (i+1 == Main.currPage.getLineCount()?"":"\n");
-        
-        Main.currPage.setText(finaltext);
     }
     public static void copyPage()
     {

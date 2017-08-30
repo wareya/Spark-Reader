@@ -33,6 +33,7 @@ public abstract class MouseHandler
 
     protected double stopTime = 0;
     protected Point stopPoint = null;
+    protected FoundWord stopWord = null;
 
     public MouseHandler(UI ui)
     {
@@ -225,6 +226,7 @@ public abstract class MouseHandler
             {
                 stopPoint = pos;
                 stopTime = new Date().getTime();
+                stopWord = mousedWord;
             }
         }
         //TODO could be more efficient, revisit when width is consistent
@@ -250,7 +252,7 @@ public abstract class MouseHandler
     public void think()
     {
         double currtime = new Date().getTime();
-        if(options.getOptionInt("rikaiEmulation") > 0 && currtime-stopTime > 200 && mousePos == stopPoint && stopPoint != null)
+        if(options.getOptionInt("rikaiEmulation") > 0 && currtime-stopTime > 200 && mousePos == stopPoint && stopPoint != null && stopWord == mousedWord && stopWord != null)
             setSelectedWord(stopPoint, false, options.getOptionInt("rikaiEmulation") > 1);
     }
 
