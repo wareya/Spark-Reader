@@ -26,6 +26,21 @@ public class Underlay
     public static ArrayList<DeconRule> underlayOldDeconRules = new ArrayList<>();
     public static HashSet<String> badSegments = new HashSet<>();
     
+    static public class HeuristicRule
+    {
+        public int index;
+        public String trait;
+        public String operation;
+        public String argument; 
+    }
+    static public class Heuristic
+    {
+        public String type;
+        public ArrayList<HeuristicRule> rules;
+    }
+    
+    public static ArrayList<Heuristic> heuristics = new ArrayList<>();
+    
     public static void load(File file) throws IOException
     {
         if(!file.exists())
@@ -43,6 +58,7 @@ public class Underlay
             if(line.equals("")) continue;
             if(line.equals("fix up ocr:")
             || line.equals("badsegments:")
+            || line.equals("heuristics:")
             || line.equals("deconjugation:")
             || line.equals("olddeconjugation:"))
                 mode = line;
@@ -54,8 +70,30 @@ public class Underlay
                 }
                 else if(mode.equals("badsegments:"))
                 {
-                    System.out.println("adding bad semgnet");
                     badSegments.add(line);
+                }
+                else if(mode.equals("heuristics:"))
+                {
+                    System.out.println("adding heuristic");
+                    String[] parts = line.split(" ", 2);
+                    Heuristic heuristic = new Heuristic();
+                    heuristic.type = parts[0];
+                    heuristic.rules = new ArrayList<>();
+                    parts = parts[1].split(" ");
+                    for(String part : parts)
+                    {
+                        String[] fields = part.split(":");
+                        HeuristicRule rule = new HeuristicRule();
+                        rule.index = Integer.parseInt(fields[0]);
+                        rule.trait = fields[1];
+                        if(fields.length > 2)
+                            rule.operation = fields[2];
+                        if(fields.length > 3)
+                            rule.argument = fields[3];
+                        heuristic.rules.add(rule);
+                        System.out.println(rule.index + " " + rule.trait + " " + rule.operation + " " +rule.argument); 
+                    }
+                    heuristics.add(heuristic);
                 }
                 else if(mode.equals("deconjugation:") || mode.equals("olddeconjugation:"))
                 {

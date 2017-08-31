@@ -359,3 +359,32 @@ badsegments:
 たー
 てよ
 たぁ
+heuristics:
+strong 0:pos2:has:副助詞 1:pos1:has:動詞 1:pos2:has:非自立可能
+strong 0:pos2:has:終助詞 1:pos1:has:助詞 1:pos2:has:格助詞
+strong 0:pos1:has:接尾辞 1:pos2:has:係助詞
+strong 0:pos1:is:動詞 0:conjf:is:終止形-一般 1:pos1:is:助詞
+strong 0:pos2:is:代名詞 0:pos3:is:一般 0:surface:not:なん 1:pos2:is:格助詞 1:pos3:is:一般
+strong 0:pos1:is:助詞 0:pos2:is:係助詞 1:pos1:is:名詞 1:pos2:is:普通名詞
+strong 0:pos1:is:名詞 0:pos2:is:普通名詞 0:pos3:is:一般 1:pos1:is:動詞 1:pos2:is:非自立可能
+strong 0:pos1:is:助詞 0:pos2:is:係助詞 1:pos1:is:副詞
+strong 0:pos1:is:助詞 0:pos2:is:係助詞 1:pos1:is:代名詞
+strong 0:pos1:is:接尾辞 0:pos2:is:名詞的 1:pos1:is:助詞 1:pos2:is:格助詞
+strong 0:pos1:is:助詞 0:pos2:is:格助詞 0:surface:is:で 1:pos1:is:動詞
+strong 0:pos1:is:助詞 0:pos2:is:格助詞 0:surface:is:に 1:pos1:is:動詞
+strong 0:pos1:is:助詞 1:pos1:is:副詞
+strong 0:pos1:is:助詞 1:pos1:is:接頭辞 1:surface:is:お
+strong 0:pos2:is:格助詞 1:pos1:is:代名詞
+strong 0:pos2:is:終助詞 1:pos1:is:代名詞
+strong 0:surface:is:は 0:pos2:is:係助詞 1:surface:is:と 1:pos2:is:格助詞
+strong 0:surface:is:は 0:pos2:is:係助詞 1:surface:is:し 1:pos1:is:動詞
+strong 0:surface:is:は 0:pos2:is:係助詞 1:surface:is:あっ 1:pos1:is:動詞
+#strong 0:surface:is:は 0:pos2:is:係助詞 1:surface:is:いら 1:pos1:is:動詞
+strong 0:surface:is:が 0:pos2:is:格助詞 1:surface:starts:い
+strong 0:surface:is:は 0:pos2:is:係助詞 1:surface:starts:い
+strong 0:unigram 0:pos2:is:非自立 1:pos2:is:接続助詞 2:pos1:is:助動詞
+strong 2:unigram 0:pos2:is:非自立 1:pos2:is:接続助詞 2:pos1:is:助動詞
+weak 0:pos1:is:動詞 0:surface:is:し 1:pos1:is:助動詞
+weak 0:surface:is:な 0:pos1:is:助動詞 1:pos1:is:助詞 1:lemma:is:の
+weak 0:surface:is:で 0:conjt:is:助動詞-ダ 1:lemma:is:有る
+bipolar 0:surface:is:と 0:pos2:is:格助詞 1:lemma:is:か 1:pos2:is:副助詞

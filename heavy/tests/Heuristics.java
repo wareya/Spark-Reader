@@ -45,6 +45,12 @@ public class Heuristics
         
         // strength
 
+        words = splitter.split("男を入れて三人しかいなかった",  new HashSet<>());
+        for(FoundWord word : words)
+        {
+            assertEquals(word.getText().equals("しかい"), false); // false split
+        }
+
         words = splitter.split("俺はいつから歩いているんだろう？",  new HashSet<>());
         for(FoundWord word : words)
         {
@@ -55,12 +61,6 @@ public class Heuristics
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("はそう"), false); // false split
-        }
-
-        words = splitter.split("男を入れて三人しかいなかった",  new HashSet<>());
-        for(FoundWord word : words)
-        {
-            assertEquals(word.getText().equals("しかい"), false); // false split
         }
         
         words = splitter.split("別段なにがいいってわけでもない",  new HashSet<>());

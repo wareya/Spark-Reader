@@ -153,7 +153,7 @@ class HeavySegmenter extends Segmenter
         for(int i = 0; i < tokens.size(); i++)
         {
             Token t = tokens.get(i);
-            if(i+1 == tokens.size() || !options.getOption("kuromojiSupportLevel").equals("heuristics"))
+            if(!options.getOption("kuromojiSupportLevel").equals("heuristics"))
             {
                 addWithUnigramCheck(r, t, false);
             }
@@ -163,169 +163,99 @@ class HeavySegmenter extends Segmenter
             // Wouldn't be necessary if the segmenter exposed more information to the word splitter, but that's just the way that it goes.
             else
             {
-                Token n = tokens.get(i+1);
                 
                 // "Strong" means that a segment forces the word splitter to make a segment after it iff it is the first segment in the current attempt at finding a word.
                 boolean strong = false;
-                // "Weak" means that a segment is forced to merge with the next one, with higher priority than strongness
+                // "Weak" means that a segment is forced to merge with the next one and the merged segment is not strong, with higher priority than strongness.
                 boolean weak = false;
-                // しかいなかった
-                strong = strong
-                      || (t.getPartOfSpeechLevel2().contains("副助詞")
-                       && n.getPartOfSpeechLevel1().contains("動詞")
-                       && n.getPartOfSpeechLevel2().contains("非自立可能"));
-                // ～かと思う
-                strong = strong
-                      || (t.getPartOfSpeechLevel2().contains("終助詞")
-                       && n.getPartOfSpeechLevel1().contains("助詞")
-                       && n.getPartOfSpeechLevel2().contains("格助詞"));
-                // ～さは (is the blacklist better for this?)
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().contains("接尾辞")
-                       && n.getPartOfSpeechLevel2().contains("係助詞"));
-                // になると
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("動詞")
-                       && t.getConjugationForm().equals("終止形-一般")
-                       && n.getPartOfSpeechLevel1().equals("助詞"));
-                // これですっ！
-                strong = strong
-                      || (t.getPartOfSpeechLevel2().equals("代名詞")
-                       && t.getPartOfSpeechLevel3().equals("一般")
-                       && !t.getSurface().equals("なん")// なんで・なんでもない
-                       && n.getPartOfSpeechLevel2().equals("格助詞")
-                       && n.getPartOfSpeechLevel3().equals("一般"));
-                // はナシだって
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("助詞")
-                       && t.getPartOfSpeechLevel2().equals("係助詞")
-                       && n.getPartOfSpeechLevel1().equals("名詞")
-                       && n.getPartOfSpeechLevel2().equals("普通名詞"));
-                // ことしたら
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("名詞")
-                       && t.getPartOfSpeechLevel2().equals("普通名詞")
-                       && t.getPartOfSpeechLevel3().equals("一般")
-                       && n.getPartOfSpeechLevel1().equals("動詞")
-                       && n.getPartOfSpeechLevel2().equals("非自立可能"));
-                // はそう
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("助詞")
-                       && t.getPartOfSpeechLevel2().equals("係助詞")
-                       && n.getPartOfSpeechLevel1().equals("副詞"));
-                // はいつ
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("助詞")
-                       && t.getPartOfSpeechLevel2().equals("係助詞")
-                       && n.getPartOfSpeechLevel1().equals("代名詞"));
-                // ～くんで
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("接尾辞")
-                       && t.getPartOfSpeechLevel2().equals("名詞的")
-                       && n.getPartOfSpeechLevel1().equals("助詞")
-                       && n.getPartOfSpeechLevel2().equals("格助詞"));
-                // ここでしたい
-                // にいない
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("助詞")
-                       && t.getPartOfSpeechLevel2().equals("格助詞")
-                       && (t.getSurface().equals("で") || t.getSurface().equals("に"))
-                       && n.getPartOfSpeechLevel1().equals("動詞"));
-                // 俺がちゃんと作りますから
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("助詞")
-                       && n.getPartOfSpeechLevel1().equals("副詞"));
-                // 二冊目もお亡くなりに
-                strong = strong
-                      || (t.getPartOfSpeechLevel1().equals("助詞")
-                       && n.getPartOfSpeechLevel1().equals("接頭辞")
-                       && n.getSurface().equals("お"));
-                // 都会に暮らしていた頃となんら変わらぬ環境
-                strong = strong
-                      || (t.getPartOfSpeechLevel2().equals("格助詞")
-                       && n.getPartOfSpeechLevel1().equals("代名詞"));
-                // なんだよそれ
-                strong = strong
-                      || (t.getPartOfSpeechLevel2().equals("終助詞")
-                       && n.getPartOfSpeechLevel1().equals("代名詞"));
-                // 僕はといえば
-                strong = strong
-                      || (t.getSurface().equals("は")
-                       && t.getPartOfSpeechLevel2().equals("係助詞")
-                       && n.getSurface().equals("と")
-                       && n.getPartOfSpeechLevel2().equals("格助詞"));
-                // 安定はしている
-                strong = strong
-                      || (t.getSurface().equals("は")
-                       && t.getPartOfSpeechLevel2().equals("係助詞")
-                       && n.getSurface().equals("し")
-                       && n.getPartOfSpeechLevel1().equals("動詞"));
-                // はあった
-                strong = strong
-                      || (t.getSurface().equals("は")
-                       && t.getPartOfSpeechLevel2().equals("係助詞")
-                       && n.getSurface().equals("あっ")
-                       && n.getPartOfSpeechLevel1().equals("動詞"));
-                // はいらない
-                strong = strong
-                      || (t.getSurface().equals("は")
-                       && t.getPartOfSpeechLevel2().equals("係助詞")
-                       && n.getSurface().equals("いら")
-                       && n.getPartOfSpeechLevel1().equals("動詞"));
-                // がい
-                strong = strong
-                      || (t.getSurface().equals("が")
-                       && t.getPartOfSpeechLevel2().equals("格助詞")
-                       && n.getSurface().startsWith("い"));
-                       
-                // はいけません
-                strong = strong
-                      || (t.getSurface().equals("は")
-                       && t.getPartOfSpeechLevel2().equals("係助詞")
-                       && n.getSurface().startsWith("い"));
+                // "Bipolar" means that a segment is forced to merge with the next one *and* the merged segment is strong, with maximum priority.
+                boolean bipolar = false;
                 
-                if(i+2 < tokens.size())
+                for(Underlay.Heuristic heuristic : Underlay.heuristics)
                 {
-                    //のですが
-                    Token m = tokens.get(i+2);
-                    strong = strong
-                        || ((t.getSurface().length() == 1 || m.getSurface().length() == 1) 
-                         && t.getPartOfSpeechLevel2().equals("非自立")// しないでください
-                         && m.getPartOfSpeechLevel2().equals("接続助詞")
-                         && n.getPartOfSpeechLevel1().equals("助動詞"));
+                    boolean state = true;
+                    
+                    for(Underlay.HeuristicRule rule : heuristic.rules)
+                    {
+                        int index = i+rule.index;
+                        if(index < 0 || index >= tokens.size())
+                        {
+                            System.out.println("breaking a heuristic rule");
+                            state = false;
+                            break;
+                        }
+                        Token token = tokens.get(index);
+                        
+                        if(rule.trait.equals("unigram"))
+                        {
+                            state = state && (token.getSurface().length() == 1);
+                            continue;
+                        }
+                        
+                        String data = "";
+                        if(rule.trait.equals("pos1"))
+                            data = token.getPartOfSpeechLevel1();
+                        else if(rule.trait.equals("pos2"))
+                            data = token.getPartOfSpeechLevel2();
+                        else if(rule.trait.equals("pos3"))
+                            data = token.getPartOfSpeechLevel3();
+                        else if(rule.trait.equals("pos4"))
+                            data = token.getPartOfSpeechLevel4();
+                        else if(rule.trait.equals("conjf"))
+                            data = token.getConjugationForm();
+                        else if(rule.trait.equals("conjt"))
+                            data = token.getConjugationType();
+                        else if(rule.trait.equals("fsoundf"))
+                            data = token.getFinalSoundAlterationForm();
+                        else if(rule.trait.equals("fsoundt"))
+                            data = token.getFinalSoundAlterationType();
+                        else if(rule.trait.equals("isoundf"))
+                            data = token.getInitialSoundAlterationForm();
+                        else if(rule.trait.equals("isoundt"))
+                            data = token.getInitialSoundAlterationType();
+                        else if(rule.trait.equals("lang"))
+                            data = token.getLanguageType();
+                        else if(rule.trait.equals("lemma"))
+                            data = token.getLemma();
+                        else if(rule.trait.equals("lemmareading"))
+                            data = token.getLemmaReadingForm();
+                        else if(rule.trait.equals("pron"))
+                            data = token.getPronunciation();
+                        else if(rule.trait.equals("pronbase"))
+                            data = token.getPronunciationBaseForm();
+                        else if(rule.trait.equals("written"))
+                            data = token.getWrittenForm();
+                        else if(rule.trait.equals("writtenbase"))
+                            data = token.getWrittenBaseForm();
+                        else if(rule.trait.equals("surface"))
+                            data = token.getSurface();
+                        
+                        if(rule.operation.equals("is"))
+                            state = state && data.equals(rule.argument);
+                        else if(rule.operation.equals("not"))
+                            state = state && !data.equals(rule.argument);
+                        else if(rule.operation.equals("has"))
+                            state = state && data.contains(rule.argument);
+                        else if(rule.operation.equals("starts"))
+                            state = state && data.startsWith(rule.argument);
+                            
+                    }
+                    if(heuristic.type.equals("strong"))
+                        strong = strong || state;
+                    else if(heuristic.type.equals("weak"))
+                        weak = weak || state;
+                    else if(heuristic.type.equals("bipolar"))
+                        bipolar = bipolar || state;
                 }
-                
-                // どう説明したものか
-                weak = weak
-                    || (t.getPartOfSpeechLevel1().equals("動詞")
-                     && t.getSurface().equals("し")
-                     && n.getPartOfSpeechLevel1().equals("助動詞"));
-                
-                // 詰め込みすぎなんだよ
-                weak = weak
-                    || (t.getSurface().equals("な")
-                     && t.getPartOfSpeechLevel1().equals("助動詞")
-                     && n.getPartOfSpeechLevel1().equals("助詞")
-                     && n.getLemma().equals("の"));
-                
-                // なのに彼女のその身にまとう衣装は奇抜であり。
-                weak = weak
-                    || (t.getSurface().equals("で")
-                     && t.getConjugationType().equals("助動詞-ダ")
-                     && n.getLemma().equals("有る"));
-                
-                // hardcoded heuristic because this one is complicated 
-                // 強盗とかしてたのかな
-                if (t.getSurface().equals("と")
-                    && t.getPartOfSpeechLevel2().equals("格助詞")
-                    && n.getLemma().equals("か")
-                    && n.getPartOfSpeechLevel2().equals("副助詞"))
+                if(bipolar)
                 {
+                    Token n = tokens.get(i+1);
                     addWithUnigramCheck(r, new Piece(t.getSurface()+n.getSurface(), true));
                     i++;
                 }
                 else if(weak)
                 {
+                    Token n = tokens.get(i+1);
                     addWithUnigramCheck(r, new Piece(t.getSurface()+n.getSurface(), false));
                     i++;
                 }
