@@ -351,3 +351,11 @@ StdRule	ろう	る	volitional	v4r	form_volition
 // enable deconjugation of bound noun+suru dictionary entries that might have archaic equivalents, like 冠する
 // only has an effect on the kuromoji backend, on the normal one the archaic equivalent doesn't cause problems
 StdRule	する	する		DefTag.vs_s	DefTag.vs_i
+badsegments:
+すっ
+たろ
+てん
+てぇ
+たー
+てよ
+たぁ

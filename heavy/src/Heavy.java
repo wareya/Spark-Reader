@@ -16,6 +16,7 @@ import java.util.List;
 
 import com.atilika.kuromoji.unidic.Token;
 import com.atilika.kuromoji.unidic.Tokenizer;
+import options.Underlay;
 
 import javax.swing.*;
 
@@ -25,9 +26,12 @@ class HeavySegmenter extends Segmenter
 {
     Tokenizer kuro;
     String kuromojiUserdict = null;
+    static HashSet<String> badSegments = null;
 
     private void ensureInitialized()
     {
+        if(badSegments == null)
+            badSegments = new HashSet<>(Underlay.badSegments);
         if(kuro == null)
         {
             if(kuromojiUserdict == null)
@@ -82,15 +86,6 @@ class HeavySegmenter extends Segmenter
     }
     
     // Considered a hack
-    static HashSet<String> badSegments = new HashSet<>(Arrays.asList(
-        "すっ",
-        "たろ",
-        "てん",
-        "てぇ",
-        "たー",
-        "てよ",
-        "たぁ"
-    ));
     private boolean shouldForceUnigram(String s)
     {
         return (badSegments.contains(s));

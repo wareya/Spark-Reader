@@ -4,10 +4,7 @@ import language.segmenter.Segmenter;
 import language.splitter.FoundWord;
 import language.splitter.WordSplitter;
 import main.Main;
-import options.BlacklistDef;
-import options.Known;
-import options.Options;
-import options.PrefDef;
+import options.*;
 import org.junit.Test;
 
 import java.io.File;
@@ -26,6 +23,8 @@ public class Splitter
         Segmenter.instance = new HeavySegmenter();
         Segmenter.basicInstance = new BasicSegmenter();
         Main.options = new Options();
+        
+        Underlay.load(Main.options.getFile("underlayPath"));
 
         Main.known = new Known(Main.options.getFile("knownWordsPath"));
         Main.prefDef = new PrefDef(Main.options.getFile("preferredDefsPath"));
@@ -35,7 +34,7 @@ public class Splitter
         Main.options.setOption("deconMode", "recursive");
         Main.options.setOption("kuromojiSupportLevel", "disabled");
 
-        Dictionary dict = new Dictionary(new File("../dictionaries"));
+        Dictionary dict = new Dictionary(Main.options.getFile("dictionaryPath"));
         WordSplitter splitter = new WordSplitter(dict);
 
         List<FoundWord> words;

@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import static language.dictionary.DefTag.toTag;
 
@@ -23,12 +24,13 @@ public class Underlay
     public static ArrayList<String> fixupRelationsList = new ArrayList<>();
     public static ArrayList<DeconRule> underlayDeconRules = new ArrayList<>();
     public static ArrayList<DeconRule> underlayOldDeconRules = new ArrayList<>();
+    public static HashSet<String> badSegments = new HashSet<>();
     
     public static void load(File file) throws IOException
     {
         if(!file.exists())
         {
-            System.out.println("WARN: no underlay file");
+            System.out.println("WARN: no underlay file " + file.getAbsolutePath());
             return;
         }
         
@@ -40,6 +42,7 @@ public class Underlay
         {
             if(line.equals("")) continue;
             if(line.equals("fix up ocr:")
+            || line.equals("badsegments:")
             || line.equals("deconjugation:")
             || line.equals("olddeconjugation:"))
                 mode = line;
@@ -48,6 +51,11 @@ public class Underlay
                 if(mode.equals("fix up ocr:"))
                 {
                     fixupRelationsList.add(line);
+                }
+                else if(mode.equals("badsegments:"))
+                {
+                    System.out.println("adding bad semgnet");
+                    badSegments.add(line);
                 }
                 else if(mode.equals("deconjugation:") || mode.equals("olddeconjugation:"))
                 {

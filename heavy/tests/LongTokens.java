@@ -4,6 +4,7 @@ import language.segmenter.Segmenter;
 import language.splitter.FoundWord;
 import main.Main;
 import options.Options;
+import options.Underlay;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,6 +25,8 @@ public class LongTokens
         Segmenter.instance = new HeavySegmenter();
         Segmenter.basicInstance = new BasicSegmenter();
         Main.options = new Options();
+        
+        Underlay.load(Main.options.getFile("underlayPath"));
 
         List<Token> tokens;
         
