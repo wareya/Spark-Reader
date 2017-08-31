@@ -74,7 +74,6 @@ public class Underlay
                 }
                 else if(mode.equals("heuristics:"))
                 {
-                    System.out.println("adding heuristic");
                     String[] parts = line.split(" ", 2);
                     Heuristic heuristic = new Heuristic();
                     heuristic.type = parts[0];
@@ -91,7 +90,6 @@ public class Underlay
                         if(fields.length > 3)
                             rule.argument = fields[3];
                         heuristic.rules.add(rule);
-                        System.out.println(rule.index + " " + rule.trait + " " + rule.operation + " " +rule.argument); 
                     }
                     heuristics.add(heuristic);
                 }

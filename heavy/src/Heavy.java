@@ -180,7 +180,6 @@ class HeavySegmenter extends Segmenter
                         int index = i+rule.index;
                         if(index < 0 || index >= tokens.size())
                         {
-                            System.out.println("breaking a heuristic rule");
                             state = false;
                             break;
                         }
