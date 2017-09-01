@@ -17,6 +17,7 @@
 package ui;
 
 import hooker.WindowHook;
+import language.FixupOCR;
 import language.splitter.FoundWord;
 import main.Main;
 import ui.input.JNativeKeyHandler;
@@ -291,10 +292,25 @@ public class UI
                 
                 //clip = Japanese.toFullWidth(clip);
 
-                log.addLine(clip);//add line to log
                 if(!options.getOptionBool("splitLines"))clip = clip.replace("\n", "");//all on one line if not splitting
                 currPage.clearMarkers();
-                ui.updateText(clip);//reflow text on defaults
+                if(!options.getOptionBool("autoFixOCR"))
+                {
+                    log.addLine(clip);//add line to log
+                    ui.updateText(clip);//reflow text on defaults
+                }
+                else
+                {
+                    ui.updateText(clip);//reflow text on defaults
+                    String text = "";
+                    for(int i = 0; i < Main.currPage.getLineCount(); i++)
+                    {
+                        Line line = Main.currPage.getLine(i);
+                        text += FixupOCR.fixupOCR(line) + "\n";
+                    }
+                    ui.updateText(text);
+                    log.addLine(text);//add line to log
+                }
                 ui.xOffset = 0;//scroll back to front
                 ui.render();
                 
