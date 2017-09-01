@@ -162,6 +162,7 @@ public class Options
         options.put("showReadingFreqs", "false");
         options.put("rikaiEmulation", "0");
         options.put("enableCopyBack", "true");
+        options.put("autoFixOCR", "false");
     }
     public Options(File file)throws IOException
     {

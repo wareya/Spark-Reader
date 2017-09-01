@@ -38,18 +38,8 @@ public class FixupOCR
             addRelations(s);
     } 
     
-    public static void fixupOCR(Line line)
+    public static String fixupOCR(Line line)
     {
-        int currline = -1;
-        
-        for(int i = 0; i < Main.currPage.getLineCount(); i++)
-        {
-            if(line == Main.currPage.getLine(i))
-            {
-                currline = i;
-                break;
-            }
-        }
 
         int length = 0;
         for(FoundWord word : line.getWords())
@@ -114,16 +104,6 @@ public class FixupOCR
             }
         }
         
-        String finaltext = "";
-        
-        for(int i = 0; i < currline && i < Main.currPage.getLineCount(); i++)
-            finaltext += Main.currPage.getLine(i).toString() + "\n";
-        
-        finaltext += text + "\n";
-        
-        for(int i = currline+1; i < Main.currPage.getLineCount(); i++)
-            finaltext += Main.currPage.getLine(i).toString() + (i+1 == Main.currPage.getLineCount()?"":"\n");
-        
-        Main.currPage.setText(finaltext);
+        return text;
     }
 }

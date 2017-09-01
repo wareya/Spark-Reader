@@ -134,7 +134,31 @@ public class WordPopup extends JPopupMenu
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                FixupOCR.fixupOCR(line);
+                String text = FixupOCR.fixupOCR(line);
+                
+                int currline = -1;
+                
+                for(int i = 0; i < Main.currPage.getLineCount(); i++)
+                {
+                    if(line == Main.currPage.getLine(i))
+                    {
+                        currline = i;
+                        break;
+                    }
+                }
+                
+                String finaltext = "";
+                
+                for(int i = 0; i < currline && i < Main.currPage.getLineCount(); i++)
+                    finaltext += Main.currPage.getLine(i).toString() + "\n";
+                
+                finaltext += text + "\n";
+                
+                for(int i = currline+1; i < Main.currPage.getLineCount(); i++)
+                    finaltext += Main.currPage.getLine(i).toString() + (i+1 == Main.currPage.getLineCount()?"":"\n");
+                
+                Main.currPage.setText(finaltext);
+                
                 ui.render(); // refresh
             }
         });
