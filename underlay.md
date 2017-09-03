@@ -43,7 +43,7 @@ Here's a stripped down example underlay:
     
 Explanations of each section and its syntax follow.
 
-##fix up ocr:
+## fix up ocr:
 
 Each line is a list of confusable characters. OCR correction will attempt to replace each character in one of these lines with another character from that same line and see if the replacement causes a better parse. You can guide this process by adding manual splits by middle clicking before correcting OCR.
 
@@ -51,7 +51,7 @@ This is a naiive approach and limits itself to replacing one character at a time
 
 There is a special case rule consisting of two spaces on a line. This is the last line in the example above. Having this rule in the underlay file enables deleting spaces when fixing up OCR. Some OCR systems introduce bogus spaces to the text, this "fixes" that by removing spaces entirely. If you don't want spaces removed, remove this rule.
 
-##deconjugation:
+## deconjugation:
 
 Spark Reader uses a recursive rule-based deconjugator, starting at the right edge of a word, and trying to shorten the word into a dictionary word. It does this through brute force, seeing if it hits a dictionary word while shortening the word.
 
@@ -61,11 +61,11 @@ There are several deconjugation rule types. Every rule type is used in the defau
 
 Badly constructed rules can cause Spark Reader to give bad parses, so be careful.
 
-##badsegments:
+## badsegments:
 
 The Kuromoji segmentation backend automatically splits up segments kuromoji spits out into single characters if they're known to be problematic for further parsing. This is a list of such known segments.
 
-##heuristics:
+## heuristics:
 
 The Kuromoji segmentation backend tags and filters the token list before feeding it to the word splitter. This tagging and filtering helps the word splitter avoid misinterpreting short sections of kana, like treating 猫がいる as 猫　がい　る instead of 猫　が　いる.
 
@@ -92,7 +92,7 @@ The third field is the operation to run on "check this field" basises. The four 
 The fourth field is the second argument of that operation.
 
 
-##But why?
+# But why?
 
 Parsing is fundamentally bad for language learning, but it allows Spark Reader to do several useful things that can't be done without parsing, like:
 
