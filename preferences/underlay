@@ -58,7 +58,9 @@ StdRule	ください		polite request	stem_te	adj_i
 // verbs
 StdRule	で		(te form)	stem_ren_less_v	stem_te
 StdRule	て		(te form)	stem_ren_less	stem_te
-StdRule	て		(te form)	stem_ren	stem_te// formal but real
+StdRule	て		(te form)	stem_ren	stem_te
+// formal but real
+
 // i-adjectives
 // i-adjectives have two te forms. One works well with auxiliary verbs (and thus deconjugation), and the other does not.
 StdRule	で		(te form)	adj_i	stem_te
@@ -129,8 +131,8 @@ OnlyFinalRule	った		past	stem_ka	uninflectable
 
 // たり is its own morpheme
 // not た+り
-// and semgmenters (like kuromoji) should make たり an entire segment
-// so we have to deconjugate たり (it's also the right thing to do
+// and segmenters (like kuromoji) should make たり an entire segment
+// so we have to deconjugate たり (it's also the right thing to do)
 // * etymology: てあり; as in てある
 OnlyFinalRule	だり		~tari	stem_ren_less_v	uninflectable
 OnlyFinalRule	たり		~tari	stem_ren_less	uninflectable
@@ -139,7 +141,9 @@ OnlyFinalRule	ったり		~tari	stem_ka	uninflectable
 
 
 // passive (godan)
-StdRule	れる		passive	stem_a	v1	// ichidan cannot conjugate to "stem_a"
+StdRule	れる		passive	stem_a	v1	
+// ichidan cannot conjugate to "stem_a"
+
 
 // passive-potential (ichidan)
 StdRule	られる	る	potential/passive nexus	v1	v1
@@ -150,7 +154,9 @@ StdRule	る		potential	stem_e	v1
 
 // causative
 StdRule	させる	る	causative	v1	v1
-StdRule	せる		causative	stem_a	v1) // ichidan cannot conjugate to "stem_a"
+StdRule	せる		causative	stem_a	v1
+// ichidan cannot conjugate to "stem_a"
+
 // spoken language -- this also covers the "short causative passive" indirectly
 // Only allowed on non-す godan verbs.
 ContextRuleSaSpecial	す		short causative	stem_a	v5s
@@ -173,7 +179,9 @@ OnlyFinalRule	ましょう		polite volitional	stem_ren	form_volition
 // part-of-speech roles
 StdRule	に		adverb	adj_na
 StdRule	な		attributive	adj_na
-//StdRule	の		attributive	n	// Should be a thing but causes unfixable parsing problems on certain strings of kana.
+//StdRule	の		attributive	n	
+// Should be a thing but causes unfixable parsing problems on certain strings of kana.
+
 StdRule	と		adverb	adv_to
 
 // i-adjective stems
@@ -190,14 +198,20 @@ StdRule		い	(stem)	adj_i	stem_adj_base
 // negative
 // verbs
 ContextRuleAdjSpecial	ない		negative	stem_mizenkei	adj_i
-OnlyFinalRule	ん		slurred negative	stem_a	uninflectable	// causes problems with ichidan verbs
+OnlyFinalRule	ん		slurred negative	stem_a	uninflectable	
+// causes problems with ichidan verbs
+
 OnlyFinalRule	ん	る	slurred	v1	uninflectable
 OnlyFinalRule	ん	る	slurred	v5r	uninflectable
 OnlyFinalRule	ん	る	slurred	v5aru	uninflectable
 OnlyFinalRule	ん	る	slurred	vk	uninflectable
 
-OnlyFinalRule	ず		adverbial negative	stem_mizenkei	uninflectable	// archaically not adverbial, but in modern japanese, almost always adverbial
-OnlyFinalRule	ずに		without doing so	stem_mizenkei	uninflectable	// exactly the same meaning, despite the difference in label
+OnlyFinalRule	ず		adverbial negative	stem_mizenkei	uninflectable	
+// archaically not adverbial, but in modern japanese, almost always adverbial
+
+OnlyFinalRule	ずに		without doing so	stem_mizenkei	uninflectable	
+// exactly the same meaning, despite the difference in label
+
 
 // i-adjectives
 ContextRuleAdjSpecial	ない		negative	stem_ku	adj_i
@@ -215,7 +229,9 @@ NeverFinalRule	げ	ぐ	(izenkei)	v5g	stem_e
 NeverFinalRule	べ	ぶ	(izenkei)	v5b	stem_e
 NeverFinalRule	ね	ぬ	(izenkei)	v5n	stem_e
 NeverFinalRule	め	む	(izenkei)	v5m	stem_e
-NeverFinalRule	れ	る	(izenkei)	v1	stem_e // not a copy/paste mistake
+NeverFinalRule	れ	る	(izenkei)	v1	stem_e
+// not a copy/paste mistake
+
 // marginal categories
 NeverFinalRule	え	う	(izenkei)	v5u_s	stem_e
 NeverFinalRule	け	く	(izenkei)	v5k_s	stem_e
@@ -231,7 +247,9 @@ OnlyFinalRule	べ	ぶ	imperative	v5b	uninflectable
 OnlyFinalRule	ね	ぬ	imperative	v5n	uninflectable
 OnlyFinalRule	め	む	imperative	v5m	uninflectable
 OnlyFinalRule	ろ	る	imperative	v1	uninflectable
-OnlyFinalRule	よ	る	imperative	v1	uninflectable	// there are two
+OnlyFinalRule	よ	る	imperative	v1	uninflectable	
+// there are two
+
 // marginal categories
 OnlyFinalRule	え	う	imperative	v5u_s	uninflectable
 OnlyFinalRule	け	く	imperative	v5k_s	uninflectable
@@ -299,7 +317,9 @@ StdRule	こう	く	volitional	v5k_s	form_volition
 // irregulars
 ContextRuleTeTrap	し	する	(infinitive)	vs_i	stem_ren
 NeverFinalRule	し	する	(unstressed infinitive)	vs_i	stem_ren_less
-NeverFinalRule	し	する	(mizenkei)	vs_i	stem_mizenkei	// actually irregular itself but this will do for now
+NeverFinalRule	し	する	(mizenkei)	vs_i	stem_mizenkei	
+// actually irregular itself but this will do for now
+
 NeverFinalRule	すれ	する	(izenkei)	vs_i	stem_e
 StdRule	しろ	する	imperative	vs_i	uninflectable
 StdRule	せよ	する	imperative	vs_i	uninflectable
@@ -318,23 +338,31 @@ FuriStdRule	来い	こい	来る	くる	imperative	vk	uninflectable
 
 NeverFinalRule	あり	ある	(infinitive)	v5r_i	stem_ren
 StdRule	あっ	ある	(unstressed infinitive)	v5r_i	stem_ren_less
-//StdRule		ある	(mizenkei)	v5r_i	stem_mizenkei	// not used
+//StdRule		ある	(mizenkei)	v5r_i	stem_mizenkei	
+// not used
+
 NeverFinalRule	あれ	ある	(izenkei)	v5r_i	stem_e
-// StdRule	あれ	ある	imperative	v5r_i	uninflectable	// rare and conflicts with あれ "that"
+// StdRule	あれ	ある	imperative	v5r_i	uninflectable	
+// rare and conflicts with あれ "that"
+
 
 // rewrite rules
 RewriteRule	でした	です	past	aux	aux
 
 // archaic/fossilized/keigo stuff
 
-// https://ja.wikipedia.org/wiki/ラ行変格活用#.E5.8F.A3.E8.AA.9E.E3.81.AE.E3.83.A9.E8.A1.8C.E7.89.B9.E5.88.A5.E6.B4.BB.E7.94.A8.E5.8B.95.E8.A9.9E
+// https:
+//ja.wikipedia.org/wiki/ラ行変格活用#.E5.8F.A3.E8.AA.9E.E3.81.AE.E3.83.A9.E8.A1.8C.E7.89.B9.E5.88.A5.E6.B4.BB.E7.94.A8.E5.8B.95.E8.A9.9E
+
 // kudasaru etc
 // source of kudasai, irasshai, etc
 NeverFinalRule	れ	る	(izenkei)	v5aru	stem_e
 OnlyFinalRule	れ	る	imperative	v5aru	uninflectable
 NeverFinalRule	ら	る	('a' stem)	v5aru	stem_a
 NeverFinalRule	っ	る	(unstressed infinitive)	v5aru	stem_ren_less
-StdRule	い	る	(infinitive)	v5aru	stem_ren	// this is the irregular part
+StdRule	い	る	(infinitive)	v5aru	stem_ren	
+// this is the irregular part
+
 StdRule	り	る	(infinitive)	v5aru	stem_ren
 StdRule	ろう	る	volitional	v5aru	form_volition
 // gozaru etc
@@ -344,7 +372,9 @@ NeverFinalRule	れ	る	(izenkei)	v4r	stem_e
 OnlyFinalRule	れ	る	imperative	v4r	uninflectable
 NeverFinalRule	ら	る	('a' stem)	v4r	stem_a
 NeverFinalRule	っ	る	(unstressed infinitive)	v4r	stem_ren_less
-StdRule	い	る	(infinitive)	v4r	stem_ren	// this is the irregular part
+StdRule	い	る	(infinitive)	v4r	stem_ren	
+// this is the irregular part
+
 StdRule	り	る	(infinitive)	v4r	stem_ren
 StdRule	ろう	る	volitional	v4r	form_volition
 
