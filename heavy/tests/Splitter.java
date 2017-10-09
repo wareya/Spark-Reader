@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class Splitter
 {
@@ -69,6 +70,16 @@ public class Splitter
         for(FoundWord word : words)
         {
             assertEquals(word.getText().equals("間"), false);
+        }
+        
+        // parser test, best place to put it for now
+        Main.prefDef.debugDisableSave();
+        Main.prefDef.setPreferred("懐く", 1200510);
+        words = splitter.split("リア「本当に懐かれてるの？」", new HashSet<>());
+        for(FoundWord word : words)
+        {
+            if(word.getCurrentDef() != null && word.getCurrentDef().getDefinition() != null)
+                assertNotEquals(word.getCurrentDef().getDefinition().getID(), 1584090);
         }
         
         // まだ疑問が残っている倉科さんの手を取ると

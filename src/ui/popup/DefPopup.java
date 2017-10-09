@@ -58,7 +58,7 @@ public class DefPopup extends JPopupMenu
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                Main.prefDef.setPreferred(def);
+                Main.prefDef.setPreferred(word.getCurrentDef(), word.getCurrentDef().getDefinition());
                 word.resortDefs();
                 word.resetScroll();
                 ui.render();

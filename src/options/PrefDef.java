@@ -75,8 +75,14 @@ public class PrefDef
         }
         br.close();
     }
+    boolean saveDisabled = false;
+    public void debugDisableSave()
+    {
+        saveDisabled = true;
+    }
     public void save()throws IOException
     {
+        if(saveDisabled) return;
         if(dueChanges == 0)return;//don't bother writing if nothing changed
         Writer fr = new OutputStreamWriter(new FileOutputStream(file, false), Charset.forName("UTF-8"));
         for(Entry<String, Long> entries: table.entrySet())
@@ -91,19 +97,24 @@ public class PrefDef
     {
         this.saveThreshold = saveThreshold;
     }
-    public void setPreferred(FoundDef def)
+    public void setPreferred(FoundDef founddef, Definition def)
     {
-        String spelling = def.getFoundForm().getOriginalWord();
-        System.out.println(spelling + " for " + def.getDefinition().getID() + " set");
-        table.put(spelling, def.getDefinition().getID());
-        dueChanges++;
+        String spelling = founddef.getDictForm();
+        setPreferred(spelling, def.getID());
+    }
+    public void setPreferred(String spelling, long id)
+    {
+        table.put(spelling, id);
+        System.out.println(spelling + " for " + id + " set");
         
+        dueChanges++;
         if(dueChanges > saveThreshold || !Main.options.getOptionBool("reduceSave"))
         {
             try
             {
                 save();
-            }catch(IOException e)
+            }
+            catch(IOException e)
             {
                 System.out.println("Failed to write changes: " + e);
                 //if this fails, we'll try again on the next change
@@ -111,8 +122,9 @@ public class PrefDef
         }
     }
 
-    public boolean isPreferred(String spelling, Definition def)
+    public boolean isPreferred(FoundDef founddef, Definition def)
     {
+        String spelling = founddef.getDictForm();
         if(table.containsKey(spelling) && table.get(spelling) == def.getID())
         {
             System.out.println(spelling + " matches " + def.getID());
