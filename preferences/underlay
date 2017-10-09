@@ -80,8 +80,8 @@ StdRule	だげる	であげる	(contraction)	v5u	v5u
 
 // improves parsing. can be rewritten by ちゃ
 StdRule	は		(topic)	stem_te	uninflectable
-OnlyFinalRule	ちゃ	ては	(contraction)	stem_te	uninflectable
-OnlyFinalRule	じゃ	では	(contraction)	stem_te	uninflectable
+OnlyFinalRule	ちゃ	ては	(contraction)	uninflectable	uninflectable
+OnlyFinalRule	じゃ	では	(contraction)	uninflectable	uninflectable
 
 StdRule	は		(topic)	stem_te_defective	uninflectable
 
