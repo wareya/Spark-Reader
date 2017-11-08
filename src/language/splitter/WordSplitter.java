@@ -161,7 +161,7 @@ public class WordSplitter
     
     private FoundWord splitSectionSingleWord(List<Piece> segments, boolean firstSection, boolean isExtended)
     {
-
+        System.out.println("singleword call");
         // Concepts:
         // - Segment: A string of text at least one character long which can be marked as "strong".
         // - Word: A string of text that has associated dictionary entries.
@@ -204,6 +204,20 @@ public class WordSplitter
         // Luckily, even for words that can be deconjugated, we can make a pretty good guess at the longest string that could possibly be valid
         boolean mayBeLong = false;
         
+        // for possible bad parses from kuromoji like 常|人離れ
+        boolean mightBeBadSegmentation = false;
+        if(segments.size() >= 2 && isExtended)
+        {
+            String first = segments.get(0).txt;
+            String second = segments.get(1).txt;
+            System.out.println("testing if it might be a bad segmentation");
+            System.out.println(first);
+            System.out.println(second);
+            if(first.length() == 1 && second.length() > 1 && Japanese.isKanji(first.charAt(0)) && Japanese.hasKana(second) && Japanese.hasKanji(second))
+                mightBeBadSegmentation = true;
+            System.out.println("might be a bad segmentation");
+        }
+        
         // We only need to start with a length as the longest dictionary term, because it can be extended to pick up conjugation characters
         // 100 is a good conservative "no way there's a dictionary term this long" limit, and prevents long text from taking several seconds to parse
         int char_length = 0;
@@ -230,6 +244,7 @@ public class WordSplitter
             }
             end--;
         }
+        System.out.println("did prerun");
 
         // extend it to include any contiguous segments that might be conjugation text or aren't kana when the previous was kana
         String lastSegment = "";
@@ -275,7 +290,9 @@ public class WordSplitter
             {
                 // If we went all the way down to the first segment without matching anything yet
                 // but it might be because of segment positions, retry with characters as segments instead of substrings as segments
-                if(mayBeLong && isExtended && !segments.get(0).strong)
+                System.out.println("whether maybelong:");
+                System.out.println(mayBeLong);
+                if(mightBeBadSegmentation || (mayBeLong && isExtended && !segments.get(0).strong))
                 {
                     FoundWord word = splitSectionSingleWord(Segmenter.basicInstance.Segment(Segmenter.Unsegment(segments, 0, segments.size())), firstSection, false);
                     int targetLen = word.getText().length();

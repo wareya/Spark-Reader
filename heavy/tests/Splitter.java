@@ -53,6 +53,7 @@ public class Splitter
         }
         
         Main.options.setOption("kuromojiSupportLevel", "basic");
+        Segmenter.extended = true;
         
         words = splitter.split("彼女とどのように知りあったのかも覚えていない。",  new HashSet<>());
         for(FoundWord word : words)
