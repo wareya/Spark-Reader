@@ -108,6 +108,10 @@ public class Dictionary
                 userdictFilename = file.getAbsolutePath();
                 loadUserDict(file, DefSource.getSource("Custom"));
             }
+            else if(file.getName().endsWith(".tsv"))
+            {
+                loadSimpleDict(file);
+            }
         }
     }
     public boolean loadEpwing(File file)
@@ -145,6 +149,21 @@ public class Dictionary
         {
             //generate and insert definition
             UserDefinition definition = new UserDefinition(line, source);
+            insertDefinition(definition);
+            source.attach(definition);
+            line = reader.readLine();
+        }
+        System.out.println("loaded " + lookup.keySet().size() + " entries so far");
+    }
+    public void loadSimpleDict(File file)throws IOException
+    {
+        BufferedReader reader = Utils.UTF8Reader(file);
+        DefSource source = DefSource.getSource(reader.readLine());//first line is source
+        String line = reader.readLine();
+        while(line != null)
+        {
+            //generate and insert definition
+            SimpleDefinition definition = new SimpleDefinition(line, source);
             insertDefinition(definition);
             source.attach(definition);
             line = reader.readLine();

@@ -2,8 +2,6 @@ package tests.dictionary;
 
 import language.deconjugator.ValidWord;
 import language.dictionary.Definition;
-import main.Main;
-import options.BlacklistDef;
 import org.junit.Assert;
 import org.junit.Test;
 
