@@ -317,7 +317,7 @@ StdRule	こう	く	volitional	v5k_s	form_volition
 // irregulars
 ContextRuleTeTrap	し	する	(infinitive)	vs_i	stem_ren
 NeverFinalRule	し	する	(unstressed infinitive)	vs_i	stem_ren_less
-NeverFinalRule	し	する	(mizenkei)	vs_i	stem_mizenkei	
+NeverFinalRule	し	する	(mizenkei)	vs_i	stem_mizenkei
 // actually irregular itself but this will do for now
 
 NeverFinalRule	すれ	する	(izenkei)	vs_i	stem_e
@@ -380,7 +380,10 @@ StdRule	ろう	る	volitional	v4r	form_volition
 
 // enable deconjugation of bound noun+suru dictionary entries that might have archaic equivalents, like 冠する
 // only has an effect on the kuromoji backend, on the normal one the archaic equivalent doesn't cause problems
-StdRule	する	する		DefTag.vs_s	DefTag.vs_i
+StdRule	する	する		vs_s	vs_i
+// see https://ja.wikipedia.org/wiki/サ行変格活用#.E7.99.BA.E3.81.99.E3.82.8B.EF.BC.88.E5.8F.A3.E8.AA.9E.EF.BC.89
+StdRule	す	する	suru->su elision	vs_s	v5s
+
 badsegments:
 すっ
 たろ
