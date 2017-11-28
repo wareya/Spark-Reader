@@ -52,7 +52,7 @@ public class Underlay
                 else if(mode.equals("deconjugation:") || mode.equals("olddeconjugation:"))
                 {
                     ArrayList<DeconRule> targetRuleList = mode.equals("olddeconjugation:")?underlayOldDeconRules:underlayDeconRules;
-                    line = line.replaceFirst("//.*", "");
+                    line = line.replaceFirst("[ ]*//.*", "");
                     
                     String[] parts = line.split("\t");
                     if(parts.length <= 1) continue;
@@ -75,7 +75,7 @@ public class Underlay
                         
                     if(parts[0].equals("StdRule"))
                     {
-                        if(parts.length >= 6)
+                        if(parts.length >= 6 && !parts[5].equals(" ") && !parts[5].equals(""))
                             targetRuleList.add(new StdRule(parts[1], parts[2], parts[3], toTag(parts[4]), toTag(parts[5])));
                         else if(parts.length == 5)
                             targetRuleList.add(new StdRule(parts[1], parts[2], parts[3], toTag(parts[4])));

@@ -136,6 +136,7 @@ public class Main
             err.printStackTrace();
         }
         if(frame != null)frame.setVisible(false);
+        if(frame != null)frame.dispose(); // try to make spark reader less likely to hang during shutdown
         System.exit(0);
     }
 
