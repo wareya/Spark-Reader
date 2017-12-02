@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static language.dictionary.DefTag.toTag;
+import language.dictionary.DefTag;
 
 /**
  * Created by wareya on 2017/08/29.
@@ -40,6 +40,11 @@ public class Underlay
     }
     
     public static ArrayList<Heuristic> heuristics = new ArrayList<>();
+    
+    private static DefTag toTag(String text)
+    {
+        return DefTag.toTag(text.trim());
+    }
     
     public static void load(File file) throws IOException
     {
