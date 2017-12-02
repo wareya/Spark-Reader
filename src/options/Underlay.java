@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static language.dictionary.DefTag.toTag;
+import language.dictionary.DefTag;
 
 /**
  * Created by wareya on 2017/08/29.
@@ -23,6 +23,11 @@ public class Underlay
     public static ArrayList<String> fixupRelationsList = new ArrayList<>();
     public static ArrayList<DeconRule> underlayDeconRules = new ArrayList<>();
     public static ArrayList<DeconRule> underlayOldDeconRules = new ArrayList<>();
+    
+    private static DefTag toTag(String text)
+    {
+        return DefTag.toTag(text.trim());
+    }
     
     public static void load(File file) throws IOException
     {
